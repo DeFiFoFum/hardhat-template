@@ -6,10 +6,11 @@
   "scripts": {
     "prebuild": "yarn audit",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "hardhat compile",
-    "lint": "prettier --list-different 'contracts/**/*.sol'",
-    "lint:fix": "prettier --write 'contracts/**/*.sol'"
+    "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
+    "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
+    "test": "hardhat test",
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test"
   },
   "repository": {
     "type": "git",
