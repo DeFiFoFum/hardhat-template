@@ -9,6 +9,7 @@
     "compile": "hardhat compile",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
     "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
+    "lint:ci": "yarn lint:sol",
     "test": "hardhat test",
     "test:gas": "env ENABLE_GAS_REPORT=true yarn test",
     "test:ci": "yarn test",
