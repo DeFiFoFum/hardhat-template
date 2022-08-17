@@ -157,7 +157,9 @@ const config: HardhatUserConfig = {
     },
   },
   gasReporter: {
-    enabled: getEnv('REPORT_GAS') !== undefined,
+    // More options can be found here:
+    // https://www.npmjs.com/package/hardhat-gas-reporter
+    enabled: getEnv('REPORT_GAS') ? true : false,
     currency: "USD",
     excludeContracts: []
   },

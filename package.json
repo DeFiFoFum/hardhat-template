@@ -11,7 +11,7 @@
     "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
     "lint:ci": "yarn lint:sol",
     "test": "hardhat test",
-    "test:gas": "env ENABLE_GAS_REPORT=true yarn test",
+    "test:gas": "env REPORT_GAS=true yarn test",
     "test:coverage": "hardhat coverage",
     "test:ci": "yarn test",
     "list:networks": "hardhat verify --list-networks"

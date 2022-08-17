@@ -10,10 +10,11 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 ## Features
 - OpenZeppelin Contracts
 - Typescript
-  - Typechain: Generate smart contract typings for Ethers during compilation.
+  - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
 - Testing
-  - Coverage: Generate a coverage report by running `yarn test:coverage`
-  - Gas Reporting: Check the gas costs of running test transactions with `yarn test:gas`
+  - [solidity-coverage](https://www.npmjs.com/package/solidity-coverage): Generate a coverage report by running `yarn test:coverage`
+  - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
+    - _these tests run slower than `yarn test`_
 - Linting
   - [Prettier](https://prettier.io/): Most popular opinionated code formatter.
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)
