@@ -1,5 +1,10 @@
 import { ethers } from "hardhat";
 
+/**
+ * // NOTE: This is an example of the default hardhat deployment approach.
+ * This project takes deployments one step further by assigning each deployment 
+ * its own task in ../tasks/ organized by date.
+ */
 async function main() {
   const currentTimestampInSeconds = Math.round(Date.now() / 1000);
   const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;

@@ -8,16 +8,17 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 
 ## Features
-
-
+- OpenZeppelin Contracts
 - Typescript
-- Solidity Coverage
+  - Typechain: Generate smart contract typings for Ethers during compilation.
+- Testing
+  - Coverage: Generate a coverage report by running `yarn test:coverage`
+  - Gas Reporting: Check the gas costs of running test transactions with `yarn test:gas`
 - Linting
   - [Prettier](https://prettier.io/): Most popular opinionated code formatter.
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)
   - [Prettier Solidity plugin](https://www.npmjs.com/package/prettier-plugin-solidity): A Prettier plugin for automatically formatting your Solidity code.
   - [Solhint](https://www.npmjs.com/package/solhint): Open source project for linting Solidity code. This project provides both Security and Style Guide validations.
-- Typechain
 
 ## Deployment and Verification
 This project uses special tasks, adapted from Balancer protocol, to deploy and verify contracts which provides methods for saving custom outputs and easily verifying contracts as well as compartmentalizing different types of deployments.
@@ -26,6 +27,7 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
 - Copy [.env.example](./.env.example) and rename to `.env`
   - Provide the necessary `env` variables before deployment/verification.
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
+- Create a deployment task: See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task to deploy following the commands below
 
 ## Deployment 
 `npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`  
