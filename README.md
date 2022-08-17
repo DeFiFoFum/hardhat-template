@@ -1,6 +1,4 @@
-<img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="100px"> 
-
-# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_
+# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px"> 
 Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Waffle, Typechain and more. 
 
 
