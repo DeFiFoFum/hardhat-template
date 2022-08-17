@@ -1,17 +1,14 @@
 # Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px"> 
+<!-- FIXME: Update `DeFiFoFum/hardhat-template` based on current repo -->
+[![lint & test](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml/badge.svg)](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml)
+[![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
+[![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Waffle, Typechain and more. 
 
 
 ## Features
-<!-- TODO: 
-- [ ] Setup tsconfig.json so that a build will output contract artifacts and types 
-- [ ] Add scripts to enforce styling on commits
-- [ ] Network helpers? https://hardhat.org/hardhat-network-helpers/docs/reference 
-- [ ] Create a test-helper library to deploy a mock-dex and mock-farm
-- [ ] Coverage reporting
-- [ ] Add hardhat features to the features list below?
-- [ ] README.md how to create a new task (reference the readme.md in the template?)
--->
+
 
 - Typescript
 - Solidity Coverage
