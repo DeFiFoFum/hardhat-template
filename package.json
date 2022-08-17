@@ -1,17 +1,17 @@
 {
   "name": "hardhat-template",
   "version": "0.0.1",
-  "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Waffle, Typechain and more.",
+  "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "index.js",
   "scripts": {
-    "prebuild": "yarn audit",
+    "prebuild": "yarn audit && yarn lint:sol",
     "build": "tsc",
     "compile": "hardhat compile",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
     "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
     "test": "hardhat test",
-    "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
-    "list-networks": "hardhat verify --list-networks"
+    "test:gas": "env ENABLE_GAS_REPORT=true yarn test",
+    "list:networks": "hardhat verify --list-networks"
   },
   "repository": {
     "type": "git",
@@ -35,7 +35,6 @@
     "@nomicfoundation/hardhat-toolbox": "^1.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
-    "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@typechain/ethers-v5": "^10.1.0",
     "@typechain/hardhat": "^6.1.2",
     "@types/chai": "^4.2.0",
