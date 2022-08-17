@@ -5,11 +5,11 @@ import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 import { HardhatRuntimeEnvironment, NetworkUserConfig } from 'hardhat/types'
 
-import { getEnv } from './src/env'
-import test from './src/test'
+import { getEnv } from './src/utils/env'
+import test from './src/utils/test'
 import Task from './src/task'
-import Verifier from './src/verifier'
-import { Logger } from './src/logger'
+import Verifier from './src/evm/verifier'
+import { Logger } from './src/utils/logger'
 import { Network } from './src/types'
 
 /**

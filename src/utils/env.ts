@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import logger from './logger';
 
 export function getEnv(name: string, required = false): string {
     const value = process.env[name];
@@ -7,7 +8,7 @@ export function getEnv(name: string, required = false): string {
         if(required) {
             throw new Error(message);
         }
-        console.log(message);
+        logger.info(message);
         return '';
     } else {
         return value;
