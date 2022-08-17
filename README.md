@@ -8,7 +8,8 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 
 ## Features
-- OpenZeppelin Contracts
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
+  - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
 - Testing
