@@ -185,7 +185,7 @@ const parseApiKey = (network: Network, key?: string): string | undefined => {
 }
 
 /**
- * Placeholder configuration for 
+ * Placeholder configuration for @nomiclabs/hardhat-etherscan to store verification API urls
  */
 const verificationConfig: {etherscan: { apiKey: Record<Network, string>}} = {
   etherscan: {
