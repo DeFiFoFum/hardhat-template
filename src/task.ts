@@ -20,6 +20,7 @@ import {
   RawOutput,
   TaskRunOptions,
 } from './types';
+import { stripHexPrefix } from './utils';
 
 const TASKS_DIRECTORY = path.resolve(__dirname, '../tasks');
 
@@ -107,23 +108,27 @@ export default class Task {
   async deploy(name: string, args: Array<Param> = [], from?: SignerWithAddress, libs?: Libraries): Promise<Contract> {
     const instance = await deploy(this.artifact(name), args, from, libs);
     const constructorArgs = instance.interface.encodeDeploy(args);
-    this.save({ [name]: instance, [this._keyForContractArgs(name)]: constructorArgs });
+    this.save({ [name]: instance, [this._keyForContractArgs(name)]: stripHexPrefix(constructorArgs) });
     logger.success(`Deployed ${name} at ${instance.address}`);
     return instance;
   }
 
   async verify(
     name: string,
-    address: string,
+    address?: string,
     constructorArguments?: string | unknown[],
     libs?: Libraries
   ): Promise<void> {
     try {
       if (!this._verifier) return logger.warn('Skipping contract verification, no verifier defined');
+      const deployOutput = this.output();
       if(!constructorArguments) {
         logger.info('No constructorArguments passed for verification. Pulling from inputs.')
-        const deployOutput = this.output()
-        constructorArguments = deployOutput[this._keyForContractArgs(name)]
+        constructorArguments = stripHexPrefix(deployOutput[this._keyForContractArgs(name)])
+      }
+      if(!address) {
+        logger.info('No address passed for verification. Pulling from inputs.')
+        address = deployOutput[name];
       }
       const url = await this._verifier.call(this, name, address, constructorArguments, libs);
       logger.success(`Verified contract ${name} at ${url}`);

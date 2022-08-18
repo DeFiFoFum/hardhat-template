@@ -39,13 +39,13 @@ task('deploy', 'Run deployment task')
 /**
  * Verify contracts based on a directory ID in tasks/
  * 
- * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> --address <contract-address> 
- *  [--args <constructor-args --key <apiKey> --force --verbose]`
+ * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> 
+ *  [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`
  */
 task('verify-contract', 'Run verification for a given contract')
   .addParam('id', 'Deployment task ID')
   .addParam('name', 'Contract name')
-  .addParam('address', 'Contract address')
+  .addOptionalParam('address', 'Contract address')
   .addOptionalParam('args', 'ABI-encoded constructor arguments')
   .addOptionalParam('key', 'Etherscan API key to verify contracts')
   .setAction(
@@ -53,7 +53,7 @@ task('verify-contract', 'Run verification for a given contract')
       args: {
         id: string
         name: string
-        address: string
+        address?: string
         key?: string
         args?: string
         verbose?: boolean
@@ -68,7 +68,7 @@ task('verify-contract', 'Run verification for a given contract')
 
       await Task.fromHRE(args.id, hre, verifier).verify(
         args.name,
-        args.address, // TODO: Can make optional by pulling address from output
+        args.address,
         args.args
       )
     }
