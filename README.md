@@ -39,7 +39,7 @@ This will deploy the example task to `bscTestnet`:
 eg: `npx hardhat deploy --id 20220816-deploy-lock --network bscTestnet`  
 
 ## Verification
-`npx hardhat verify-contract --id <task-id> --network <network-name> --address <contract-address> [--args <constructor-args --key <apiKey> --force --verbose]`  
+`npx hardhat verify-contract --id <task-id> --network <network-name> [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`  
 
 This will verify the example task deployed to `bscTestnet`:  
 eg: `npx hardhat deploy --id 20220816-deploy-lock --network bscTestnet`  
