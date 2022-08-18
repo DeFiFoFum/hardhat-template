@@ -13,6 +13,7 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
 - Testing
+  - [VS-Code Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter): Use Mocha Test Explorer to easily choose which tests to run. (Smart Contracts must be manually compiled between updates.)
   - [solidity-coverage](https://www.npmjs.com/package/solidity-coverage): Generate a coverage report by running `yarn test:coverage`
   - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
     - _these tests run slower than `yarn test`_
