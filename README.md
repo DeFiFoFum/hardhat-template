@@ -4,7 +4,7 @@
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Waffle, Typechain and more. 
+Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more. 
 
 
 ## Features
