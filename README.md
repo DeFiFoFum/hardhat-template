@@ -14,6 +14,7 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
 - Testing
   - [VS-Code Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter): Use Mocha Test Explorer to easily choose which tests to run. (Smart Contracts must be manually compiled between updates.)
+  - Debug Solidity unit tests with [VS-Code debugger](https://code.visualstudio.com/docs/editor/debugging)
   - [solidity-coverage](https://www.npmjs.com/package/solidity-coverage): Generate a coverage report by running `yarn test:coverage`
   - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
     - _these tests run slower than `yarn test`_
@@ -22,6 +23,7 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)
   - [Prettier Solidity plugin](https://www.npmjs.com/package/prettier-plugin-solidity): A Prettier plugin for automatically formatting your Solidity code.
   - [Solhint](https://www.npmjs.com/package/solhint): Open source project for linting Solidity code. This project provides both Security and Style Guide validations.
+    - [solhint.config.ts](./solhint.config.js) is full featured and support Solidity style guide recommendations.
 
 ## Deployment and Verification
 This project uses special tasks, adapted from Balancer protocol, to deploy and verify contracts which provides methods for saving custom outputs and easily verifying contracts as well as compartmentalizing different types of deployments.
