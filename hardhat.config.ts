@@ -12,6 +12,7 @@ import Task from './src/task'
 import Verifier from './src/evm/verifier'
 import { Logger } from './src/utils/logger'
 import { Network } from './src/types'
+import solhintConfig from "./solhint.config"
 
 /**
  * Deploy contracts based on a directory ID in tasks/
@@ -39,7 +40,7 @@ task('deploy', 'Run deployment task')
 /**
  * Verify contracts based on a directory ID in tasks/
  * 
- * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> 
+ * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name>
  *  [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`
  */
 task('verify-contract', 'Run verification for a given contract')
@@ -148,7 +149,8 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
 }
 
 const config: HardhatUserConfig = {
-  solidity: '0.8.16',
+  // Storing this single source of truth in `solhint.config.js`
+  solidity: solhintConfig.rules['compiler-version'][1],
   networks: {
     ...networkConfig,
     hardhat: {
