@@ -28,9 +28,9 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
 
 **Configuration**
 - Copy [.env.example](./.env.example) and rename to `.env`
-  - Provide the necessary `env` variables before deployment/verification.
+  - Provide the necessary `env` variables before deployment/verification
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
-- Create a deployment task: See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task to deploy following the commands below
+- Create a deployment task (See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task), then deploy/verify following the commands below
 
 ## Deployment 
 `npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`  
