@@ -1,3 +1,5 @@
+const solhintConfig = require('./solhint.config')
+
 module.exports = {
   trailingComma: 'es5',
   tabWidth: 2,
@@ -8,7 +10,7 @@ module.exports = {
       // https://www.npmjs.com/package/prettier-plugin-solidity
       files: '*.sol',
       options: {
-        printWidth: 80,
+        printWidth: solhintConfig.rules['max-line-length'][1],
         tabWidth: 4,
         useTabs: false,
         singleQuote: false,
