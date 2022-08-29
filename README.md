@@ -8,8 +8,12 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 
 ## Features
+  <!-- - // TODO: https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades -->
+  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
+  <!-- - // TODO: https://www.npmjs.com/package/hardhat-contract-sizer -->
 - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
+- [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
 - Testing

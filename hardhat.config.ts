@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import 'solidity-coverage'
+import 'hardhat-docgen'
 
 import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
@@ -164,6 +165,11 @@ const config: HardhatUserConfig = {
     enabled: getEnv('REPORT_GAS') ? true : false,
     currency: "USD",
     excludeContracts: []
+  },
+  docgen: {
+    path: './docs',
+    clear: true,
+    runOnCompile: true,
   },
   etherscan: {
     /**
