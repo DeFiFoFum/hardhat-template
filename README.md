@@ -11,11 +11,14 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
   <!-- - // TODO: https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades -->
   <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
   <!-- - // TODO: https://www.npmjs.com/package/hardhat-contract-sizer -->
-- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
+- Contract Support
+  - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
-- [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
 - Typescript
-  - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during compilation.
+  - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during 
+- Docs
+  - [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
+compilation.
 - Testing
   - [VS-Code Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter): Use Mocha Test Explorer to easily choose which tests to run. (Smart Contracts must be manually compiled between updates.)
   - Debug Solidity unit tests with [VS-Code debugger](https://code.visualstudio.com/docs/editor/debugging)
