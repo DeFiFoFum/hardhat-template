@@ -3,7 +3,7 @@ import { RunSuperFunction, HardhatRuntimeEnvironment, HttpNetworkConfig, Hardhat
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
-export default async function (args: any, hre: HardhatRuntimeEnvironment, run: RunSuperFunction<any>): Promise<void> {
+export async function testRunner(args: any, hre: HardhatRuntimeEnvironment, run: RunSuperFunction<any>): Promise<void> {
   if (hre.network.name === 'hardhat' && !args.fork) await runNormalTests(args, hre, run);
   else if (hre.network.name === 'hardhat' && args.fork) await runForkTests(args, hre, run);
   else await runDeployTests(args, hre, run);

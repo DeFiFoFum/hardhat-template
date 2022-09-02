@@ -4,7 +4,7 @@
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "index.js",
   "scripts": {
-    "prebuild": "yarn audit && yarn lint:sol",
+    "prebuild": "yarn audit && yarn compile && yarn lint:sol",
     "build": "tsc",
     "compile": "hardhat compile",
     "gen:docs": "hardhat docgen",
