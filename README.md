@@ -1,5 +1,10 @@
 # Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px"> 
-<!-- FIXME: Update `DeFiFoFum/hardhat-template` based on current repo -->
+<!-- 
+  FIXME: Update `DeFiFoFum/hardhat-template` based on current repo 
+  1. Find All (CMD/CTRL + SHIFT + F)
+  2. Search for: DeFiFoFum/hardhat-template
+  3. Replace with <user>/<your-repo>
+  -->
 [![lint & test](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml/badge.svg)](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml)
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
