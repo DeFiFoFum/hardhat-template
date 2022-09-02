@@ -36,6 +36,7 @@ compilation.
   - [Prettier Solidity plugin](https://www.npmjs.com/package/prettier-plugin-solidity): A Prettier plugin for automatically formatting your Solidity code.
   - [Solhint](https://www.npmjs.com/package/solhint): Open source project for linting Solidity code. This project provides both Security and Style Guide validations.
     - [solhint.config.ts](./solhint.config.js) is full featured and support Solidity style guide recommendations.
+- [Build/Publish as NPM Package](#buildpublish-as-npm-package): This repo is setup to build important files into a publishable NPM package. (See below for more info)
 
 ## Deployment and Verification
 This project uses special tasks, adapted from Balancer protocol, to deploy and verify contracts which provides methods for saving custom outputs and easily verifying contracts as well as compartmentalizing different types of deployments.
@@ -78,3 +79,15 @@ Check solidity files:
   
 Fix Solidity files:  
 `yarn lint:sol:fix`  
+
+## Build/Publish as NPM Package
+Currently this repo is setup to `include`: 
+- `src/`, 
+- `artifacts` (Created after `yarn compile`)
+- `typechain-types` (Created after `yarn compile`)
+
+- `yarn build`: Build files into `./dist` directory
+- [tsconfig.json](./tsconfig.json): 
+  - `include`: Use this field to include additional files in the build output
+  - `exclude`: Use this field to exclude files from the build output
+
