@@ -99,7 +99,7 @@ export default class Task {
       await this.verify(name, instance.address, args, libs);
       return instance;
     } else {
-      logger.info(`${name} already deployed at ${output[name]}`);
+      logger.warn(`${name} already deployed at ${output[name]}`);
       await this.verify(name, output[name], args, libs);
       return this.instanceAt(name, output[name]);
     }

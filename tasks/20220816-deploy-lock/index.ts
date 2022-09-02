@@ -1,5 +1,4 @@
-import Task from '../../src/task';
-import { TaskRunOptions } from '../../src/types';
+import { Task, TaskRunOptions}  from '../../hardhat'
 import { DeploymentInputs } from './input';
 
 function getTimestampInSeconds (offset = 0) {

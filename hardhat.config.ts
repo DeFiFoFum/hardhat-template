@@ -7,12 +7,8 @@ import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 import { HardhatRuntimeEnvironment, NetworkUserConfig } from 'hardhat/types'
 
-import { getEnv } from './src/utils/env'
-import test from './src/utils/test'
-import Task from './src/task'
-import Verifier from './src/evm/verifier'
-import { Logger } from './src/utils/logger'
-import { Network } from './src/types'
+import { Task, Verifier, Network } from './hardhat'
+import { getEnv, Logger, testRunner } from './hardhat/utils'
 import solhintConfig from "./solhint.config"
 
 /**
@@ -92,7 +88,7 @@ task(TASK_TEST)
     undefined,
     types.int
   )
-  .setAction(test)
+  .setAction(testRunner)
 
 export const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
 export const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
