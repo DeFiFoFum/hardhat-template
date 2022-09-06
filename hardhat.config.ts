@@ -167,6 +167,13 @@ const config: HardhatUserConfig = {
     clear: true,
     runOnCompile: true,
   },
+  typechain: {
+    // outDir: 'src/types', // defaults to './typechain-types/'
+    target: 'ethers-v5',
+    // externalArtifacts: [], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
+    alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
+    dontOverrideCompile: false // defaults to false
+  },
   etherscan: {
     /**
      * // NOTE This is valid in the latest version of "@nomiclabs/hardhat-etherscan.
