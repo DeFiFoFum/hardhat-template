@@ -75,11 +75,16 @@ task('verify-contract', 'Run verification for a given contract')
 /**
  * Example of accessing ethers and performing Web3 calls inside a task
  * task action function receives the Hardhat Runtime Environment as second argument
+ * 
+ * Docs regarding hardhat helper functions added to ethers object:
+ * https://github.com/NomicFoundation/hardhat/tree/master/packages/hardhat-ethers#helpers
  */ 
 task(
   "blockNumber",
   "Prints the current block number",
   async (_, hre: HardhatRuntimeEnvironment) => {
+    // A provider field is added to ethers, which is an 
+    //   ethers.providers.Provider automatically connected to the selected network
     await hre.ethers.provider.getBlockNumber().then((blockNumber) => {
       console.log("Current block number: " + blockNumber);
     });

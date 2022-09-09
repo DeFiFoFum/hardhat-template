@@ -2,8 +2,12 @@
   "name": "@defifofum/hardhat-template",
   "version": "0.0.2",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "postinstall": "hardhat",
     "prebuild": "yarn audit && yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
     "precompile": "yarn clean ./artifacts",
@@ -12,7 +16,7 @@
     "test": "hardhat test",
     "test:gas": "env REPORT_GAS=true yarn test",
     "test:coverage": "hardhat coverage",
-    "test:ci": "yarn test",
+    "test:ci": "yarn compile && yarn test",
     "lint": "yarn lint:sol",
     "lint:fix": "yarn lint:sol:fix",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
