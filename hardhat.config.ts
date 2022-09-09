@@ -73,6 +73,20 @@ task('verify-contract', 'Run verification for a given contract')
   )
 
 /**
+ * Example of accessing ethers and performing Web3 calls inside a task
+ * task action function receives the Hardhat Runtime Environment as second argument
+ */ 
+task(
+  "blockNumber",
+  "Prints the current block number",
+  async (_, hre: HardhatRuntimeEnvironment) => {
+    await hre.ethers.provider.getBlockNumber().then((blockNumber) => {
+      console.log("Current block number: " + blockNumber);
+    });
+  }
+);
+
+/**
  * Provide additional fork testing options
  * 
  * eg: `npx hardhat test --fork <network-name> --blockNumber <block-number>`
