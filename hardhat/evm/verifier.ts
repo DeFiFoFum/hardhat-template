@@ -31,7 +31,7 @@ import EtherscanResponse, {
 import * as parser from '@solidity-parser/parser';
 
 import Task from '../task';
-import logger from '../utils/logger';
+import { logger } from '../utils/logger';
 
 const MAX_VERIFICATION_INTENTS = 3;
 

@@ -8,15 +8,15 @@ import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 import { HardhatRuntimeEnvironment, NetworkUserConfig } from 'hardhat/types'
 
 import { Task, Verifier, Network } from './hardhat'
-import { getEnv, Logger, testRunner } from './hardhat/utils'
-import solhintConfig from "./solhint.config"
+import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
+import solhintConfig from './solhint.config'
 
 /**
  * Deploy contracts based on a directory ID in tasks/
- * 
+ *
  * `npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`
  */
-task('deploy', 'Run deployment task')
+task('deploy', '🫶 Run deployment task')
   .addParam('id', 'Deployment task ID')
   .addFlag('force', 'Ignore previous deployments')
   .addOptionalParam('key', 'Etherscan API key to verify contracts')
@@ -26,21 +26,19 @@ task('deploy', 'Run deployment task')
       hre: HardhatRuntimeEnvironment
     ) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key);
-      const verifier = key
-        ? new Verifier(hre.network, key)
-        : undefined
+      const key = parseApiKey(hre.network.name as Network, args.key)
+      const verifier = key ? new Verifier(hre.network, key) : undefined
       await Task.fromHRE(args.id, hre, verifier).run(args)
     }
   )
 
 /**
  * Verify contracts based on a directory ID in tasks/
- * 
+ *
  * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name>
  *  [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`
  */
-task('verify-contract', 'Run verification for a given contract')
+task('verify-contract', '🫶 Run verification for a given contract')
   .addParam('id', 'Deployment task ID')
   .addParam('name', 'Contract name')
   .addOptionalParam('address', 'Contract address')
@@ -59,10 +57,8 @@ task('verify-contract', 'Run verification for a given contract')
       hre: HardhatRuntimeEnvironment
     ) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key);
-      const verifier = key
-        ? new Verifier(hre.network, key)
-        : undefined
+      const key = parseApiKey(hre.network.name as Network, args.key)
+      const verifier = key ? new Verifier(hre.network, key) : undefined
 
       await Task.fromHRE(args.id, hre, verifier).verify(
         args.name,
@@ -72,31 +68,42 @@ task('verify-contract', 'Run verification for a given contract')
     }
   )
 
+task('print-tasks', '🫶 Prints available tasks in tasks/ directory').setAction(
+  async (args: { verbose?: boolean }) => {
+    Logger.setDefaults(false, args.verbose || false)
+    logger.log(
+      `Use the following tasks in a variety of ways \nnpx hardhat deploy --id <task-id> --network <network-name> \nnpx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name> \n`,
+      `🫶`
+    )
+    Task.printAllTask()
+  }
+)
+
 /**
  * Example of accessing ethers and performing Web3 calls inside a task
  * task action function receives the Hardhat Runtime Environment as second argument
- * 
+ *
  * Docs regarding hardhat helper functions added to ethers object:
  * https://github.com/NomicFoundation/hardhat/tree/master/packages/hardhat-ethers#helpers
- */ 
+ */
 task(
-  "blockNumber",
-  "Prints the current block number",
+  'blockNumber',
+  '🫶 Prints the current block number',
   async (_, hre: HardhatRuntimeEnvironment) => {
-    // A provider field is added to ethers, which is an 
+    // A provider field is added to ethers, which is an
     //   ethers.providers.Provider automatically connected to the selected network
     await hre.ethers.provider.getBlockNumber().then((blockNumber) => {
-      console.log("Current block number: " + blockNumber);
-    });
+      console.log('Current block number: ' + blockNumber)
+    })
   }
-);
+)
 
 /**
  * Provide additional fork testing options
- * 
+ *
  * eg: `npx hardhat test --fork <network-name> --blockNumber <block-number>`
  */
-task(TASK_TEST)
+task(TASK_TEST, '🫶 Test Task')
   .addOptionalParam(
     'fork',
     'Optional network name to be forked block number to fork in case of running fork tests.'
@@ -146,7 +153,8 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
     },
   },
   polygon: {
-    url: getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
+    url:
+      getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
     chainId: 137,
     accounts: {
       mnemonic: mainnetMnemonic,
@@ -154,7 +162,7 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
   },
   polygonTestnet: {
     url:
-    getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
+      getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
     chainId: 80001,
     accounts: {
       mnemonic: testnetMnemonic,
@@ -178,8 +186,8 @@ const config: HardhatUserConfig = {
     // More options can be found here:
     // https://www.npmjs.com/package/hardhat-gas-reporter
     enabled: getEnv('REPORT_GAS') ? true : false,
-    currency: "USD",
-    excludeContracts: []
+    currency: 'USD',
+    excludeContracts: [],
   },
   docgen: {
     path: './docs',
@@ -191,7 +199,7 @@ const config: HardhatUserConfig = {
     target: 'ethers-v5',
     // externalArtifacts: [], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
-    dontOverrideCompile: false // defaults to false
+    dontOverrideCompile: false, // defaults to false
   },
   etherscan: {
     /**
@@ -217,7 +225,7 @@ const parseApiKey = (network: Network, key?: string): string | undefined => {
 /**
  * Placeholder configuration for @nomiclabs/hardhat-etherscan to store verification API urls
  */
-const verificationConfig: {etherscan: { apiKey: Record<Network, string>}} = {
+const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
   etherscan: {
     apiKey: {
       hardhat: 'NO_API_KEY',
@@ -227,8 +235,8 @@ const verificationConfig: {etherscan: { apiKey: Record<Network, string>}} = {
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
-    }
-  }
+    },
+  },
 }
 
 export default config

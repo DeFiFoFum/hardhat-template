@@ -4,7 +4,7 @@ import { BuildInfo, CompilerOutputContract, HardhatRuntimeEnvironment } from 'ha
 import { BigNumber, Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-import logger from './utils/logger';
+import { logger } from './utils/logger';
 import Verifier from './evm/verifier';
 import { deploy, instanceAt } from './evm/contracts';
 
@@ -34,6 +34,19 @@ export default class Task {
 
   static fromHRE(id: string, hre: HardhatRuntimeEnvironment, verifier?: Verifier): Task {
     return new this(id, hre.network.name as Network, verifier);
+  }
+
+  static getAllTasks(): string[] {
+    return this._getAllDirs(TASKS_DIRECTORY)
+  }
+
+  static printAllTask() {
+    const taskNames = this.getAllTasks();
+    logger.log(`Available Tasks:`, `🚀`)
+    for (const taskName of taskNames) {
+      logger.log(`${taskName}:`, `➡️`)
+
+    }
   }
 
   static forTest(id: string, network: Network, outputTestFile = 'test'): Task {
@@ -163,7 +176,7 @@ export default class Task {
     const buildInfoDir = this._dirAt(this.dir(), 'build-info');
     const builds: {
       [sourceName: string]: { [contractName: string]: CompilerOutputContract };
-    } = this._existsFile(path.join(buildInfoDir, `${fileName || contractName}.json`))
+    } = Task._existsFile(path.join(buildInfoDir, `${fileName || contractName}.json`))
       // If build info file exists, use it
       ? this.buildInfo(contractName).output.contracts
       // Otherwise pull in all build info files and reduce each contract into a single object
@@ -249,22 +262,28 @@ export default class Task {
 
   private _fileAt(base: string, name: string, ensure = true): string {
     const filePath = path.join(base, name);
-    if (ensure && !this._existsFile(filePath)) throw Error(`Could not find a file at ${filePath}`);
+    if (ensure && !Task._existsFile(filePath)) throw Error(`Could not find a file at ${filePath}`);
     return filePath;
   }
 
   private _dirAt(base: string, name: string, ensure = true): string {
     const dirPath = path.join(base, name);
-    if (ensure && !this._existsDir(dirPath)) throw Error(`Could not find a directory at ${dirPath}`);
+    if (ensure && !Task._existsDir(dirPath)) throw Error(`Could not find a directory at ${dirPath}`);
     return dirPath;
   }
 
-  private _existsFile(filePath: string): boolean {
+  private static _existsFile(filePath: string): boolean {
     return fs.existsSync(filePath) && fs.statSync(filePath).isFile();
   }
 
-  private _existsDir(dirPath: string): boolean {
+  private static _existsDir(dirPath: string): boolean {
     return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory();
+  }
+
+  private static _getAllDirs(dirPath: string): string[] {
+    return fs.readdirSync(dirPath).filter((file) => {
+      return this._existsDir(dirPath + '/' + file)
+    })
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
