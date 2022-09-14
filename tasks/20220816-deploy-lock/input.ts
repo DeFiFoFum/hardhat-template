@@ -4,7 +4,7 @@ export type DeploymentInputs = {
   unlockTime: number
 }
 
-const DEFAULT_UNLOCK = 100;
+const DEFAULT_UNLOCK = 100
 
 const deploymentInputs: Record<Network, DeploymentInputs> = {
   mainnet: {
