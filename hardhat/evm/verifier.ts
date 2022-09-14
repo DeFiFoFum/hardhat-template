@@ -321,13 +321,20 @@ export default class Verifier {
   private getAbsoluteSourcePath(
     relativeSourcePath: string,
     input: CompilerInput
-  ): string {
-    // We're not actually converting from relative to absolute but rather guessing: we'll extract the filename from the
-    // relative path, and then look for a source name in the inputs that matches it.
-    const contractName = (
-      relativeSourcePath.match(/.*\/(\w*)\.sol/) as RegExpMatchArray
-    )[1]
-    return this.getContractSourceName(contractName, input)
+  ): string | undefined {
+    try {
+      // We're not actually converting from relative to absolute but rather guessing: we'll extract the filename from the
+      // relative path, and then look for a source name in the inputs that matches it.
+      const contractName = (
+        relativeSourcePath.match(/.*\/(\w*)\.sol/) as RegExpMatchArray
+      )[1]
+      return this.getContractSourceName(contractName, input)
+    } catch (error) {
+      logger.error(
+        `No Solidity contract source found for relativeSourcePath: ${relativeSourcePath}. Consider updating build-info.`
+      )
+      return undefined
+    }
   }
 
   private getContractSourceName(
@@ -357,7 +364,10 @@ export default class Verifier {
         // Imported paths might be relative, so we convert them to absolute
         const importedSourceName = this.getAbsoluteSourcePath(node.path, input)
 
-        if (!previousSourceNames.has(importedSourceName)) {
+        if (
+          importedSourceName &&
+          !previousSourceNames.has(importedSourceName)
+        ) {
           // New source!
           previousSourceNames = this.getContractImportedSourceNames(
             importedSourceName,
