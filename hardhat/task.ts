@@ -52,7 +52,7 @@ export default class Task {
     const taskNames = this.getAllTasks()
     logger.log(`Available Tasks:`, `🚀`)
     for (const taskName of taskNames) {
-      logger.log(`${taskName}:`, `➡️`)
+      logger.log(`${taskName}`, `➡️`)
     }
   }
 
