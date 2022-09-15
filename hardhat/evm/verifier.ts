@@ -323,17 +323,21 @@ export default class Verifier {
     input: CompilerInput
   ): string | undefined {
     try {
-      // We're not actually converting from relative to absolute but rather guessing: we'll extract the filename from the
-      // relative path, and then look for a source name in the inputs that matches it.
+      /**
+       * This regular expression pulls out the name of a Solidity contract given a path.
+       * This supports dashes `-` in the name to support `draft-IERC20Permit.sol`
+       *
+       * Play around with the regex below: https://regexr.com/
+       */
       const contractName = (
-        relativeSourcePath.match(/.*\/(\w*)\.sol/) as RegExpMatchArray
+        relativeSourcePath.match(/.*\/((\w|-)*)\.sol/) as RegExpMatchArray
       )[1]
       return this.getContractSourceName(contractName, input)
     } catch (error) {
       logger.error(
-        `No Solidity contract source found for relativeSourcePath: ${relativeSourcePath}. Consider updating build-info.`
+        `No Solidity contract source found for relativeSourcePath: ${relativeSourcePath}. Consider updating build-info or checking regular expression in getAbsoluteSourcePath.`
       )
-      return undefined
+      throw new Error(error)
     }
   }
 
