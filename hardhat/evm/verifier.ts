@@ -334,10 +334,9 @@ export default class Verifier {
       )[1]
       return this.getContractSourceName(contractName, input)
     } catch (error) {
-      logger.error(
+      throw new Error(
         `No Solidity contract source found for relativeSourcePath: ${relativeSourcePath}. Consider updating build-info or checking regular expression in getAbsoluteSourcePath.`
       )
-      throw new Error(error)
     }
   }
 
