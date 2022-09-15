@@ -44,6 +44,8 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
 **Configuration**
 - Copy [.env.example](./.env.example) and rename to `.env`
   - Provide the necessary `env` variables before deployment/verification
+  - `_MNEMONIC` for deployments
+  - `_API_KEY` for verifications
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
 - Create a deployment task (See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task), then deploy/verify following the commands below
 
