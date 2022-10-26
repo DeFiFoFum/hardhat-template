@@ -205,10 +205,12 @@ export default class Task {
   }
 
   buildInfos(): Array<BuildInfo> {
+    const BUILD_INFO_IGNORE_FILES = ['.gitkeep']
     const buildInfoDir = this._dirAt(this.dir(), 'build-info')
-    return fs
+    const filteredFiles = fs
       .readdirSync(buildInfoDir)
-      .map((fileName) => this.buildInfo(fileName))
+      .filter((fileName) => !BUILD_INFO_IGNORE_FILES.includes(fileName))
+    return filteredFiles.map((fileName) => this.buildInfo(fileName))
   }
 
   artifact(contractName: string, fileName?: string): Artifact {
