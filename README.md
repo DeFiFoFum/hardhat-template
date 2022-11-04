@@ -47,6 +47,7 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
   - `_MNEMONIC` for deployments
   - `_API_KEY` for verifications
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
+  - [hardhat/types.ts](./hardhat/types.ts): Holds network typings which can be updated with more networks.
 - Create a deployment task (See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task), then deploy/verify following the commands below
 
 ## Deployment 
@@ -72,15 +73,15 @@ To list the available networks for verification run the command below. API keys 
 ## Linting
 This project uses Prettier, an opinionated code formatter, to keep code styles consistent. This project has additional plugins for Solidity support as well. 
 
+- `yarn lint`: Check Solidity files & TS/JS files
+- `yarn lint:fix`: Fix Solidity files & TS/JS files
+
 ### Linting Solidity Code
 - [prettier.config.js](./prettier.config.js): Provide config settings for Solidity under `overrides`.
 - [.solhint.json](./.solhint.json): Provide config settings for `solhint`.  
 
-Check solidity files:  
-`yarn lint:sol`  
-  
-Fix Solidity files:  
-`yarn lint:sol:fix`  
+- `yarn lint:sol`: Check Solidity files
+- `yarn lint:sol:fix`: Fix Solidity files
 
 ## Build/Publish as NPM Package
 Currently this repo is setup to `include`: 
