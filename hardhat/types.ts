@@ -6,10 +6,7 @@ import Task from './task'
 
 export const NETWORKS = <const>[
   'mainnet',
-  'ropsten',
-  // 'goerli',
-  // 'rinkeby',
-  // 'kovan',
+  'goerli',
   'bsc',
   'bscTestnet',
   'polygon',

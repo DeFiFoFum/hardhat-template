@@ -5,7 +5,7 @@ import 'hardhat-docgen'
 
 import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
-import { HardhatRuntimeEnvironment, NetworkUserConfig } from 'hardhat/types'
+import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig } from 'hardhat/types'
 
 import { Task, Verifier, Network } from './hardhat'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
@@ -119,25 +119,30 @@ task(TASK_TEST, '🫶 Test Task')
 export const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
 export const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
 
-const networkConfig: Record<Network, NetworkUserConfig> = {
+interface NetworkUserConfigExtended extends HttpNetworkUserConfig {
+  getExplorerUrl: (address: string) => string;
+}
+
+const networkConfig: Record<Network, NetworkUserConfigExtended> = {
   mainnet: {
-    // TODO: Add default network url
     url: getEnv('MAINNET_RPC_URL') || '',
+    getExplorerUrl: (address: string) => `https://etherscan.io/address/${address}`,
     chainId: 1,
     accounts: {
       mnemonic: mainnetMnemonic,
     },
   },
-  ropsten: {
-    // TODO: Add default network url
-    url: getEnv('ROPSTEN_RPC_URL') || '',
-    chainId: 3,
+  goerli: {
+    url: getEnv('GOERLI') || '',
+    getExplorerUrl: (address: string) => `https://goerli.etherscan.io/address/${address}`,
+    chainId: 5,
     accounts: {
       mnemonic: testnetMnemonic,
     },
   },
   bsc: {
     url: getEnv('BSC_RPC_URL') || 'https://bsc-dataseed1.binance.org',
+    getExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
     chainId: 56,
     accounts: {
       mnemonic: mainnetMnemonic,
@@ -147,6 +152,7 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
     url:
       getEnv('BSC_TESTNET_RPC_URL') ||
       'https://data-seed-prebsc-1-s1.binance.org:8545',
+    getExplorerUrl: (address: string) => `https://testnet.bscscan.com/address/${address}`,
     chainId: 97,
     accounts: {
       mnemonic: testnetMnemonic,
@@ -155,6 +161,7 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
   polygon: {
     url:
       getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
+    getExplorerUrl: (address: string) => `https://polygonscan.com/address/${address}`,
     chainId: 137,
     accounts: {
       mnemonic: mainnetMnemonic,
@@ -163,13 +170,16 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
   polygonTestnet: {
     url:
       getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
+    getExplorerUrl: (address: string) => `https://mumbai.polygonscan.com/address/${address}`,
     chainId: 80001,
     accounts: {
       mnemonic: testnetMnemonic,
     },
   },
   // Placeholder for the configuration below.
-  hardhat: {},
+  hardhat: {
+    getExplorerUrl: (address: string) => `(NO DEV EXPLORER): ${address}`,
+  },
 }
 
 const config: HardhatUserConfig = {
@@ -192,7 +202,8 @@ const config: HardhatUserConfig = {
   docgen: {
     path: './docs',
     clear: true,
-    runOnCompile: true,
+    // TODO: Enable for each compile
+    runOnCompile: false,
   },
   typechain: {
     // outDir: 'src/types', // defaults to './typechain-types/'
@@ -230,7 +241,7 @@ const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
     apiKey: {
       hardhat: 'NO_API_KEY',
       mainnet: getEnv('ETHERSCAN_API_KEY'),
-      ropsten: getEnv('ETHERSCAN_API_KEY'),
+      goerli: getEnv('ETHERSCAN_API_KEY'),
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
