@@ -45,21 +45,21 @@ export function formatBNValueToString(value: any) {
  *
  * @param {*} bnToCheck BN or string of the value to check
  * @param {*} bnExpected BN or string of the value to compare against
- * @param {*} tolerancePercentage Percentage to add/subtract from expected value to check tolerance
+ * @param {*} tolerancePercentage (1% = 1e4) Percentage to add/subtract from expected value to check tolerance
  * @returns boolean
  */
 export function isWithinLimit(
   bnToCheck: BigNumberish,
   bnExpected: BigNumberish,
-  tolerancePercentage = 2
+  tolerancePercentage = 1e4
 ) {
   bnToCheck = BigNumber.from(bnToCheck)
   bnExpected = BigNumber.from(bnExpected)
   const tolerance = bnExpected
     .mul(BigNumber.from(tolerancePercentage))
-    .div(BigNumber.from(100))
+    .div(BigNumber.from(1e6))
   let withinTolerance = true
-  if (bnToCheck.gte(bnExpected.add(tolerance))) {
+  if (bnToCheck.gt(bnExpected.add(tolerance))) {
     console.error(
       `bnHelper::isWithinLimit - ${bnToCheck.toString()} gte upper tolerance limit of ${tolerancePercentage}% to a value of ${bnExpected
         .add(tolerance)
@@ -68,7 +68,7 @@ export function isWithinLimit(
     withinTolerance = false
   }
 
-  if (bnToCheck.lte(bnExpected.sub(tolerance))) {
+  if (bnToCheck.lt(bnExpected.sub(tolerance))) {
     console.error(
       `bnHelper::isWithinLimit - ${bnToCheck.toString()} lte lower tolerance limit of ${tolerancePercentage}% to a value of ${bnExpected
         .sub(tolerance)
@@ -81,7 +81,7 @@ export function isWithinLimit(
 }
 
 /**
- * Check that a BN/BN String is within a percentage tolerance of another big number
+ * Check that a BN/BN String is within a range of another big number.
  *
  * @param {*} bnToCheck BN or string of the value to check
  * @param {*} bnExpected BN or string of the value to compare against
