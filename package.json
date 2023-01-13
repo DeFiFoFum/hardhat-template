@@ -43,7 +43,8 @@
   "resolutions": {
     "got": "^11.8.5",
     "node-fetch": "^2.6.7",
-    "minimatch": "^3.0.5"
+    "minimatch": "^3.0.5",
+    "flat": "^5.0.1"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
