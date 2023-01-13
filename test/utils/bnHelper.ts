@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish } from 'ethers';
 
 export function addBNStr(a: BigNumberish, b: BigNumberish) {
-  return (BigNumber.from(a).add(BigNumber.from(a))).toString();
+  return (BigNumber.from(a).add(BigNumber.from(b))).toString();
 }
 
 export function subBNStr(a: BigNumberish, b: BigNumberish) {
