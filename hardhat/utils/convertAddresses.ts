@@ -1,3 +1,10 @@
+export const isAddress = (address?: string) =>
+  address
+    ? address.length === 42 && address.slice(0, 2) === '0x'
+      ? true
+      : false
+    : false
+
 /**
  * Iterates through an object and converts any address strings to block explorer links passed
  *
@@ -19,7 +26,7 @@ export function convertAddressesToExplorerLinks(
   ) {
     Object.keys(_addressObject).forEach((key) => {
       const value = _addressObject[key]
-      if (typeof value === 'object' && value !== null) {
+      if (isAddress(value)) {
         _convertAddressesToExplorerLinks(value, _getLink, _detailedInfo)
       } else if (typeof value === 'string') {
         // Check if value is an address

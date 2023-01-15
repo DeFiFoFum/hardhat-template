@@ -11,6 +11,7 @@
     "prebuild": "yarn audit && yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
     "precompile": "yarn clean ./artifacts",
+    "precommit": "yarn lint:fix",
     "compile": "hardhat compile",
     "gen:docs": "hardhat docgen",
     "deploy": "hardhat deploy",
