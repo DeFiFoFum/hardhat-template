@@ -1,4 +1,9 @@
-import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
+/**
+ * hardhat-network-helpers:
+ * `mine`: Increase block height
+ * `time`: Adjust block timestamp
+ */
+import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 /**
  * hardhat-chai-matchers reference
  * https://hardhat.org/hardhat-chai-matchers/docs/reference
