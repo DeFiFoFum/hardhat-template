@@ -23,11 +23,7 @@ export function divBNStr(a: BigNumberish, b: BigNumberish) {
  * @returns All values are converted to a string
  */
 export function formatBNValueToString(value: any) {
-  if (
-    typeof value === 'string' ||
-    typeof value == 'number' ||
-    (value as BigNumber)._isBigNumber
-  ) {
+  if (typeof value === 'string' || typeof value == 'number' || (value as BigNumber)._isBigNumber) {
     return value.toString()
   } else if (typeof value === 'object') {
     // Functions with multiple returns can't be updated. A new object is used instead.
@@ -48,16 +44,10 @@ export function formatBNValueToString(value: any) {
  * @param {*} tolerancePercentage (1% = 1e4) Percentage to add/subtract from expected value to check tolerance
  * @returns boolean
  */
-export function isWithinLimit(
-  bnToCheck: BigNumberish,
-  bnExpected: BigNumberish,
-  tolerancePercentage = 1e4
-) {
+export function isWithinLimit(bnToCheck: BigNumberish, bnExpected: BigNumberish, tolerancePercentage = 1e4) {
   bnToCheck = BigNumber.from(bnToCheck)
   bnExpected = BigNumber.from(bnExpected)
-  const tolerance = bnExpected
-    .mul(BigNumber.from(tolerancePercentage))
-    .div(BigNumber.from(1e6))
+  const tolerance = bnExpected.mul(BigNumber.from(tolerancePercentage)).div(BigNumber.from(1e6))
   let withinTolerance = true
   if (bnToCheck.gt(bnExpected.add(tolerance))) {
     console.error(
@@ -88,11 +78,7 @@ export function isWithinLimit(
  * @param {*} tolerance Wei amount within limits
  * @returns boolean
  */
-export function isWithinWeiLimit(
-  bnToCheck: BigNumberish,
-  bnExpected: BigNumberish,
-  tolerance = BigNumber.from(0)
-) {
+export function isWithinWeiLimit(bnToCheck: BigNumberish, bnExpected: BigNumberish, tolerance = BigNumber.from(0)) {
   bnToCheck = BigNumber.from(bnToCheck)
   bnExpected = BigNumber.from(bnExpected)
   let withinTolerance = true

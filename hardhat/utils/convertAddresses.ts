@@ -1,9 +1,5 @@
 export const isAddress = (address?: string) =>
-  address
-    ? address.length === 42 && address.slice(0, 2) === '0x'
-      ? true
-      : false
-    : false
+  address ? (address.length === 42 && address.slice(0, 2) === '0x' ? true : false) : false
 
 /**
  * Iterates through an object and converts any address strings to block explorer links passed
@@ -45,9 +41,5 @@ export function convertAddressesToExplorerLinks(
     return _addressObject
   }
   const addrObjDeepCopy = JSON.parse(JSON.stringify(addressObject))
-  return _convertAddressesToExplorerLinks(
-    addrObjDeepCopy,
-    getLink,
-    detailedInfo
-  )
+  return _convertAddressesToExplorerLinks(addrObjDeepCopy, getLink, detailedInfo)
 }

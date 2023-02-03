@@ -94,3 +94,7 @@ Currently this repo is setup to `include`:
   - `include`: Use this field to include additional files in the build output
   - `exclude`: Use this field to exclude files from the build output
 
+## Gotchas
+1. Put single quotes around globs in `package.json`: 
+   - `"lint:ts": "prettier --check './{scripts,tasks,src,hardhat,test}/**/*.ts'"`
+
