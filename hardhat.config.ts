@@ -176,6 +176,24 @@ const networkConfig: Record<Network, NetworkUserConfigExtended> = {
       mnemonic: testnetMnemonic,
     },
   },
+  telos: {
+    url:
+      getEnv('TELOS_RPC_URL') || 'https://mainnet.telos.net/evm',
+    getExplorerUrl: (address: string) => `https://www.teloscan.io/address/${address}`,
+    chainId: 40,
+    accounts: {
+      mnemonic: testnetMnemonic,
+    },
+  },
+  telosTestnet: {
+    url:
+      getEnv('TELOS_TESTNET_RPC_URL') || 'https://testnet.telos.net/evm',
+    getExplorerUrl: (address: string) => `https://testnet.teloscan.io/address/${address}`,
+    chainId: 41,
+    accounts: {
+      mnemonic: testnetMnemonic,
+    },
+  },
   // Placeholder for the configuration below.
   hardhat: {
     getExplorerUrl: (address: string) => `(NO DEV EXPLORER): ${address}`,
@@ -246,6 +264,9 @@ const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
+      // NOTE: I don't believe TELOS verification is supported
+      telos: getEnv('TELOSSCAN_API_KEY'),
+      telosTestnet: getEnv('TELOSSCAN_API_KEY_API_KEY'),
     },
   },
 }

@@ -14,6 +14,8 @@
         "Numberish",
         "POLYGONSCAN",
         "precommit",
+        "telos",
+        "TELOSSCAN",
         "WBNB"
     ]
 }
