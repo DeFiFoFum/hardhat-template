@@ -16,7 +16,6 @@ module.exports = {
         useTabs: false,
         singleQuote: false,
         bracketSpacing: false,
-        explicitTypes: 'always',
       },
     },
   ],
