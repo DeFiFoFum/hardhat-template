@@ -133,9 +133,25 @@ const networkConfig: Record<Network, NetworkUserConfigExtended> = {
     },
   },
   goerli: {
-    url: getEnv('GOERLI') || '',
+    url: getEnv('GOERLI_RPC_URL') || '',
     getExplorerUrl: (address: string) => `https://goerli.etherscan.io/address/${address}`,
     chainId: 5,
+    accounts: {
+      mnemonic: testnetMnemonic,
+    },
+  },
+  arbitrum: {
+    url: getEnv('ARBITRUM_RPC_URL') || '',
+    getExplorerUrl: (address: string) => `https://arbiscan.io/address/${address}`,
+    chainId: 42161,
+    accounts: {
+      mnemonic: mainnetMnemonic,
+    },
+  },
+  arbitrumGoerli: {
+    url: getEnv('ARBITRUM_GOERLI_RPC_URL') || '',
+    getExplorerUrl: (address: string) => `https://testnet.arbiscan.io/address/${address}`,
+    chainId: 421613,
     accounts: {
       mnemonic: testnetMnemonic,
     },
@@ -260,6 +276,8 @@ const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
       hardhat: 'NO_API_KEY',
       mainnet: getEnv('ETHERSCAN_API_KEY'),
       goerli: getEnv('ETHERSCAN_API_KEY'),
+      arbitrum: getEnv('ARBITRUM_API_KEY'),
+      arbitrumGoerli: getEnv('ARBITRUM_API_KEY'),
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
