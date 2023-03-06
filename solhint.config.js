@@ -1,7 +1,7 @@
 /**
- * Set the Solidity compiler version
+ * Set the Solidity compiler versions
  */
-const COMPILER_VERSION = "0.8.16"
+const COMPILER_VERSIONS = ["0.8.16"]
 
 /**
  * 
@@ -16,6 +16,7 @@ const COMPILER_VERSION = "0.8.16"
 module.exports = {
   "extends": "solhint:recommended",
   "plugins": [],
+  "compilers": COMPILER_VERSIONS,
   "rules": {
     // Best Practice Rules
     "constructor-syntax": "warn",
@@ -28,11 +29,11 @@ module.exports = {
     "reason-string": ["warn", { "maxLength": 50 }], // Revert reason length
     "func-param-name-mixedcase": "error",
     "modifier-name-mixedcase": "error",
-    "private-vars-leading-underscore": ["error", { "strict": false }], 
+    "private-vars-leading-underscore": ["error", { "strict": false }],
     "ordering": "error",
 
     // Security Rules
-    "compiler-version": ["error", COMPILER_VERSION],
+    "compiler-version": ["error", COMPILER_VERSIONS[0]],
     "avoid-sha3": "error",
     "avoid-suicide": "error",
     "avoid-throw": "error",
