@@ -5,7 +5,7 @@ import 'hardhat-docgen'
 
 import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
-import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig } from 'hardhat/types'
+import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig, SolcUserConfig } from 'hardhat/types'
 
 import { Task, Verifier, Network } from './hardhat'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
@@ -190,10 +190,16 @@ const networkConfig: Record<Network, NetworkUserConfigExtended> = {
   },
 }
 
-function getSolidityCompilerVersions() {
-  const compilers: any[] = []
-  solhintConfig.compilers.forEach((compiler) => {
-    compilers.push({
+/**
+ * Configure compiler versions in ./solhint.json
+ *
+ * @returns SolcUserConfig[]
+ */
+function getSolcUserConfig(): SolcUserConfig[] {
+  return solhintConfig.compilers.map((compiler) => {
+    return {
+      // Adding multiple compiler versions
+      // https://hardhat.org/hardhat-runner/docs/advanced/multiple-solidity-versions#multiple-solidity-versions
       version: compiler,
       settings: {
         optimizer: {
@@ -201,14 +207,12 @@ function getSolidityCompilerVersions() {
           runs: 1000,
         },
       },
-    })
+    }
   })
-  return compilers
 }
 
 const config: HardhatUserConfig = {
-  // Storing this single source of truth in `solhint.config.js`
-  solidity: { compilers: getSolidityCompilerVersions() },
+  solidity: { compilers: getSolcUserConfig() },
   networks: {
     ...networkConfig,
     hardhat: {
@@ -226,7 +230,7 @@ const config: HardhatUserConfig = {
   docgen: {
     path: './docs',
     clear: true,
-    // TODO: Enable for each compile
+    // TODO: Enable for each compile (disabled for template to avoid unnecessary generation)
     runOnCompile: false,
   },
   typechain: {

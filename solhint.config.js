@@ -16,7 +16,6 @@ const COMPILER_VERSIONS = ["0.8.16"]
 module.exports = {
   "extends": "solhint:recommended",
   "plugins": [],
-  "compilers": COMPILER_VERSIONS,
   "rules": {
     // Best Practice Rules
     "constructor-syntax": "warn",
@@ -33,10 +32,12 @@ module.exports = {
     "ordering": "error",
 
     // Security Rules
-    "compiler-version": ["error", COMPILER_VERSIONS[0]],
+    "compiler-version": [COMPILER_VERSIONS.length == 1 ? "error" : "warn", COMPILER_VERSIONS[0]],
     "avoid-sha3": "error",
     "avoid-suicide": "error",
     "avoid-throw": "error",
     // "not-rely-on-time": "off",
   },
+  // NOTE: Custom configuration for template
+  "compilers": COMPILER_VERSIONS,
 }
