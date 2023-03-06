@@ -191,12 +191,12 @@ const networkConfig: Record<Network, NetworkUserConfigExtended> = {
 }
 
 /**
- * Configure compiler versions in ./solhint.json
+ * Configure compiler versions in ./solhint.config.js
  *
  * @returns SolcUserConfig[]
  */
 function getSolcUserConfig(): SolcUserConfig[] {
-  return solhintConfig.compilers.map((compiler) => {
+  return (solhintConfig.rules['compiler-version'][2] as string[]).map((compiler) => {
     return {
       // Adding multiple compiler versions
       // https://hardhat.org/hardhat-runner/docs/advanced/multiple-solidity-versions#multiple-solidity-versions
