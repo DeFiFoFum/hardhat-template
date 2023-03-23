@@ -2,6 +2,7 @@ import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import 'solidity-coverage'
 import 'hardhat-docgen'
+import 'hardhat-contract-sizer'
 
 import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
@@ -239,6 +240,16 @@ const config: HardhatUserConfig = {
     // externalArtifacts: [], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
     dontOverrideCompile: false, // defaults to false
+  },
+  contractSizer: {
+    // https://github.com/ItsNickBarry/hardhat-contract-sizer#usage
+    alphaSort: false, // whether to sort results table alphabetically (default sort is by contract size)
+    disambiguatePaths: false, // whether to output the full path to the compilation artifact (relative to the Hardhat root directory)
+    runOnCompile: false, // whether to output contract sizes automatically after compilation
+    strict: false, // whether to throw an error if any contracts exceed the size limit
+    // only: [':ERC20$'], // Array of String matchers used to include contracts
+    // except: [':ERC20$'], // Array of String matchers used to exclude contracts
+    // outputFile: './contract-size.md', // Optional output file to write to
   },
   // etherscan: {
   /**

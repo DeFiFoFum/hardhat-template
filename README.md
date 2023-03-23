@@ -15,7 +15,6 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 ## Features
   <!-- - // TODO: https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades -->
   <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
-  <!-- - // TODO: https://www.npmjs.com/package/hardhat-contract-sizer -->
 - Contract Support
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
@@ -36,6 +35,7 @@ compilation.
   - [Prettier Solidity plugin](https://www.npmjs.com/package/prettier-plugin-solidity): A Prettier plugin for automatically formatting your Solidity code.
   - [Solhint](https://www.npmjs.com/package/solhint): Open source project for linting Solidity code. This project provides both Security and Style Guide validations.
     - [solhint.config.ts](./solhint.config.js) is full featured and support Solidity style guide recommendations.
+  - [Hardhat Contract Sizer](https://www.npmjs.com/package/hardhat-contract-sizer)
 - [Build/Publish as NPM Package](#buildpublish-as-npm-package): This repo is setup to build important files into a publishable NPM package. (See below for more info)
 
 ## Deployment and Verification
