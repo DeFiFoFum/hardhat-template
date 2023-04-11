@@ -11,21 +11,18 @@
     "strict": true,
     "skipLibCheck": true
   },
+  // Include TS files to type check. 
+  // Only specific files are packaged in package.json > files.
   "include": [
+    "hardhat",
     "index.ts",
     "artifacts/**/*.json",
-    "src",
     "typechain-types",
-    "test",
+    "src",
+    "tasks",
     "scripts",
+    "test",
     "hardhat.config.ts"
   ],
-  // The intent here is to only include src/ and Smart Contract artifacts and types.
-  "exclude": [
-    "dist",
-    "hardhat",
-    "tasks",
-    "prettier.config.js",
-    "solhint.config.js"
-  ]
+  "exclude": []
 }
