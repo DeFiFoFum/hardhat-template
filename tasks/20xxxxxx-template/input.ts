@@ -1,14 +1,19 @@
-import { Network } from '../../hardhat'
+import { Networks } from '../../hardhat'
+
+export type ConfiguredNetworks = Extract<
+  Networks,
+  'mainnet' | 'goerli' | 'bsc' | 'bscTestnet' | 'polygon' | 'polygonTestnet' | 'hardhat'
+>
 
 export type DeploymentInputs = {
   admin: string
 }
 
-const deploymentInputs: Record<Network, DeploymentInputs> = {
+const deploymentInputs: Record<ConfiguredNetworks, DeploymentInputs> = {
   mainnet: {
     admin: '0x',
   },
-  ropsten: {
+  goerli: {
     admin: '0x',
   },
   bsc: {

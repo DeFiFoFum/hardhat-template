@@ -18,7 +18,7 @@ export const NETWORKS = <const>[
   'telosTestnet',
 ]
 // Create a type out of the network array
-export type Network = typeof NETWORKS[number]
+export type Networks = (typeof NETWORKS)[number]
 
 export type TaskRunOptions = {
   force?: boolean
@@ -35,7 +35,7 @@ export type Input = {
 }
 
 export type RawInputByNetwork = {
-  [key in Network]: RawInputKeyValue
+  [key in Networks]: RawInputKeyValue
 }
 
 export type RawInputKeyValue = {

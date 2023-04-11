@@ -10,7 +10,7 @@ import { deploy, instanceAt } from './evm/contracts'
 
 import {
   NETWORKS,
-  Network,
+  Networks,
   Libraries,
   Artifact,
   Input,
@@ -28,12 +28,12 @@ const TASKS_DIRECTORY = path.resolve(__dirname, '../tasks')
 
 export default class Task {
   id: string
-  _network?: Network
+  _network?: Networks
   _verifier?: Verifier
   _outputFile?: string
 
   static fromHRE(id: string, hre: HardhatRuntimeEnvironment, verifier?: Verifier): Task {
-    return new this(id, hre.network.name as Network, verifier)
+    return new this(id, hre.network.name as Networks, verifier)
   }
 
   static getAllTasks(): string[] {
@@ -48,13 +48,13 @@ export default class Task {
     }
   }
 
-  static forTest(id: string, network: Network, outputTestFile = 'test'): Task {
+  static forTest(id: string, network: Networks, outputTestFile = 'test'): Task {
     const task = new this(id, network)
     task.outputFile = outputTestFile
     return task
   }
 
-  constructor(id: string, network?: Network, verifier?: Verifier) {
+  constructor(id: string, network?: Networks, verifier?: Verifier) {
     if (network && !NETWORKS.includes(network)) throw Error(`Unknown network ${network}`)
     this.id = id
     this._network = network
@@ -69,12 +69,12 @@ export default class Task {
     this._outputFile = file
   }
 
-  get network(): Network {
+  get network(): Networks {
     if (!this._network) throw Error('A network must be specified to define a task')
     return this._network
   }
 
-  set network(name: Network) {
+  set network(name: Networks) {
     this._network = name
   }
 
@@ -213,7 +213,7 @@ export default class Task {
     return this._parseRawInput(this.rawInput())
   }
 
-  output({ ensure = true, network }: { ensure?: boolean; network?: Network } = {}): Output {
+  output({ ensure = true, network }: { ensure?: boolean; network?: Networks } = {}): Output {
     if (network) this.network = network
     const taskOutputDir = this._dirAt(this.dir(), 'output', ensure)
     const taskOutputFile = this._fileAt(taskOutputDir, this.outputFile, ensure)
@@ -238,7 +238,7 @@ export default class Task {
   }
 
   private _parseRawInput(rawInput: RawInputKeyValue): Input {
-    return Object.keys(rawInput).reduce((input: Input, key: Network | string) => {
+    return Object.keys(rawInput).reduce((input: Input, key: Networks | string) => {
       const item = rawInput[key]
       if (Array.isArray(item)) input[key] = item
       else if (BigNumber.isBigNumber(item)) input[key] = item

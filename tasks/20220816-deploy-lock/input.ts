@@ -1,4 +1,9 @@
-import { Network } from '../../hardhat'
+import { Networks } from '../../hardhat'
+
+export type ConfiguredNetworks = Extract<
+  Networks,
+  'mainnet' | 'goerli' | 'bsc' | 'bscTestnet' | 'polygon' | 'polygonTestnet' | 'hardhat'
+>
 
 export type DeploymentInputs = {
   unlockTime: number
@@ -6,11 +11,11 @@ export type DeploymentInputs = {
 
 const DEFAULT_UNLOCK = 100
 
-const deploymentInputs: Record<Network, DeploymentInputs> = {
+const deploymentInputs: Record<ConfiguredNetworks, DeploymentInputs> = {
   mainnet: {
     unlockTime: DEFAULT_UNLOCK,
   },
-  ropsten: {
+  goerli: {
     unlockTime: DEFAULT_UNLOCK,
   },
   bsc: {

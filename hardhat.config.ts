@@ -8,7 +8,7 @@ import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig, SolcUserConfig } from 'hardhat/types'
 
-import { Task, Verifier, Network } from './hardhat'
+import { Task, Verifier, Networks } from './hardhat'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
 import solhintConfig from './solhint.config'
 import '@openzeppelin/hardhat-upgrades'
@@ -25,7 +25,7 @@ task('deploy', '🫶 Run deployment task')
   .setAction(
     async (args: { id: string; force?: boolean; key?: string; verbose?: boolean }, hre: HardhatRuntimeEnvironment) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key)
+      const key = parseApiKey(hre.network.name as Networks, args.key)
       const verifier = key ? new Verifier(hre.network, key) : undefined
       await Task.fromHRE(args.id, hre, verifier).run(args)
     }
@@ -56,7 +56,7 @@ task('verify-contract', '🫶 Run verification for a given contract')
       hre: HardhatRuntimeEnvironment
     ) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key)
+      const key = parseApiKey(hre.network.name as Networks, args.key)
       const verifier = key ? new Verifier(hre.network, key) : undefined
 
       await Task.fromHRE(args.id, hre, verifier).verify(args.name, args.address, args.args)
@@ -104,7 +104,7 @@ interface NetworkUserConfigExtended extends HttpNetworkUserConfig {
   getExplorerUrl: (address: string) => string
 }
 
-const networkConfig: Record<Network, NetworkUserConfigExtended> = {
+const networkConfig: Record<Networks, NetworkUserConfigExtended> = {
   mainnet: {
     url: getEnv('MAINNET_RPC_URL') || '',
     getExplorerUrl: (address: string) => `https://etherscan.io/address/${address}`,
@@ -268,14 +268,14 @@ const config: HardhatUserConfig = {
   // },
 }
 
-const parseApiKey = (network: Network, key?: string): string | undefined => {
+const parseApiKey = (network: Networks, key?: string): string | undefined => {
   return key || verificationConfig.etherscan.apiKey[network]
 }
 
 /**
  * Placeholder configuration for @nomiclabs/hardhat-etherscan to store verification API urls
  */
-const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
+const verificationConfig: { etherscan: { apiKey: Record<Networks, string> } } = {
   etherscan: {
     apiKey: {
       hardhat: 'NO_API_KEY',
