@@ -2,7 +2,7 @@
 pragma solidity 0.8.16;
 
 // Import this file to use console.log
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /* solhint-disable not-rely-on-time */
 contract Lock {
