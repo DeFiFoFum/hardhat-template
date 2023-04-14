@@ -39,44 +39,36 @@ compilation.
 - [Build/Publish as NPM Package](#buildpublish-as-npm-package): This repo is setup to build important files into a publishable NPM package. (See below for more info)
 
 ## Deployment and Verification
+
 This project uses special tasks, adapted from Balancer protocol, to deploy and verify contracts which provides methods for saving custom outputs and easily verifying contracts as well as compartmentalizing different types of deployments.
 
-**Configuration**
+### Configuration
+
 - Copy [.env.example](./.env.example) and rename to `.env`
   - Provide the necessary `env` variables before deployment/verification
   - `_MNEMONIC` for deployments
   - `_API_KEY` for verifications
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
   - [hardhat/types.ts](./hardhat/types.ts): Holds network typings which can be updated with more networks.
-- Create a deployment task (See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task), then deploy/verify following the commands below
+- Configure Deployment Variables for each network in [deploy.config.ts](./scripts/deploy/deploy.config.ts).
+- Ensure Etherscan API Keys are configured in [hardhat.config.ts](./hardhat.config.ts) under `etherscan`.
 
-## Deployment 
-`npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`  
+## Deployment & Verification
 
-This will deploy the example task to `bscTestnet`:  
-eg: `npx hardhat deploy --id 20220816-deploy-lock --network bscTestnet`  
-
-## Verification
-`npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name> [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`  
-
-This will verify the example task deployed to `bscTestnet`:  
-eg: `npx hardhat verify-contract --id 20220816-deploy-lock --network bscTestnet --name Lock`  
-
-
-<!-- 
-NOTE: This feature is deprecated until @nomiclabs/hardhat-etherscan can be upgraded
-
-To list the available networks for verification run the command below. API keys for any network in this list can be added to 
-`npx hardhat verify --list-networks` 
--->
+1. Create a deployment script in [scripts/deploy](./scripts/deploy/). (Use [deployLock](./scripts/deploy/deployLock.ts) as a template.)
+2. Use [DeployManager](./scripts/deploy/DeployManager.ts) to deploy contracts to easily deploy, verify and save the output to the [deployments](./deployments/) directory.
+3. Run a deployment with `npx hardhat run ./scripts/deploy/deployLock.ts --network <network>`
+4. Etherscan-like API key should be stored in [hardhat.config.ts](./hardhat.config.ts) under `etherscan` and the [DeployManager](./scripts/deploy/DeployManager.ts) can use that to verify contracts after deployment.
 
 ## Linting
+
 This project uses Prettier, an opinionated code formatter, to keep code styles consistent. This project has additional plugins for Solidity support as well. 
 
 - `yarn lint`: Check Solidity files & TS/JS files
 - `yarn lint:fix`: Fix Solidity files & TS/JS files
 
 ### Linting Solidity Code
+
 - [prettier.config.js](./prettier.config.js): Provide config settings for Solidity under `overrides`.
 - [.solhint.json](./.solhint.json): Provide config settings for `solhint`.  
 
@@ -84,17 +76,22 @@ This project uses Prettier, an opinionated code formatter, to keep code styles c
 - `yarn lint:sol:fix`: Fix Solidity files
 
 ## Build/Publish as NPM Package
-Currently this repo is setup to `include`: 
-- `src/`, 
-- `artifacts` (Created after `yarn compile`)
-- `typechain-types` (Created after `yarn compile`)
 
-- `yarn build`: Build files into `./dist` directory
-- [tsconfig.json](./tsconfig.json): 
-  - `include`: Use this field to include additional files in the build output
-  - `exclude`: Use this field to exclude files from the build output
+1. Currently this repo uses `tsc` to build files to `dist/`.
+2. Files are cherry picked in [package.json](./package.json) under `files` as there are a lot of support files included in this repo.
+
+_Consider including only what is needed._
+```json
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/src/**/*",
+    "dist/typechain-types/**/*",
+    // "dist/artifacts/**/*"
+  ],
+```
 
 ## Gotchas
+
 1. Put single quotes around globs in `package.json`: 
    - `"lint:ts": "prettier --check './{scripts,tasks,src,hardhat,test}/**/*.ts'"`
-

@@ -7,14 +7,13 @@
     "dist/index.js",
     "dist/index.d.ts",
     "dist/src/**/*",
-    "dist/typechain-types/**/*",
-    "dist/artifacts/**/*"
+    "dist/typechain-types/**/*"
   ],
   "scripts": {
     "postinstall": "hardhat",
     "prebuild": "yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
-    "precommit": "yarn lint:fix",
+    "precommit": "yarn lint:fix && yarn lint:ci",
     "prepublishOnly": "yarn audit && node prepublish.js",
     "precompile": "yarn clean ./artifacts",
     "compile": "hardhat compile",
