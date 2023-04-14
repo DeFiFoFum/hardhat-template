@@ -13,7 +13,6 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 
 ## Features
-  <!-- - // TODO: https://www.npmjs.com/package/@openzeppelin/hardhat-upgrades -->
   <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
 - Contract Support
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
@@ -29,6 +28,7 @@ compilation.
   - [solidity-coverage](https://www.npmjs.com/package/solidity-coverage): Generate a coverage report by running `yarn test:coverage`
   - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
     - _these tests run slower than `yarn test`_
+  - [hardhat-contract-sizer](https://www.npmjs.com/package/hardhat-contract-sizer): Check the size of the contracts being developed with `yarn size`
 - Linting
   - [Prettier](https://prettier.io/): Most popular opinionated code formatter.
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)

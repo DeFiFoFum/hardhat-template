@@ -1,5 +1,6 @@
 export * from './env'
 export * from './logger'
+export * from './convertAddresses'
 export * from './test'
 
 export function stripHexPrefix(hexString: string): string {
