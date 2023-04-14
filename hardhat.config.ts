@@ -1,76 +1,32 @@
-import { HardhatUserConfig } from 'hardhat/config'
+import { HardhatUserConfig, task, types } from 'hardhat/config'
+import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig, SolcUserConfig } from 'hardhat/types'
+import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
+// Plugins
 import '@nomicfoundation/hardhat-toolbox'
+import '@nomiclabs/hardhat-etherscan'
 import 'solidity-coverage'
 import 'hardhat-docgen'
 import 'hardhat-contract-sizer'
-
-import { task, types } from 'hardhat/config'
-import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
-import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig, SolcUserConfig } from 'hardhat/types'
-
-import { Task, Verifier, Networks } from './hardhat'
-import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
-import solhintConfig from './solhint.config'
 import '@openzeppelin/hardhat-upgrades'
-
-/**
- * Deploy contracts based on a directory ID in tasks/
- *
- * `npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`
- */
-task('deploy', '🫶 Run deployment task')
-  .addParam('id', 'Deployment task ID')
-  .addFlag('force', 'Ignore previous deployments')
-  .addOptionalParam('key', 'Etherscan API key to verify contracts')
-  .setAction(
-    async (args: { id: string; force?: boolean; key?: string; verbose?: boolean }, hre: HardhatRuntimeEnvironment) => {
-      Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Networks, args.key)
-      const verifier = key ? new Verifier(hre.network, key) : undefined
-      await Task.fromHRE(args.id, hre, verifier).run(args)
-    }
-  )
-
-/**
- * Verify contracts based on a directory ID in tasks/
- *
- * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name>
- *  [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`
- */
-task('verify-contract', '🫶 Run verification for a given contract')
-  .addParam('id', 'Deployment task ID')
-  .addParam('name', 'Contract name')
-  .addOptionalParam('address', 'Contract address')
-  .addOptionalParam('args', 'ABI-encoded constructor arguments')
-  .addOptionalParam('key', 'Etherscan API key to verify contracts')
-  .setAction(
-    async (
-      args: {
-        id: string
-        name: string
-        address?: string
-        key?: string
-        args?: string
-        verbose?: boolean
-      },
-      hre: HardhatRuntimeEnvironment
-    ) => {
-      Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Networks, args.key)
-      const verifier = key ? new Verifier(hre.network, key) : undefined
-
-      await Task.fromHRE(args.id, hre, verifier).verify(args.name, args.address, args.args)
-    }
-  )
-
-task('print-tasks', '🫶 Prints available tasks in tasks/ directory').setAction(async (args: { verbose?: boolean }) => {
-  Logger.setDefaults(false, args.verbose || false)
-  logger.log(
-    `Use the following tasks in a variety of ways \nnpx hardhat deploy --id <task-id> --network <network-name> \nnpx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name> \n`,
-    `🫶`
-  )
-  Task.printAllTask()
-})
+// Project Config
+import solhintConfig from './solhint.config'
+import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
+// Network Config
+export const NETWORKS = <const>[
+  'mainnet',
+  'goerli',
+  'arbitrum',
+  'arbitrumGoerli',
+  'bsc',
+  'bscTestnet',
+  'polygon',
+  'polygonTestnet',
+  'hardhat',
+  'telos',
+  'telosTestnet',
+]
+// Create a type out of the network array
+export type Networks = (typeof NETWORKS)[number]
 
 /**
  * Example of accessing ethers and performing Web3 calls inside a task
@@ -251,46 +207,38 @@ const config: HardhatUserConfig = {
     // except: [':ERC20$'], // Array of String matchers used to exclude contracts
     // outputFile: './contract-size.md', // Optional output file to write to
   },
-  // etherscan: {
-  /**
-   * // NOTE This is valid in the latest version of "@nomiclabs/hardhat-etherscan.
-   *  This version breaks the src/task.ts file which hasn't been refactored yet
-   */
-  // apiKey: {
-  //   mainnet: getEnv('ETHERSCAN_API_KEY'),
-  //   optimisticEthereum: getEnv('OPTIMISTIC_ETHERSCAN_API_KEY'),
-  //   arbitrumOne: getEnv('ARBISCAN_API_KEY'),
-  //   bsc: getEnv('BSCSCAN_API_KEY'),
-  //   bscTestnet: getEnv('BSCSCAN_API_KEY'),
-  //   polygon: getEnv('POLYGONSCAN_API_KEY'),
-  //   polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
-  // },
-  // },
-}
-
-const parseApiKey = (network: Networks, key?: string): string | undefined => {
-  return key || verificationConfig.etherscan.apiKey[network]
-}
-
-/**
- * Placeholder configuration for @nomiclabs/hardhat-etherscan to store verification API urls
- */
-const verificationConfig: { etherscan: { apiKey: Record<Networks, string> } } = {
   etherscan: {
+    /**
+     * // NOTE This is valid in the latest version of "@nomiclabs/hardhat-etherscan.
+     *  This version breaks the src/task.ts file which hasn't been refactored yet
+     */
     apiKey: {
-      hardhat: 'NO_API_KEY',
       mainnet: getEnv('ETHERSCAN_API_KEY'),
-      goerli: getEnv('ETHERSCAN_API_KEY'),
-      arbitrum: getEnv('ARBITRUM_API_KEY'),
-      arbitrumGoerli: getEnv('ARBITRUM_API_KEY'),
+      optimisticEthereum: getEnv('OPTIMISTIC_ETHERSCAN_API_KEY'),
+      arbitrumOne: getEnv('ARBISCAN_API_KEY'),
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
-      // NOTE: I don't believe TELOS verification is supported
-      telos: getEnv('TELOSSCAN_API_KEY'),
-      telosTestnet: getEnv('TELOSSCAN_API_KEY_API_KEY'),
     },
+    customChains: [
+      {
+        network: 'telos',
+        chainId: 40,
+        urls: {
+          apiURL: '', // TODO: telos API key not added
+          browserURL: 'https://www.teloscan.io',
+        },
+      },
+      {
+        network: 'telosTestnet',
+        chainId: 41,
+        urls: {
+          apiURL: '', // TODO: telosTestnet API key not added
+          browserURL: 'https://testnet.teloscan.io',
+        },
+      },
+    ],
   },
 }
 
