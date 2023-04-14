@@ -9,6 +9,9 @@ contract Lock {
     uint256 public unlockTime;
     address payable public owner;
 
+    /// @notice Emitted when the contract is withdrawn
+    /// @param amount The amount of wei withdrawn
+    /// @param when The timestamp of the block when the withdraw happened
     event Withdrawal(uint256 amount, uint256 when);
 
     constructor(uint256 _unlockTime) payable {
@@ -18,6 +21,7 @@ contract Lock {
         owner = payable(msg.sender);
     }
 
+    /// @notice Withdraw all the funds
     function withdraw() public {
         // Uncomment this line to print a log in your terminal
         // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);

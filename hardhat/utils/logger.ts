@@ -2,7 +2,7 @@ import chalk from 'chalk'
 
 const DEFAULTS = {
   verbose: false,
-  silent: true,
+  silent: false,
 }
 
 export class Logger {

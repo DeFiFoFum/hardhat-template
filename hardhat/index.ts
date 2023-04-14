@@ -1,5 +1,2 @@
-import Task from './task'
-import Verifier from './evm/verifier'
-import { TaskRunOptions, Networks } from './types'
-
-export { Task, TaskRunOptions, Verifier, Networks }
+export * from './types'
+export * as utils from './utils'
