@@ -219,7 +219,7 @@ const config: HardhatUserConfig = {
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
-      polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
+      polygonMumbai: getEnv('POLYGONSCAN_API_KEY'),
     },
     customChains: [
       {
