@@ -1,4 +1,4 @@
-# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px"> 
+# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px">
 <!-- 
   FIXME: Update `DeFiFoFum/hardhat-template` based on current repo 
   1. Find All (CMD/CTRL + SHIFT + F)
@@ -9,8 +9,7 @@
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more. 
-
+Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.
 
 ## Features
   <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
@@ -18,7 +17,7 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
 - Typescript
-  - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during 
+  - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during
 - Docs
   - [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
 compilation.
@@ -62,7 +61,7 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
 
 ## Linting
 
-This project uses Prettier, an opinionated code formatter, to keep code styles consistent. This project has additional plugins for Solidity support as well. 
+This project uses Prettier, an opinionated code formatter, to keep code styles consistent. This project has additional plugins for Solidity support as well.
 
 - `yarn lint`: Check Solidity files & TS/JS files
 - `yarn lint:fix`: Fix Solidity files & TS/JS files
@@ -81,6 +80,7 @@ This project uses Prettier, an opinionated code formatter, to keep code styles c
 2. Files are cherry picked in [package.json](./package.json) under `files` as there are a lot of support files included in this repo.
 
 _Consider including only what is needed._
+
 ```json
   "files": [
     "dist/index.js",
@@ -93,5 +93,5 @@ _Consider including only what is needed._
 
 ## Gotchas
 
-1. Put single quotes around globs in `package.json`: 
+1. Put single quotes around globs in `package.json`:
    - `"lint:ts": "prettier --check './{scripts,tasks,src,hardhat,test}/**/*.ts'"`
