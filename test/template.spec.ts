@@ -16,8 +16,8 @@ import { deployOneYearLockFixture } from './fixtures'
  * and resets the Hardhat Network to that snapshot for every test.
  */
 async function fixture() {
-  const lockDeployment = await deployOneYearLockFixture(ethers)
-  return { ...lockDeployment }
+  const deployment = await deployOneYearLockFixture(ethers)
+  return { ...deployment }
 }
 
 describe('Test Template', function () {
