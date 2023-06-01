@@ -12,7 +12,7 @@
 Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.
 
 ## Features
-  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
+
 - Contract Support
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
@@ -36,6 +36,9 @@ compilation.
     - [solhint.config.ts](./solhint.config.js) is full featured and support Solidity style guide recommendations.
   - [Hardhat Contract Sizer](https://www.npmjs.com/package/hardhat-contract-sizer)
 - [Build/Publish as NPM Package](#buildpublish-as-npm-package): This repo is setup to build important files into a publishable NPM package. (See below for more info)
+- Forking/Simulating
+  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
+  - [Tenderly Simulation API](https://docs.tenderly.co/simulations-and-forks/simulation-api): This repo has support for sending TX data to the simulator API for debugging and simulation.
 
 ## Deployment and Verification
 
