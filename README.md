@@ -28,6 +28,10 @@ compilation.
   - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
     - _these tests run slower than `yarn test`_
   - [hardhat-contract-sizer](https://www.npmjs.com/package/hardhat-contract-sizer): Check the size of the contracts being developed with `yarn size`
+  - **Fork Testing**: This repo has support for forking networks and running tests against the forked network. Update [hardhat-fork.config.ts](./hardhat-fork.config.ts) with the network you want to fork and run `yarn test:fork` to run tests against the forked network with the tests in [test-fork](./test-fork).
+- TX Simulations
+  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
+  - [Tenderly Simulation API](https://docs.tenderly.co/simulations-and-forks/simulation-api): This repo has support for sending TX data to the simulator API for debugging and simulation.
 - Linting
   - [Prettier](https://prettier.io/): Most popular opinionated code formatter.
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)
@@ -36,9 +40,6 @@ compilation.
     - [solhint.config.ts](./solhint.config.js) is full featured and support Solidity style guide recommendations.
   - [Hardhat Contract Sizer](https://www.npmjs.com/package/hardhat-contract-sizer)
 - [Build/Publish as NPM Package](#buildpublish-as-npm-package): This repo is setup to build important files into a publishable NPM package. (See below for more info)
-- Forking/Simulating
-  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
-  - [Tenderly Simulation API](https://docs.tenderly.co/simulations-and-forks/simulation-api): This repo has support for sending TX data to the simulator API for debugging and simulation.
 
 ## Deployment and Verification
 

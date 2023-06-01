@@ -24,6 +24,7 @@
     "test:gas": "env REPORT_GAS=true yarn test",
     "test:coverage": "hardhat coverage",
     "test:ci": "yarn compile && yarn test",
+    "test:fork": "yarn hardhat --config hardhat-fork.config.ts test ./test-fork/**/*.spec.ts",
     "size": "hardhat size-contracts",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:fix": "yarn lint:sol:fix && yarn lint:ts:fix",

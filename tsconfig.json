@@ -22,7 +22,9 @@
     "tasks",
     "scripts",
     "test",
-    "hardhat.config.ts"
+    "hardhat.config.ts",
+    "test-fork",
+    "hardhat-fork.config.ts",
   ],
   "exclude": []
 }
