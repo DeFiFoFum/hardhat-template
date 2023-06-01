@@ -62,7 +62,7 @@ interface NetworkUserConfigExtended extends HttpNetworkUserConfig {
 
 const networkConfig: Record<Networks, NetworkUserConfigExtended> = {
   mainnet: {
-    url: getEnv('MAINNET_RPC_URL') || '',
+    url: getEnv('MAINNET_RPC_URL') || 'https://eth.llamarpc.com',
     getExplorerUrl: (address: string) => `https://etherscan.io/address/${address}`,
     chainId: 1,
     accounts: {
@@ -78,7 +78,7 @@ const networkConfig: Record<Networks, NetworkUserConfigExtended> = {
     },
   },
   arbitrum: {
-    url: getEnv('ARBITRUM_RPC_URL') || '',
+    url: getEnv('ARBITRUM_RPC_URL') || 'https://endpoints.omniatech.io/v1/arbitrum/one/public	',
     getExplorerUrl: (address: string) => `https://arbiscan.io/address/${address}`,
     chainId: 42161,
     accounts: {
