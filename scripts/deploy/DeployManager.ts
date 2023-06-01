@@ -1,6 +1,6 @@
 // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
 
-import { ContractFactory } from 'ethers'
+import { ContractFactory, Signer } from 'ethers'
 import { network, run } from 'hardhat'
 import { logger } from '../../hardhat/utils/logger'
 import fs from 'fs'
@@ -22,18 +22,36 @@ The `DeployManager` class imports the following modules:
 The class also defines a property called `baseDir` which is set to the current directory by default, and an array of objects called `contracts` which stores the deployment details of all the contracts deployed using this class.
 */
 
-export class DeployManager {
-  baseDir: string
-  contracts: {
-    name: string
-    address: string
-    encodedConstructorArgs: string
-    constructorArguments: any[]
-  }[] = []
+/**
+ * Returns the verification command for a smart contract deployment.
+ *
+ * @param {ContractDetails} contractDetails - The contract details object (Assumes verificationScript is missing).
+ * @returns {string} - The verification command string.
+ */
+function getVerificationCommand(contractDetails: ContractDetails): string {
+  const { address, constructorArguments } = contractDetails
+  const constructorArgsString = constructorArguments.map((arg) => `'${arg.toString()}'`).join(' ')
+  const verificationCommand = `npx hardhat verify --network ${network.name} ${address} ${constructorArgsString}`
+  return verificationCommand
+}
 
-  constructor(baseDir = __dirname + `/../../deployments`) {
+interface ContractDetails {
+  name: string
+  address: string
+  encodedConstructorArgs: string
+  constructorArguments: any[]
+  verificationCommand: string
+}
+
+export class DeployManager {
+  signer?: Signer
+  baseDir: string
+  deployedContracts: ContractDetails[] = []
+
+  constructor(signer?: Signer, baseDir = __dirname + `/../../deployments`) {
     logger.log(`Setting up DeployManager. Your simple and friendly contract deployment, uhhh, manager.`, `👋🤓`)
     this.baseDir = baseDir
+    this.signer = signer ? signer : undefined
     logger.log(`Deployment information will be saved in: ${baseDir}`, `💾`)
   }
 
@@ -42,14 +60,16 @@ export class DeployManager {
     params: Parameters<C['deploy']>,
     name = 'Contract' // TODO: Provide better fallback naming
   ): Promise<ReturnType<C['deploy']>> {
-    logger.log(`Deploying ${name}`, `🚀`)
-
-    // TODO: Can pass signer await contract.connect(signer).deploy
-    const contractInstance = await contract.deploy(...params)
+    logger.logHeader(`Deploying ${name}`, `🚀`)
+    // Deploy contract with signer if available
+    const contractInstance = this.signer
+      ? await contract.connect(this.signer).deploy(...params)
+      : await contract.deploy(...params)
     let encodedConstructorArgs = ''
     try {
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     } catch {
+      // NOTE: The encode fails when the deploy options are passed in. So we pop the last element and try again.
       params.pop()
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     }
@@ -57,22 +77,31 @@ export class DeployManager {
 
     logger.success(`Deployed ${name} at ${contractInstance.address}`)
     // Save deployment details
-    const deployDetails = {
+    const deployedContractDetails: ContractDetails = {
       name: name,
       address: contractInstance.address,
       encodedConstructorArgs,
       constructorArguments: params,
+      verificationCommand: '',
     }
 
-    this.contracts.push(deployDetails)
+    try {
+      deployedContractDetails.verificationCommand = getVerificationCommand(deployedContractDetails)
+    } catch (e: any) {
+      console.error(
+        `Failed to generate verification command for deployedContractDetails: ${deployedContractDetails} with error: ${e}`
+      )
+    }
+
+    this.deployedContracts.push(deployedContractDetails)
     this.saveContractsToFile()
 
     return contractInstance as ReturnType<C['deploy']>
   }
 
   async verifyContracts() {
-    for (const contract of this.contracts) {
-      logger.log(`Verifying ${contract.name} at ${contract.address}`, `➡️`)
+    for (const contract of this.deployedContracts) {
+      logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, `➡️`)
       try {
         await run('verify:verify', {
           address: contract.address,
@@ -86,9 +115,9 @@ export class DeployManager {
   }
 
   saveContractsToFile() {
-    logger.log(`Saving contract details to file.`, `➡️`)
+    logger.logHeader(`Saving contract details to file.`, `➡️`)
 
-    const paramsString = JSON.stringify(this.contracts, null, 2) // The 'null, 2' arguments add indentation for readability
+    const paramsString = JSON.stringify(this.deployedContracts, null, 2) // The 'null, 2' arguments add indentation for readability
     // Write the string to a file
     const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '') // e.g. 20230330
     const networkName = network.name

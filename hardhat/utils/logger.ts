@@ -47,6 +47,15 @@ export class Logger {
     }
     console.error(formattedMessage)
   }
+
+  logHeader(msg: string, emoji: string, color = 'white'): void {
+    this.log(`\n`, '')
+    this.log(
+      `\n========================================\n${msg}\n========================================`,
+      emoji,
+      color
+    )
+  }
 }
 
 export const logger = new Logger()
