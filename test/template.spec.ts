@@ -1,4 +1,5 @@
 import { ethers } from 'hardhat'
+// https://hardhat.org/hardhat-network-helpers/docs/reference
 import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
@@ -16,8 +17,10 @@ import { deployOneYearLockFixture } from './fixtures'
  * and resets the Hardhat Network to that snapshot for every test.
  */
 async function fixture() {
+  // Contracts are deployed using the first signer/account by default
+  const accounts = await ethers.getSigners()
   const deployment = await deployOneYearLockFixture(ethers)
-  return { ...deployment }
+  return { ...deployment, accounts }
 }
 
 describe('Test Template', function () {
