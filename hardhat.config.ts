@@ -1,5 +1,5 @@
 import { HardhatUserConfig, task, types } from 'hardhat/config'
-import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, NetworkUserConfig, SolcUserConfig } from 'hardhat/types'
+import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, SolcUserConfig } from 'hardhat/types'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 // Plugins
 import '@nomicfoundation/hardhat-toolbox'
@@ -56,11 +56,18 @@ task(TASK_TEST, '🫶 Test Task')
 export const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
 export const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
 
-interface NetworkUserConfigExtended extends HttpNetworkUserConfig {
+type ExtendedNetworkOptions = {
   getExplorerUrl: (address: string) => string
 }
 
-const networkConfig: Record<Networks, NetworkUserConfigExtended> = {
+type NetworkUserConfigExtended = HttpNetworkUserConfig & ExtendedNetworkOptions
+
+// Custom type for the hardhat network
+type ExtendedHardhatNetworkConfig = {
+  [K in Networks]: K extends 'hardhat' ? HardhatUserConfig & ExtendedNetworkOptions : NetworkUserConfigExtended
+}
+
+const networkConfig: ExtendedHardhatNetworkConfig = {
   mainnet: {
     url: getEnv('MAINNET_RPC_URL') || 'https://eth.llamarpc.com',
     getExplorerUrl: (address: string) => `https://etherscan.io/address/${address}`,
