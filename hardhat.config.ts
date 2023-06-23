@@ -11,22 +11,7 @@ import '@openzeppelin/hardhat-upgrades'
 // Project Config
 import solhintConfig from './solhint.config'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
-// Network Config
-export const NETWORKS = <const>[
-  'mainnet',
-  'goerli',
-  'arbitrum',
-  'arbitrumGoerli',
-  'bsc',
-  'bscTestnet',
-  'polygon',
-  'polygonTestnet',
-  'hardhat',
-  'telos',
-  'telosTestnet',
-]
-// Create a type out of the network array
-export type Networks = (typeof NETWORKS)[number]
+import { Networks } from './hardhat'
 
 /**
  * Example of accessing ethers and performing Web3 calls inside a task
