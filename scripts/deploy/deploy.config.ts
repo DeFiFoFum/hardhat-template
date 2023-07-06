@@ -1,5 +1,5 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { Networks } from '../../hardhat.config'
+import { Networks } from '../../hardhat'
 
 /**
  * Get the deploy config for a given network
