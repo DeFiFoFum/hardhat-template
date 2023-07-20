@@ -1,7 +1,7 @@
 // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
 
 import { ContractFactory, Signer } from 'ethers'
-import { network, run } from 'hardhat'
+import { network, run, upgrades } from 'hardhat'
 import { logger } from '../../hardhat/utils/logger'
 import fs from 'fs'
 
@@ -29,8 +29,10 @@ The class also defines a property called `baseDir` which is set to the current d
  * @returns {string} - The verification command string.
  */
 function getVerificationCommand(contractDetails: ContractDetails): string {
-  const { address, constructorArguments } = contractDetails
-  const constructorArgsString = constructorArguments.map((arg) => `'${arg.toString()}'`).join(' ')
+  const { address, constructorArguments, upgradeableProxy } = contractDetails
+  const constructorArgsString = upgradeableProxy
+    ? ''
+    : constructorArguments.map((arg) => `'${arg.toString()}'`).join(' ')
   const verificationCommand = `npx hardhat verify --network ${network.name} ${address} ${constructorArgsString}`
   return verificationCommand
 }
@@ -41,6 +43,7 @@ interface ContractDetails {
   encodedConstructorArgs: string
   constructorArguments: any[]
   verificationCommand: string
+  upgradeableProxy: boolean
 }
 
 export class DeployManager {
@@ -58,20 +61,26 @@ export class DeployManager {
   async deployContractFromFactory<C extends ContractFactory>(
     contract: C,
     params: Parameters<C['deploy']>,
-    name = 'Contract' // TODO: Provide better fallback naming
+    name = 'Contract', // TODO: Provide better fallback naming
+    upgradeableProxy: boolean = false
   ): Promise<ReturnType<C['deploy']>> {
     logger.logHeader(`Deploying ${name}`, `🚀`)
     // Deploy contract with signer if available
-    const contractInstance = this.signer
-      ? await contract.connect(this.signer).deploy(...params)
-      : await contract.deploy(...params)
+    let contractInstance
     let encodedConstructorArgs = ''
-    try {
-      encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
-    } catch {
-      // NOTE: The encode fails when the deploy options are passed in. So we pop the last element and try again.
-      params.pop()
-      encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
+    if (upgradeableProxy) {
+      contractInstance = await upgrades.deployProxy(contract, params)
+    } else {
+      contractInstance = this.signer
+        ? await contract.connect(this.signer).deploy(...params)
+        : await contract.deploy(...params)
+      try {
+        encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
+      } catch {
+        // NOTE: The encode fails when the deploy options are passed in. So we pop the last element and try again.
+        params.pop()
+        encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
+      }
     }
     await contractInstance.deployed()
 
@@ -83,6 +92,7 @@ export class DeployManager {
       encodedConstructorArgs,
       constructorArguments: params,
       verificationCommand: '',
+      upgradeableProxy,
     }
 
     try {
@@ -105,7 +115,7 @@ export class DeployManager {
       try {
         await run('verify:verify', {
           address: contract.address,
-          constructorArguments: contract.constructorArguments,
+          constructorArguments: contract.upgradeableProxy ? [] : contract.constructorArguments,
         })
         logger.success(`Verified ${contract.name} at ${contract.address}`)
       } catch (error) {
