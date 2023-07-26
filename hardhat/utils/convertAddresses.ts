@@ -1,5 +1,25 @@
+import { getExplorerUrlForNetwork } from '../../hardhat.config'
+import { Networks } from '../networks'
+
 export const isAddress = (address?: string) =>
   address ? (address.length === 42 && address.slice(0, 2) === '0x' ? true : false) : false
+
+/**
+ * Iterates through an object and converts any address strings to block explorer links passed
+ *
+ * @param {Object<any>} addressObject Object to iterate through looking for possible addresses to convert
+ * @param {Networks} networkName The current hardhat network name
+ * @param {boolean} detailedInfo If `true` will instead turn an address string into an object {address: string, explorer: string}
+ * @returns parsedAddressObject
+ */
+export function convertAddressesToExplorerLinksByNetwork(
+  addressObject: any,
+  networkName: Networks,
+  detailedInfo = false
+) {
+  const getExplorerLink = getExplorerUrlForNetwork(networkName)
+  return convertAddressesToExplorerLinks(addressObject, getExplorerLink, detailedInfo)
+}
 
 /**
  * Iterates through an object and converts any address strings to block explorer links passed
@@ -22,11 +42,9 @@ export function convertAddressesToExplorerLinks(
   ) {
     Object.keys(_addressObject).forEach((key) => {
       const value = _addressObject[key]
-      if (isAddress(value)) {
-        _convertAddressesToExplorerLinks(value, _getLink, _detailedInfo)
-      } else if (typeof value === 'string') {
+      if (typeof value === 'string') {
         // Check if value is an address
-        if (value.length === 42 && value.slice(0, 2) === '0x') {
+        if (isAddress(value)) {
           if (_detailedInfo) {
             _addressObject[key] = {
               address: value,
@@ -36,6 +54,8 @@ export function convertAddressesToExplorerLinks(
             _addressObject[key] = _getLink(value)
           }
         }
+      } else {
+        _convertAddressesToExplorerLinks(value, _getLink, _detailedInfo)
       }
     })
     return _addressObject

@@ -139,6 +139,10 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
   },
 }
 
+export function getExplorerUrlForNetwork(networkName: Networks) {
+  return networkConfig[networkName]?.getExplorerUrl
+}
+
 /**
  * Configure compiler versions in ./solhint.config.js
  *
