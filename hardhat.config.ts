@@ -117,22 +117,6 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
       mnemonic: testnetMnemonic,
     },
   },
-  telos: {
-    url: getEnv('TELOS_RPC_URL') || 'https://mainnet.telos.net/evm',
-    getExplorerUrl: (address: string) => `https://www.teloscan.io/address/${address}`,
-    chainId: 40,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
-  },
-  telosTestnet: {
-    url: getEnv('TELOS_TESTNET_RPC_URL') || 'https://testnet.telos.net/evm',
-    getExplorerUrl: (address: string) => `https://testnet.teloscan.io/address/${address}`,
-    chainId: 41,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
-  },
   // Placeholder for the configuration below.
   hardhat: {
     getExplorerUrl: (address: string) => `(NO DEV EXPLORER): ${address}`,
@@ -219,23 +203,16 @@ const config: HardhatUserConfig = {
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonMumbai: getEnv('POLYGONSCAN_API_KEY'),
     },
+    // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#adding-support-for-other-networks
     customChains: [
-      {
-        network: 'telos',
-        chainId: 40,
-        urls: {
-          apiURL: '', // TODO: telos API key not added
-          browserURL: 'https://www.teloscan.io',
-        },
-      },
-      {
-        network: 'telosTestnet',
-        chainId: 41,
-        urls: {
-          apiURL: '', // TODO: telosTestnet API key not added
-          browserURL: 'https://testnet.teloscan.io',
-        },
-      },
+      // {
+      //   network: '',
+      //   chainId: 1,
+      //   urls: {
+      //     apiURL: '',
+      //     browserURL: 'https://www.etherscan.io',
+      //   },
+      // },
     ],
   },
 }

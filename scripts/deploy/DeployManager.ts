@@ -1,6 +1,6 @@
 // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
 
-import { ContractFactory, Signer } from 'ethers'
+import { ContractFactory, Signer, utils } from 'ethers'
 import { network, run } from 'hardhat'
 import { logger } from '../../hardhat/utils/logger'
 import fs from 'fs'
@@ -61,6 +61,10 @@ export class DeployManager {
     name = 'Contract' // TODO: Provide better fallback naming
   ): Promise<ReturnType<C['deploy']>> {
     logger.logHeader(`Deploying ${name}`, `🚀`)
+    // Get the balance of the account before deployment
+    const balanceBefore = await this.signer?.getBalance()
+    const balanceBeforeInEther = utils.formatEther(balanceBefore || 0)
+    logger.log(`Balance before deployment: ${balanceBeforeInEther} ETH`, `💰`)
     // Deploy contract with signer if available
     const contractInstance = this.signer
       ? await contract.connect(this.signer).deploy(...params)
@@ -101,7 +105,7 @@ export class DeployManager {
 
   async verifyContracts() {
     for (const contract of this.deployedContracts) {
-      logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, `➡️`)
+      logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
       try {
         await run('verify:verify', {
           address: contract.address,
@@ -115,7 +119,7 @@ export class DeployManager {
   }
 
   saveContractsToFile() {
-    logger.logHeader(`Saving contract details to file.`, `➡️`)
+    logger.log(`Saving contract details to file.`, `💾`)
 
     const paramsString = JSON.stringify(this.deployedContracts, null, 2) // The 'null, 2' arguments add indentation for readability
     // Write the string to a file

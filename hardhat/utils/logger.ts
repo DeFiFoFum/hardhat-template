@@ -51,8 +51,8 @@ export class Logger {
   logHeader(msg: string, emoji: string, color = 'white'): void {
     this.log(`\n`, '')
     this.log(
-      `\n========================================\n${msg}\n========================================`,
-      emoji,
+      `\n========================================\n${emoji} ${msg}\n========================================`,
+      '',
       color
     )
   }
