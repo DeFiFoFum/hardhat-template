@@ -4,7 +4,7 @@ import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helper
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
 
-import { deployOneYearLockFixture } from './fixtures'
+import { dynamicFixture } from './fixtures'
 
 /**
  * Configurable fixture to use for each test file.
@@ -19,7 +19,7 @@ import { deployOneYearLockFixture } from './fixtures'
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
-  const deployment = await deployOneYearLockFixture(ethers)
+  const deployment = await dynamicFixture(ethers, 'YourContractName')
   return { ...deployment, accounts }
 }
 
