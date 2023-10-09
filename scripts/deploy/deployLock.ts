@@ -13,7 +13,7 @@ async function main() {
   const accounts = await ethers.getSigners()
   const { wNative, adminAddress } = getDeployConfig(currentNetwork, accounts)
   // Optionally pass in signer to deploy contracts
-  const deployManager = new DeployManager(accounts[0])
+  const deployManager = await DeployManager.create(accounts[0])
 
   const currentTimestampInSeconds = Math.round(Date.now() / 1000)
   const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60

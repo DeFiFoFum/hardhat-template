@@ -1,9 +1,8 @@
-// https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
-
 import { ContractFactory, Signer, utils } from 'ethers'
 import { network, run } from 'hardhat'
 import { logger } from '../../hardhat/utils/logger'
 import fs from 'fs'
+import { DEPLOYMENTS_BASE_DIR } from './deploy.config'
 
 /*
 This is a TypeScript class called `DeployManager` that is used to deploy contracts, verify them and save the deployment details to a file. The class has the following methods:
@@ -48,11 +47,19 @@ export class DeployManager {
   baseDir: string
   deployedContracts: ContractDetails[] = []
 
-  constructor(signer?: Signer, baseDir = __dirname + `/../../deployments`) {
+  private constructor(signer?: Signer, baseDir = DEPLOYMENTS_BASE_DIR) {
     logger.log(`Setting up DeployManager. Your simple and friendly contract deployment, uhhh, manager.`, `👋🤓`)
     this.baseDir = baseDir
     this.signer = signer ? signer : undefined
     logger.log(`Deployment information will be saved in: ${baseDir}`, `💾`)
+  }
+  // Using a static method to create an instance of the class to log the signer address if available
+  static async create(signer?: Signer, baseDir = DEPLOYMENTS_BASE_DIR): Promise<DeployManager> {
+    const instance = new DeployManager(signer, baseDir)
+    if (instance.signer) {
+      logger.log(`Signer address: ${await instance.signer.getAddress()}`, `🖊️`)
+    }
+    return instance
   }
 
   async deployContractFromFactory<C extends ContractFactory>(
@@ -107,6 +114,7 @@ export class DeployManager {
     for (const contract of this.deployedContracts) {
       logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
       try {
+        // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
         await run('verify:verify', {
           address: contract.address,
           constructorArguments: contract.constructorArguments,

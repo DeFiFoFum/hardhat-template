@@ -1,5 +1,9 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Networks } from '../../hardhat'
+import path from 'path'
+
+// Define a base directory for deployments
+export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
 
 /**
  * Get the deploy config for a given network
