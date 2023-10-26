@@ -8,6 +8,7 @@ import 'solidity-coverage'
 import 'hardhat-docgen'
 import 'hardhat-contract-sizer'
 import '@openzeppelin/hardhat-upgrades'
+import './plugins/abiPlugins'
 // Project Config
 import solhintConfig from './solhint.config'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
