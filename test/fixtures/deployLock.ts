@@ -12,7 +12,7 @@ export async function deployOneYearLockFixture(_ethers: typeof ethers) {
   const [owner, otherAccount] = await _ethers.getSigners()
 
   const Lock = await _ethers.getContractFactory('Lock')
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount })
+  const lock = await Lock.deploy(unlockTime, owner.address, { value: lockedAmount })
 
   return { lock, unlockTime, lockedAmount, owner, otherAccount }
 }

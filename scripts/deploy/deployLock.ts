@@ -25,7 +25,7 @@ async function main() {
   const Lock = await ethers.getContractFactory(lockContractName)
   const lock = await deployManager.deployContractFromFactory(
     Lock,
-    [unlockTime, { value: lockedAmount }],
+    [unlockTime, accounts[0].address, { value: lockedAmount }],
     lockContractName // Pass in contract name to log contract
   )
   console.log('Lock with 1 ETH deployed to:', lock.address)

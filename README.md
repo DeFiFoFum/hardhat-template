@@ -1,4 +1,4 @@
-# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px">
+# Hardhat w/ Foundry Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px">
 <!-- 
   FIXME: Update `DeFiFoFum/hardhat-template` based on current repo 
   1. Find All (CMD/CTRL + SHIFT + F)
@@ -13,6 +13,8 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 ## Features
 
+- [Foundry Smart Contract Development ToolChain](https://book.getfoundry.sh/)
+  - See [README-foundry.md](./README-foundry.md) for more info.
 - Contract Support
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support

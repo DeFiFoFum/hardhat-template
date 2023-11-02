@@ -6,20 +6,38 @@ pragma solidity 0.8.16;
 
 /* solhint-disable not-rely-on-time */
 contract Lock {
+    /// -----------------------------------------------------------------------
+    /// Storage variables
+    /// -----------------------------------------------------------------------
+
     uint256 public unlockTime;
     address payable public owner;
+
+    /// -----------------------------------------------------------------------
+    /// Events
+    /// -----------------------------------------------------------------------
 
     /// @notice Emitted when the contract is withdrawn
     /// @param amount The amount of wei withdrawn
     /// @param when The timestamp of the block when the withdraw happened
     event Withdrawal(uint256 amount, uint256 when);
 
-    constructor(uint256 _unlockTime) payable {
+    /// -----------------------------------------------------------------------
+    /// Constructor
+    /// -----------------------------------------------------------------------
+
+    constructor(uint256 _unlockTime, address payable _owner) payable {
         require(block.timestamp < _unlockTime, "Unlock time should be in the future");
 
         unlockTime = _unlockTime;
-        owner = payable(msg.sender);
+        owner = _owner;
     }
+
+    receive() external payable {}
+
+    /// -----------------------------------------------------------------------
+    /// Public functions
+    /// -----------------------------------------------------------------------
 
     /// @notice Withdraw all the funds
     function withdraw() public {
