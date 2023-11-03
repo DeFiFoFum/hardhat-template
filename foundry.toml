@@ -2,5 +2,5 @@
 src = 'contracts'
 test = 'test'
 out = 'artifacts/contracts'
-libs = ['lib']
+libs = ['modules/lib']
 gas_reports = ["*"]
