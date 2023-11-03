@@ -13,6 +13,8 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 
 ## Features
 
+_**For testing features see [README-testing.md](./README-testing.md)**_
+
 - [Foundry Smart Contract Development ToolChain](https://book.getfoundry.sh/)
   - See [README-foundry.md](./README-foundry.md) for more info.
 - Contract Support
@@ -23,17 +25,6 @@ Solidity Smart Contract development template using modern Web3 frameworks/tools 
 - Docs
   - [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
 compilation.
-- Testing
-  - [VS-Code Mocha Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-mocha-test-adapter): Use Mocha Test Explorer to easily choose which tests to run. (Smart Contracts must be manually compiled between updates.)
-  - Debug Solidity unit tests with [VS-Code debugger](https://code.visualstudio.com/docs/editor/debugging)
-  - [solidity-coverage](https://www.npmjs.com/package/solidity-coverage): Generate a coverage report by running `yarn test:coverage`
-  - [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter): Check the gas costs of running test transactions with `yarn test:gas`
-    - _these tests run slower than `yarn test`_
-  - [hardhat-contract-sizer](https://www.npmjs.com/package/hardhat-contract-sizer): Check the size of the contracts being developed with `yarn size`
-  - **Fork Testing**: This repo has support for forking networks and running tests against the forked network. Update [hardhat-fork.config.ts](./hardhat-fork.config.ts) with the network you want to fork and run `yarn test:fork` to run tests against the forked network with the tests in [test-fork](./test-fork).
-- TX Simulations
-  <!-- - // TODO: https://www.npmjs.com/package/@tenderly/hardhat-tenderly -->
-  - [Tenderly Simulation API](https://docs.tenderly.co/simulations-and-forks/simulation-api): This repo has support for sending TX data to the simulator API for debugging and simulation.
 - Linting
   - [Prettier](https://prettier.io/): Most popular opinionated code formatter.
     - [Prettier Config](https://prettier.io/docs/en/configuration.html)
