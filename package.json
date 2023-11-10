@@ -1,6 +1,6 @@
 {
   "name": "@defifofum/hardhat-template",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain, Foundry and more.",
   "main": "./dist/index.js",
   "files": [
@@ -18,6 +18,7 @@
     "prepublishOnly": "yarn audit && node prepublish.js",
     "precompile": "yarn clean ./artifacts && yarn clean ./cache",
     "compile": "hardhat compile",
+    "compile:quick": "hardhat compile",
     "gen:docs": "hardhat docgen",
     "deploy": "hardhat run ./scripts/deploy/deployLock.ts --network",
     "verify": "hardhat verify-contract",
