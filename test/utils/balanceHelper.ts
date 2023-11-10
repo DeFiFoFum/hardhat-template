@@ -36,3 +36,33 @@ export const createNativeBalanceSnapshotter = (_ethers: typeof ethers) => {
     }
   }
 }
+
+/**
+ * Provide an ERC20 contract and an array of account addresses and receive on object
+ *   structured { account: string(balance) }
+ *
+ * @param {*} erc20Address
+ * @param {*} accounts
+ * @returns
+ */
+export async function getAccountTokenBalances(erc20Address: string, accounts: string[]) {
+  let promises = []
+  let accountBalances = {}
+  const ERC20_Factory = await ethers.getContractFactory('ERC20')
+  const erc20Contract = ERC20_Factory.attach(erc20Address)
+
+  for (const account of accounts) {
+    promises.push(
+      erc20Contract.balanceOf(account).then(
+        (balance: BigNumber) =>
+          (accountBalances = {
+            ...accountBalances,
+            [account]: balance.toString(),
+          })
+      )
+    )
+  }
+
+  await Promise.all(promises)
+  return accountBalances
+}

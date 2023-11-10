@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat'
 import { BigNumberish, Contract } from 'ethers'
 import { formatBNValueToString } from './bnHelper'
 
@@ -7,8 +8,7 @@ export type SnapshotCall = {
 }
 
 /**
- * Provide a contract with an array of view functions which contain zero arguments
- *  and return an object of all values.
+ * Provide a contract with an array of view functions and return an object of all return values.
  *
  * @param {*} contract
  * @param {*} snapshotFunctions Array of SnapshotCall | string matching the names of
@@ -16,7 +16,7 @@ export type SnapshotCall = {
  * @returns
  */
 // TODO: Can use generics to return the proper shape of the object
-export async function getContractGetterSnapshot<ContractType extends Contract>(
+export async function snapshotContractViewFunctions<ContractType extends Contract>(
   contract: ContractType,
   snapshotCalls: (SnapshotCall | string)[]
 ) {
