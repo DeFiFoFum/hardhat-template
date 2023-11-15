@@ -99,9 +99,7 @@ export class DeployManager {
     params: Parameters<C['deploy']>, // NOTE: For upgradeable proxy
     {
       name = 'Contract', // Default contract name if not provided
-    }: // FIXME: cc
-    // upgradeableProxy = false, // Default to non-upgradeable proxy
-    DeployContractOptions = {}
+    }: DeployContractOptions = {}
   ): Promise<ReturnType<C['deploy']>> {
     logger.logHeader(`Deploying ${name}`, `🚀`)
     // Get the balance of the account before deployment
