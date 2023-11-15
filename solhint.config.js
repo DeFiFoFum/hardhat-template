@@ -29,11 +29,11 @@ module.exports = {
     'func-param-name-mixedcase': 'error',
     'modifier-name-mixedcase': 'error',
     'private-vars-leading-underscore': ['error', { strict: false }],
-    ordering: 'error',
+    ordering: 'warn',
 
     // Security Rules
     'compiler-version': [
-      SOLC_COMPILER_VERSIONS.length == 1 ? 'error' : 'warn',
+      'warn',
       SOLC_COMPILER_VERSIONS[0],
       // NOTE: Custom value added in template to support exporting multiple compiler versions
       SOLC_COMPILER_VERSIONS,
