@@ -1,6 +1,7 @@
 import { ethers, network } from 'hardhat'
 import { getDeployConfig, DeployableNetworks } from './deploy.config'
 import { DeployManager } from './DeployManager'
+import { logger } from '../../hardhat/utils'
 
 /**
  * // NOTE: This is an example of the default hardhat deployment approach.
@@ -11,7 +12,9 @@ async function main() {
   const currentNetwork = network.name as DeployableNetworks
   // Optionally pass in accounts to be able to use them in the deployConfig
   const accounts = await ethers.getSigners()
-  const { wNative, adminAddress } = getDeployConfig(currentNetwork, accounts)
+  // NOTE: For importing deployment params by network
+  // const { wNative, adminAddress } = getDeployConfig(currentNetwork, accounts)
+
   // Optionally pass in signer to deploy contracts
   const deployManager = await DeployManager.create(accounts[0])
 
@@ -26,9 +29,23 @@ async function main() {
   const lock = await deployManager.deployContractFromFactory(
     Lock,
     [unlockTime, accounts[0].address, { value: lockedAmount }],
-    lockContractName // Pass in contract name to log contract
+    {
+      name: lockContractName, // Pass in contract name to log contract
+    }
   )
-  console.log('Lock with 1 ETH deployed to:', lock.address)
+  logger.log(`Lock with 1 ETH deployed to: ${lock.address}`, '🔒')
+
+  const lockUpgradableContractName = 'LockUpgradeable'
+  const LockUpgradable = await ethers.getContractFactory(lockUpgradableContractName)
+  // TODO: This isn't passing value to the constructor due to how upgradeable contracts work
+  const lockUpgradable = await deployManager.deployUpgradeableContract(
+    LockUpgradable,
+    [unlockTime, accounts[0].address],
+    {
+      name: lockUpgradableContractName, // Pass in contract name to log contract
+    }
+  )
+  logger.log(`LockUpgradeable to: ${lock.address}`, '🔒')
 
   await deployManager.verifyContracts()
 }
