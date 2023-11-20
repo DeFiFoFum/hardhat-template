@@ -17,6 +17,7 @@
         "Numberish",
         "POLYGONSCAN",
         "precommit",
+        "semgrep",
         "Snapshotter",
         "telos",
         "TELOSSCAN",
