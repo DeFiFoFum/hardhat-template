@@ -24,28 +24,14 @@ async function main() {
 
   const lockedAmount = ethers.utils.parseEther('.00001')
 
-  const lockContractName = 'Lock'
-  const Lock = await ethers.getContractFactory(lockContractName)
-  const lock = await deployManager.deployContractFromFactory(
-    Lock,
-    [unlockTime, accounts[0].address, { value: lockedAmount }],
-    {
-      name: lockContractName, // Pass in contract name to log contract
-    }
-  )
+  const lock = await deployManager.deployContract('Lock', [unlockTime, accounts[0].address, { value: lockedAmount }])
   logger.log(`Lock with 1 ETH deployed to: ${lock.address}`, '🔒')
 
-  const lockUpgradableContractName = 'LockUpgradeable'
-  const LockUpgradable = await ethers.getContractFactory(lockUpgradableContractName)
-  // TODO: This isn't passing value to the constructor due to how upgradeable contracts work
-  const lockUpgradable = await deployManager.deployUpgradeableContract(
-    LockUpgradable,
-    [unlockTime, accounts[0].address],
-    {
-      name: lockUpgradableContractName, // Pass in contract name to log contract
-    }
+  const { implementationThroughProxy: lockUpgradable } = await deployManager.deployUpgradeableContract(
+    'LockUpgradeable',
+    [unlockTime, accounts[0].address]
   )
-  logger.log(`LockUpgradeable to: ${lock.address}`, '🔒')
+  logger.log(`LockUpgradeable to: ${lockUpgradable.address}`, '🔒')
 
   await deployManager.verifyContracts()
 }
