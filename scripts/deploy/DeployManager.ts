@@ -248,12 +248,13 @@ export class DeployManager {
   ): Promise<{
     implementationThroughProxy: ReturnType<CF['attach']>
     proxyAdmin: ProxyAdmin
+    proxyAdminOwner: string
     transparentProxy: TransparentUpgradeableProxy
     implementation: ReturnType<CF['deploy']>
     initialized: boolean
   }> {
-    const { name = 'Contract', proxyAdminOwner, skipInitialization = false } = options
-    let { proxyAdminAddress } = options
+    const { name = 'Contract', skipInitialization = false } = options
+    let { proxyAdminOwner, proxyAdminAddress } = options
     logger.log(`Deploying upgradeable ${name}`, `🚀`)
 
     // Deploy the logic/implementation contract
@@ -265,9 +266,12 @@ export class DeployManager {
     // Deploy the ProxyAdmin if not provided
     let proxyAdmin
     if (!proxyAdminAddress) {
-      const admin = proxyAdminOwner ? proxyAdminOwner : await (await this.getSigner()).getAddress()
-      logger.log(`deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${admin}`, '⚠️')
-      proxyAdmin = await this.deployProxyAdmin(admin)
+      proxyAdminOwner = proxyAdminOwner ? proxyAdminOwner : await (await this.getSigner()).getAddress()
+      logger.log(
+        `deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${proxyAdminOwner}`,
+        '⚠️'
+      )
+      proxyAdmin = await this.deployProxyAdmin(proxyAdminOwner)
       proxyAdminAddress = proxyAdmin.address
     } else {
       proxyAdmin = (await ethers.getContractAt('ProxyAdmin', proxyAdminAddress)) as ProxyAdmin
@@ -301,6 +305,7 @@ export class DeployManager {
     return {
       implementationThroughProxy,
       proxyAdmin,
+      proxyAdminOwner: proxyAdminOwner || '',
       transparentProxy,
       implementation,
       initialized: skipInitialization,
