@@ -344,7 +344,9 @@ export class DeployManager {
   async deployProxyAdmin(adminAddress: string): Promise<ProxyAdmin> {
     logger.log(`Deploying Proxy Admin`, `🚀`)
     const ProxyAdminFactory = (await ethers.getContractFactory('ProxyAdmin')) as ProxyAdmin__factory
-    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [adminAddress], { name: 'ProxyAdmin' })
+    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [], { name: 'ProxyAdmin' })
+    // NOTE: in OZv5, the adminAddress is passed in as the constructor argument, but I prefer the OZv4 version because of the helper read functions
+    await proxyAdmin.transferOwnership(adminAddress)
     return proxyAdmin
   }
 
