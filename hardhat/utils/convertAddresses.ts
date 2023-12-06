@@ -40,6 +40,11 @@ export function convertAddressesToExplorerLinks(
     _getLink: (address: string) => string,
     _detailedInfo = false
   ) {
+    // Return early if _addressObject is null or undefined
+    if (_addressObject == null) {
+      return _addressObject
+    }
+
     Object.keys(_addressObject).forEach((key) => {
       const value = _addressObject[key]
       if (typeof value === 'string') {

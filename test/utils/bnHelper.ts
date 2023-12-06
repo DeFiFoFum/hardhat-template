@@ -1,5 +1,9 @@
 import { BigNumber, BigNumberish } from 'ethers'
 
+export function ether(ether: BigNumberish) {
+  return BigNumber.from(ether).mul(BigNumber.from(10).pow(18))
+}
+
 export function addBNStr(a: BigNumberish, b: BigNumberish) {
   return BigNumber.from(a).add(BigNumber.from(b)).toString()
 }

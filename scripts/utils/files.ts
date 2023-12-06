@@ -12,14 +12,17 @@ export const getDateString = () => new Date().toISOString().slice(0, 10).replace
 /**
  * Save a JS object to a local .ts file as an exported constant.
  *
- * @param fileName Name of the file (Do not include '.ts')
+ * @param fileName Name of the file. File extension will be cleaned and replaced with .ts
  * @param constName Name of the exported constant
  * @param data Object to write to file
  */
 export const writeObjectToTsFile = async (fileName: string, constName: string, data: {}): Promise<boolean> => {
   try {
+    // If the file name includes an extension, remove it
+    const extension = path.extname(fileName)
+    const baseName = extension ? path.basename(fileName, extension) : fileName
     const formattedData = `export const ${constName} = ${JSON.stringify(data, null, 2)};`
-    await fs.promises.writeFile(fileName + '.ts', formattedData)
+    await fs.promises.writeFile(baseName + '.ts', formattedData)
     return true
   } catch (e) {
     console.error(`${writeObjectToTsFile.name}:: Error writing ${fileName}: ${e}`)

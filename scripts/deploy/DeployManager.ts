@@ -44,9 +44,29 @@ interface ContractFromFactoryOptions {
   name?: string
 }
 
+/**
+ * Extended diagram of the Proxy Pattern used for upgradeable contracts including the admin of the ProxyAdmin:
+ *
+ *  +-------+                      +----------------+           +-------------------+           +-------------------+
+ *  |       |                      |                |           |                   |           |                   |
+ *  | Owner |                      |  ProxyAdmin    |           |  Transparent      |           |  Implementation   |
+ *  |       +--------------------->|                |  admin    |  UpgradeableProxy |  delegate |  Contract (Logic) |
+ *  |       |                      |                +---------->+                   +---------->+                   |
+ *  +-------+                      |                |           |                   |           |                   |
+ *                                 +----------------+           +-------------------+           +-------------------+
+ *
+ * - Owner: The external owner/administrator that has the rights to upgrade the proxy by interacting with the ProxyAdmin.
+ * - ProxyAdmin: The contract that administers the proxy contract, capable of upgrading it.
+ *      The ProxyAdmin CANNOT interact with the implementation contract directly.
+ * - TransparentUpgradeableProxy: The proxy contract that delegates calls to the implementation contract.
+ * - Implementation Contract (Logic): The contract containing the logic, which can be upgraded.
+ */
 interface UpgradeableContractFromFactoryOptions extends ContractFromFactoryOptions {
+  // Used to skip initializer when deploying upgradeable contracts
   skipInitialization?: boolean
+  // Skip deploying proxy admin and use existing one
   proxyAdminAddress?: string
+  // Proxy admin owner (Only used if proxyAdminAddress is not provided)
   proxyAdminOwner?: string
 }
 

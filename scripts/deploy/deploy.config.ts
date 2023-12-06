@@ -1,6 +1,8 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Networks } from '../../hardhat'
 import path from 'path'
+import { convertAddressesToExplorerLinksByNetwork } from '../../hardhat/utils'
+import { writeObjectToTsFile } from '../utils/files'
 
 // Define a base directory for deployments
 export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
@@ -16,6 +18,24 @@ export const getDeployConfig = (network: DeployableNetworks, signers?: SignerWit
     throw new Error(`No deploy config for network ${network}`)
   }
   return config(signers)
+}
+
+/**
+ * Generates a file path for deployment based on the current date and network name, and saves the deployment details to that file.
+ * @param networkName - The name of the network for which the deployment is being done
+ * @param deploymentDetails - The details of the deployment to save
+ */
+export async function saveDeploymentOutput(
+  networkName: Networks,
+  deploymentDetails: {},
+  convertAddressesToExplorerLinks: boolean
+): Promise<void> {
+  const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '') // e.g. 20230330
+  const filePath = path.resolve(DEPLOYMENTS_BASE_DIR, `${dateString}-${networkName}-deployment`)
+  if (convertAddressesToExplorerLinks) {
+    deploymentDetails = convertAddressesToExplorerLinksByNetwork(deploymentDetails, networkName, true)
+  }
+  await writeObjectToTsFile(filePath, 'deployment', deploymentDetails)
 }
 
 /**

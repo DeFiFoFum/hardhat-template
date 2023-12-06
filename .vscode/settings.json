@@ -6,6 +6,11 @@
         "titleBar.activeBackground": "#000000",
     },
     "editor.formatOnSave": true,
+    "mochaExplorer.files": [
+        "test/**/*.+(js|ts)",
+        // TODO: fork-tests currently don't work with the test explorer 
+        // "test-fork/**/*.+(js|ts)"
+    ],
     "cSpell.words": [
         "ARBISCAN",
         "bignumber",
