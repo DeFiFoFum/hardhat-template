@@ -45,14 +45,20 @@ task(TASK_TEST, '🫶 Test Task')
   .setAction(testRunner)
 
 const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
-const mainnetAccounts: HttpNetworkAccountsUserConfig = mainnetMnemonic
+const mainnetPrivateKey = getEnv('MAINNET_PRIVATE_KEY')
+const mainnetAccounts: HttpNetworkAccountsUserConfig | undefined = mainnetMnemonic
   ? { mnemonic: mainnetMnemonic }
-  : [getEnv('MAINNET_PRIVATE_KEY')] // Fallback to private key
+  : mainnetPrivateKey
+  ? [mainnetPrivateKey] // Fallback to private key
+  : undefined
 
 const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
-const testnetAccounts: HttpNetworkAccountsUserConfig = testnetMnemonic
+const testnetPrivateKey = getEnv('TESTNET_PRIVATE_KEY')
+const testnetAccounts: HttpNetworkAccountsUserConfig | undefined = testnetMnemonic
   ? { mnemonic: testnetMnemonic }
-  : [getEnv('TESTNET_PRIVATE_KEY')] // Fallback to private key
+  : testnetPrivateKey
+  ? [testnetPrivateKey] // Fallback to private key
+  : undefined
 
 type ExtendedNetworkOptions = {
   getExplorerUrl: (address: string) => string
