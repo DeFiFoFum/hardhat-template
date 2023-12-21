@@ -1,5 +1,10 @@
 import { HardhatUserConfig, task, types } from 'hardhat/config'
-import { HardhatRuntimeEnvironment, HttpNetworkUserConfig, SolcUserConfig } from 'hardhat/types'
+import {
+  HardhatRuntimeEnvironment,
+  HttpNetworkAccountsUserConfig,
+  HttpNetworkUserConfig,
+  SolcUserConfig,
+} from 'hardhat/types'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 // Plugins
 import '@nomicfoundation/hardhat-toolbox'
@@ -39,8 +44,15 @@ task(TASK_TEST, '🫶 Test Task')
   .addOptionalParam('blockNumber', 'Optional block number to fork in case of running fork tests.', undefined, types.int)
   .setAction(testRunner)
 
-export const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
-export const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
+const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
+const mainnetAccounts: HttpNetworkAccountsUserConfig = mainnetMnemonic
+  ? { mnemonic: mainnetMnemonic }
+  : [getEnv('MAINNET_PRIVATE_KEY')] // Fallback to private key
+
+const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
+const testnetAccounts: HttpNetworkAccountsUserConfig = testnetMnemonic
+  ? { mnemonic: testnetMnemonic }
+  : [getEnv('TESTNET_PRIVATE_KEY')] // Fallback to private key
 
 type ExtendedNetworkOptions = {
   getExplorerUrl: (address: string) => string
@@ -58,65 +70,49 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     url: getEnv('MAINNET_RPC_URL') || 'https://eth.llamarpc.com',
     getExplorerUrl: (address: string) => `https://etherscan.io/address/${address}`,
     chainId: 1,
-    accounts: {
-      mnemonic: mainnetMnemonic,
-    },
+    accounts: mainnetAccounts,
   },
   goerli: {
     url: getEnv('GOERLI_RPC_URL') || '',
     getExplorerUrl: (address: string) => `https://goerli.etherscan.io/address/${address}`,
     chainId: 5,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
+    accounts: testnetAccounts,
   },
   arbitrum: {
     url: getEnv('ARBITRUM_RPC_URL') || 'https://endpoints.omniatech.io/v1/arbitrum/one/public	',
     getExplorerUrl: (address: string) => `https://arbiscan.io/address/${address}`,
     chainId: 42161,
-    accounts: {
-      mnemonic: mainnetMnemonic,
-    },
+    accounts: mainnetAccounts,
   },
   arbitrumGoerli: {
     url: getEnv('ARBITRUM_GOERLI_RPC_URL') || '',
     getExplorerUrl: (address: string) => `https://testnet.arbiscan.io/address/${address}`,
     chainId: 421613,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
+    accounts: testnetAccounts,
   },
   bsc: {
     url: getEnv('BSC_RPC_URL') || 'https://bsc-dataseed1.binance.org',
     getExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
     chainId: 56,
-    accounts: {
-      mnemonic: mainnetMnemonic,
-    },
+    accounts: mainnetAccounts,
   },
   bscTestnet: {
     url: getEnv('BSC_TESTNET_RPC_URL') || 'https://data-seed-prebsc-1-s1.binance.org:8545',
     getExplorerUrl: (address: string) => `https://testnet.bscscan.com/address/${address}`,
     chainId: 97,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
+    accounts: testnetAccounts,
   },
   polygon: {
-    url: getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
+    url: getEnv('POLYGON_RPC_URL') || 'https://polygon.llamarpc.com',
     getExplorerUrl: (address: string) => `https://polygonscan.com/address/${address}`,
     chainId: 137,
-    accounts: {
-      mnemonic: mainnetMnemonic,
-    },
+    accounts: mainnetAccounts,
   },
   polygonTestnet: {
     url: getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
     getExplorerUrl: (address: string) => `https://mumbai.polygonscan.com/address/${address}`,
     chainId: 80001,
-    accounts: {
-      mnemonic: testnetMnemonic,
-    },
+    accounts: testnetAccounts,
   },
   // Placeholder for the configuration below.
   hardhat: {
@@ -126,6 +122,10 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
 
 export function getExplorerUrlForNetwork(networkName: Networks) {
   return networkConfig[networkName]?.getExplorerUrl
+}
+
+export function convertToExplorerUrlForNetwork(networkName: Networks, address: string) {
+  return getExplorerUrlForNetwork(networkName)(address)
 }
 
 /**
@@ -174,9 +174,7 @@ const config: HardhatUserConfig = {
   typechain: {
     // outDir: 'src/types', // defaults to './typechain-types/'
     target: 'ethers-v5',
-    externalArtifacts: [
-      // './artifacts-custom/**/*.json'
-    ], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
+    externalArtifacts: ['./artifacts-external/**/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
     dontOverrideCompile: false, // defaults to false
   },

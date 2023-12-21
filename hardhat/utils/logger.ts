@@ -5,18 +5,37 @@ const DEFAULTS = {
   silent: false,
 }
 
+interface LoggerOptions {
+  actor?: string
+  color?: string
+  verbose?: boolean
+  silent?: boolean
+}
+
 export class Logger {
   actor: string
   color: string
+  verbose: boolean
+  silent: boolean
 
-  static setDefaults(silent: boolean, verbose: boolean): void {
-    DEFAULTS.silent = silent
-    DEFAULTS.verbose = verbose
-  }
-
-  constructor(actor = '', color = 'white') {
+  constructor({
+    actor = '',
+    color = 'white',
+    verbose = DEFAULTS.verbose,
+    silent = DEFAULTS.silent,
+  }: LoggerOptions = {}) {
     this.actor = actor
     this.color = color
+    this.verbose = verbose
+    this.silent = silent
+  }
+
+  setVerbose(verbose: boolean): void {
+    this.verbose = verbose
+  }
+
+  setSilent(silent: boolean): void {
+    this.silent = silent
   }
 
   info(msg: string): void {
