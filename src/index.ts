@@ -4,3 +4,11 @@
  */
 const moduleState = undefined
 export { moduleState }
+
+// Logger
+import { logger } from '../hardhat/utils'
+if (process.env.DEVELOPMENT !== 'true') {
+  // If not in development, silence the logger
+  logger.setSilent(true)
+}
+export { logger }

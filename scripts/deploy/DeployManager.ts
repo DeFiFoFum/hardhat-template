@@ -84,6 +84,7 @@ export class DeployManager {
   private signer?: Signer
   baseDir: string
   deployedContracts: DeployedContractDetails[] = []
+  maxDeployRetries: number = 20
 
   /**
    * Private constructor to initialize the DeployManager class.
@@ -132,6 +133,25 @@ export class DeployManager {
     this.signer = signer
   }
 
+  /**
+   * More accurately manage nonces for the signer.
+   * @returns Next nonce for the signer
+   */
+  private async getNextNonce(): Promise<number> {
+    const signer = await this.getSigner()
+    // Get the nonce including pending transactions
+    const currentNonce = await signer.getTransactionCount('pending')
+    return currentNonce
+  }
+
+  /**
+   * Sets the number of retries to attempt for deployments for errors related to nonces and gas prices.
+   * @param retires - The number of retries to attempt
+   */
+  setMaxDeployRetries(retires: number) {
+    this.maxDeployRetries = retires
+  }
+
   // -----------------------------------------------------------------------------------------------
   // Deployments
   // -----------------------------------------------------------------------------------------------
@@ -171,7 +191,40 @@ export class DeployManager {
     logger.log(`Balance before deployment: ${balanceBeforeInEther} ETH`, `💰`)
     // Deploy contract with signer if available
     let encodedConstructorArgs = ''
-    const contractInstance = await contractFactory.connect(await this.getSigner()).deploy(...params)
+    let contractInstance: Awaited<ReturnType<CF['deploy']>> | undefined = undefined
+    let deployAttempt = 0
+
+    while (deployAttempt < this.maxDeployRetries) {
+      try {
+        const nextNonce = await this.getNextNonce()
+        logger.log(`Attempting to deploy ${name} with nonce: ${nextNonce}`, `🚀`)
+        contractInstance = (await contractFactory.connect(await this.getSigner()).deploy(...params, {
+          nonce: nextNonce,
+        })) as Awaited<ReturnType<CF['deploy']>>
+        await contractInstance.deployed()
+        logger.success(`Deployed ${name} at ${contractInstance.address}`)
+        break // Break out of loop if successful
+      } catch (error: any) {
+        // NOTE: Handling Nonce errors here:
+        if (error.code === 'NONCE_EXPIRED' || error.message.includes('already known')) {
+          const seconds = 1
+          deployAttempt++
+          logger.warn(
+            `${deployAttempt}/${this.maxDeployRetries}: Nonce already used, retrying with a new nonce in ${seconds} seconds...`
+          )
+          // Optionally, wait for a short period before retrying
+          await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+        } else {
+          // If the error is not related to nonce, rethrow it
+          throw error
+        }
+      }
+    }
+
+    if (!contractInstance) {
+      throw new Error(`Failed to deploy ${name} after ${deployAttempt} attempts.`)
+    }
+
     try {
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     } catch {
@@ -179,9 +232,7 @@ export class DeployManager {
       params.pop()
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     }
-    await contractInstance.deployed()
 
-    logger.success(`Deployed ${name} at ${contractInstance.address}`)
     // Save deployment details
     const deployedContractDetails: DeployedContractDetails = {
       name: name,
@@ -202,7 +253,7 @@ export class DeployManager {
     this.deployedContracts.push(deployedContractDetails)
     this.saveContractsToFile()
 
-    return contractInstance as ReturnType<CF['deploy']>
+    return contractInstance
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -344,7 +395,9 @@ export class DeployManager {
   async deployProxyAdmin(adminAddress: string): Promise<ProxyAdmin> {
     logger.log(`Deploying Proxy Admin`, `🚀`)
     const ProxyAdminFactory = (await ethers.getContractFactory('ProxyAdmin')) as ProxyAdmin__factory
-    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [adminAddress], { name: 'ProxyAdmin' })
+    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [], { name: 'ProxyAdmin' })
+    // NOTE: in OZv5, the adminAddress is passed in as the constructor argument, but I prefer the OZv4 version because of the helper read functions
+    await proxyAdmin.transferOwnership(adminAddress)
     return proxyAdmin
   }
 

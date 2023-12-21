@@ -1,7 +1,9 @@
 /**
  * Set the Solidity compiler versions
  */
-const SOLC_COMPILER_VERSIONS = ['0.8.23']
+// NOTE: Setting to '0.8.19` for now as certain chains do not support the push0 opcode.
+// https://medium.com/coinmonks/push0-opcode-a-significant-update-in-the-latest-solidity-version-0-8-20-ea028668028a
+const SOLC_COMPILER_VERSIONS = ['0.8.19']
 
 /**
  *
