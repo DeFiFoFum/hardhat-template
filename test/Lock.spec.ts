@@ -83,6 +83,8 @@ describe('Lock', function () {
 
         // We use lock.connect() to send a transaction from another account
         await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith("You aren't the owner")
+        // NOTE: To test for a custom error, we can use the `to.be.revertedWithCustomError()` matcher
+        // await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWithCustomError('ErrorLock_NotTheOwner')
       })
 
       it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
@@ -101,7 +103,7 @@ describe('Lock', function () {
 
         await time.increaseTo(unlockTime)
 
-        await expect(lock.withdraw()).to.emit(lock, 'Withdrawal').withArgs(lockedAmount, anyValue) // We accept any value as `when` arg
+        await expect(lock.withdraw()).to.emit(lock, 'Withdrawal').withArgs(lockedAmount, anyValue) // We can accept any value as `when` arg
       })
     })
 

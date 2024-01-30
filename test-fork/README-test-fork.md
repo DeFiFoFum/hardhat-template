@@ -2,6 +2,10 @@
 
 - [Hardhat: Forking other networks](https://hardhat.org/hardhat-network/docs/guides/forking-other-networks)
 
+## Usage
+
+- `yarn test:fork`
+
 ## Setup
 
 1. Update [hardhat-fork.config](../hardhat-fork.config.ts) under `hardhat.forkingl.url` with the fork RPC endpoint. (Forking is only configured on the `hardhat` network, but multiple fork configs can be created for different networks.)
