@@ -24,6 +24,9 @@ _**For testing features see [README-testing.md](./README-testing.md)**_
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during
 - Docs
+  - [Solidity Docgen](https://github.com/OpenZeppelin/solidity-docgen): Generate markdown files from the NatSpec comments in your Solidity code.
+    - [solidity-docgen config](https://github.com/OpenZeppelin/solidity-docgen/blob/HEAD/src/config.ts)
+  - OR
   - [Hardhat Docgen](https://www.npmjs.com/package/hardhat-docgen): Generate a static documentation site from NatSpec comments automatically on compilation with Hardhat.
 compilation.
 - Linting
