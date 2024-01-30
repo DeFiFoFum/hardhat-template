@@ -20,6 +20,7 @@ _**For testing features see [README-testing.md](./README-testing.md)**_
 - Contract Support
   - [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/): Trusted smart contract standards
   - [Openzeppelin Contracts Upgradeable](https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable): Upgradeable smart contract support
+  - [Safe Wallet](https://docs.safe.global/safe-smart-account/supported-networks/v1.3.0): Deploy Safe Wallets to the same address on multiple networks. (See [README-safe.md](./README-safe.md) for more info.)
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during
 - Docs
