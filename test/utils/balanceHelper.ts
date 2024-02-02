@@ -16,7 +16,7 @@ type Snapshot = {
 }
 
 /*
-// Updated example usage of createNativeBalanceSnapshotter
+// Example usage of createNativeBalanceSnapshotter
 
 // Import the function from the balanceHelper.ts file
 import { createNativeBalanceSnapshotter } from './test/utils/balanceHelper'
@@ -43,7 +43,7 @@ console.log('Updated Snapshots:', updatedSnapshots)
 */
 export const createNativeBalanceSnapshotter = (
   _ethers: typeof ethers,
-  accountAddresses: string[]
+  accountAddresses: (string | SignerWithAddress)[]
 ): (() => Promise<{
   [address: string]: Snapshot
 }>) => {
@@ -59,13 +59,18 @@ export const createNativeBalanceSnapshotter = (
     } = {}
 
     await Promise.all(
-      accountAddresses.map(async (address) => {
-        if (!snapshots[address]) {
-          snapshots[address] = []
+      accountAddresses.map(async (account) => {
+        let accountAddress = account as string
+        if (typeof account !== 'string') {
+          accountAddress = account.address
+        }
+        if (!snapshots[accountAddress]) {
+          snapshots[accountAddress] = []
         }
 
-        const balance = await provider.getBalance(address)
-        const lastSnapshot = snapshots[address].length > 0 ? snapshots[address][snapshots[address].length - 1] : null
+        const balance = await provider.getBalance(accountAddress)
+        const lastSnapshot =
+          snapshots[accountAddress].length > 0 ? snapshots[accountAddress][snapshots[accountAddress].length - 1] : null
         const newSnapshot: BalanceSnapshot = { balance, blockNumber, timestamp: block.timestamp }
 
         if (lastSnapshot) {
@@ -73,21 +78,21 @@ export const createNativeBalanceSnapshotter = (
           const blockDiff = blockNumber - lastSnapshot.blockNumber
           const timeDiff = block.timestamp - lastSnapshot.timestamp
 
-          snapshots[address].push(newSnapshot)
+          snapshots[accountAddress].push(newSnapshot)
 
-          currentSnapshot[address] = {
+          currentSnapshot[accountAddress] = {
             balanceDiff,
             blockDiff,
             timeDiff,
-            snapshots: snapshots[address],
+            snapshots: snapshots[accountAddress],
           }
         } else {
-          snapshots[address].push(newSnapshot)
-          currentSnapshot[address] = {
+          snapshots[accountAddress].push(newSnapshot)
+          currentSnapshot[accountAddress] = {
             balanceDiff: BigNumber.from(0),
             blockDiff: 0,
             timeDiff: 0,
-            snapshots: snapshots[address],
+            snapshots: snapshots[accountAddress],
           }
         }
       })
@@ -125,7 +130,7 @@ console.log('Updated ERC20 Snapshots:', updatedERC20Snapshots)
 */
 export const createERC20BalanceSnapshotter = (
   _ethers: typeof ethers,
-  accountAddresses: string[] | SignerWithAddress[],
+  accountAddresses: (string | SignerWithAddress)[],
   tokenAddresses: string[]
 ): (() => Promise<{
   [address: string]: {
@@ -208,3 +213,4 @@ export const createERC20BalanceSnapshotter = (
     return currentSnapshot
   }
 }
+//

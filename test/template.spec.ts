@@ -16,6 +16,7 @@ import { dynamicFixture } from './fixtures'
  * loadFixture() runs this setup once, snapshots that state,
  * and resets the Hardhat Network to that snapshot for every test.
  */
+type FixtureReturn = Awaited<ReturnType<typeof fixture>>
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
@@ -24,9 +25,17 @@ async function fixture() {
 }
 
 describe('Test Template', function () {
-  it('Should be able to load fixture', async () => {
-    const loadedFixture = await loadFixture(fixture)
+  let FR: FixtureReturn
+  before(async function () {
+    // Add code here to run before all tests
+  })
 
-    expect(loadedFixture).to.not.be.undefined
+  beforeEach(async function () {
+    // Add code here to run before each test
+    FR = await loadFixture(fixture)
+  })
+
+  it('Should be able to load fixture', async () => {
+    expect(FR).to.not.be.undefined
   })
 })
