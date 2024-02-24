@@ -3,6 +3,7 @@ import { Networks } from '../../hardhat'
 import path from 'path'
 import { convertAddressesToExplorerLinksByNetwork } from '../../hardhat/utils'
 import { writeObjectToTsFile } from '../utils/files'
+import { getDateMinuteString } from '../utils/dates'
 
 // Define a base directory for deployments
 export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
@@ -29,13 +30,14 @@ export async function saveDeploymentOutput(
   networkName: Networks,
   deploymentDetails: {},
   convertAddressesToExplorerLinks: boolean
-): Promise<void> {
-  const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '') // e.g. 20230330
-  const filePath = path.resolve(DEPLOYMENTS_BASE_DIR, `${dateString}-${networkName}-deployment`)
+): Promise<{}> {
+  // getDateMinuteString: YYYYMMDDTHH:MM
+  const filePath = path.resolve(DEPLOYMENTS_BASE_DIR, `${getDateMinuteString()}-${networkName}-deployment`)
   if (convertAddressesToExplorerLinks) {
     deploymentDetails = convertAddressesToExplorerLinksByNetwork(deploymentDetails, networkName, true)
   }
   await writeObjectToTsFile(filePath, 'deployment', deploymentDetails)
+  return deploymentDetails
 }
 
 /**
@@ -43,7 +45,7 @@ export async function saveDeploymentOutput(
  *
  * NOTE: Add networks as needed
  */
-export type DeployableNetworks = Extract<Networks, 'bsc' | 'bscTestnet'>
+export type DeployableNetworks = Extract<Networks, 'hardhat' | 'bsc' | 'bscTestnet'>
 
 /**
  * Deployment Variables for each network
@@ -54,6 +56,9 @@ interface DeploymentVariables {
   proxyAdminAddress: string
   adminAddress: string | SignerWithAddress
   wNative: string
+  contractOverrides?: {
+    proxyAdminContractAddress?: string
+  }
 }
 
 const deployableNetworkConfig: Record<DeployableNetworks, (signers?: SignerWithAddress[]) => DeploymentVariables> = {
@@ -66,6 +71,13 @@ const deployableNetworkConfig: Record<DeployableNetworks, (signers?: SignerWithA
     }
   },
   bscTestnet: (signers?: SignerWithAddress[]) => {
+    return {
+      proxyAdminAddress: '0x',
+      adminAddress: signers?.[0] || '0x',
+      wNative: '0x',
+    }
+  },
+  hardhat: (signers?: SignerWithAddress[]) => {
     return {
       proxyAdminAddress: '0x',
       adminAddress: signers?.[0] || '0x',

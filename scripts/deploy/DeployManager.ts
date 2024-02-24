@@ -10,6 +10,7 @@ import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxy__factory,
 } from '../../typechain-types'
+import { getDateMinuteString } from '../utils/dates'
 
 /*
 This is a TypeScript class called `DeployManager` that is used to deploy contracts, verify them and save the deployment details to a file. The class has the following methods:
@@ -275,7 +276,7 @@ export class DeployManager {
     implementationThroughProxy: ReturnType<CF['attach']> // Returns the interface of the implementation, at the proxy address.
     proxyAdmin: ProxyAdmin
     transparentProxy: TransparentUpgradeableProxy
-    implementation: ReturnType<CF['deploy']>
+    implementation: Awaited<ReturnType<CF['deploy']>>
   }> {
     const factory = (await ethers.getContractFactory(contractName)) as CF
     return this.deployUpgradeableContractFromFactory(factory, initializerParams, { name: contractName, ...options })
@@ -293,7 +294,7 @@ export class DeployManager {
     implementationThroughProxy: ReturnType<CF['attach']> // Returns the interface of the implementation, at the proxy address.
     proxyAdmin: ProxyAdmin
     transparentProxy: TransparentUpgradeableProxy
-    implementation: ReturnType<CF['deploy']>
+    implementation: Awaited<ReturnType<CF['deploy']>>
   }> {
     const factory = (await ethers.getContractFactory(contractName)) as CF
     return this.deployUpgradeableContractFromFactory(factory, [], {
@@ -321,7 +322,7 @@ export class DeployManager {
     proxyAdmin: ProxyAdmin
     proxyAdminOwner: string
     transparentProxy: TransparentUpgradeableProxy
-    implementation: ReturnType<CF['deploy']>
+    implementation: Awaited<ReturnType<CF['deploy']>>
     initialized: boolean
   }> {
     const { name = 'Contract', skipInitialization = false } = options
@@ -395,9 +396,9 @@ export class DeployManager {
   async deployProxyAdmin(adminAddress: string): Promise<ProxyAdmin> {
     logger.log(`Deploying Proxy Admin`, `🚀`)
     const ProxyAdminFactory = (await ethers.getContractFactory('ProxyAdmin')) as ProxyAdmin__factory
-    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [], { name: 'ProxyAdmin' })
     // NOTE: in OZv5, the adminAddress is passed in as the constructor argument, but I prefer the OZv4 version because of the helper read functions
-    await proxyAdmin.transferOwnership(adminAddress)
+    // The ProxyAdmin contract in this repo has been updated to use the constructor argument for the admin address to be able to do CREATE2 deployments
+    const proxyAdmin = await this.deployContractFromFactory(ProxyAdminFactory, [adminAddress], { name: 'ProxyAdmin' })
     return proxyAdmin
   }
 
@@ -434,21 +435,26 @@ export class DeployManager {
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Verifies all the contracts in the deployedContracts array.
+   * Verifies all the contracts in the deployedContracts array without compiling.
    */
   async verifyContracts() {
     for (const contract of this.deployedContracts) {
-      logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
-      try {
-        // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
-        await run('verify:verify', {
-          address: contract.address,
-          constructorArguments: contract.constructorArguments,
-        })
-        logger.success(`Verified ${contract.name} at ${contract.address}`)
-      } catch (error) {
-        logger.error(`Failed trying to verify ${contract.name} at ${contract.address}: ${error}`)
-      }
+      await this.verifyContract(contract)
+    }
+  }
+
+  async verifyContract(contract: DeployedContractDetails, noCompile = true) {
+    logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
+    try {
+      // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
+      await run('verify:verify', {
+        address: contract.address,
+        constructorArguments: contract.constructorArguments,
+        // noCompile, // This replaces the --no-compile flag
+      })
+      logger.success(`Verified ${contract.name} at ${contract.address}`)
+    } catch (error) {
+      logger.error(`Failed trying to verify ${contract.name} at ${contract.address}: ${error}`)
     }
   }
 
@@ -471,16 +477,32 @@ export class DeployManager {
     logger.log(`Saving contract details to file.`, `💾`)
 
     const paramsString = JSON.stringify(this.deployedContracts, null, 2) // The 'null, 2' arguments add indentation for readability
-    // Write the string to a file
-    const dateString = new Date().toISOString().slice(0, 10).replace(/-/g, '') // e.g. 20230330
-    const networkName = network.name
 
-    const filePath = this.baseDir + `/${dateString}-${networkName}-deployment.js`
+    const getFilePath = (dateString: string) => {
+      return this.baseDir + `/${dateString}-${network.name}-deployment.js`
+    }
+
+    const currentDate = new Date()
+    const currentDateString = getDateMinuteString(currentDate) // e.g. 20230330T12:50
+    const filePath = getFilePath(currentDateString)
     try {
       fs.writeFileSync(filePath, `module.exports = ${paramsString};`)
       logger.success(`Contract details saved to ${filePath}!`)
     } catch (error) {
       logger.error(`Failed saving contract details to file: ${error}`)
+    }
+
+    // Calculate the date string for one minute before the current time
+    const oneMinuteBefore = getDateMinuteString(new Date(currentDate.getTime() - 60000))
+    const oldFilePath = getFilePath(oneMinuteBefore)
+    // Check if the file exists and delete it
+    if (fs.existsSync(oldFilePath)) {
+      try {
+        fs.unlinkSync(oldFilePath)
+        logger.success(`Deleted old contract details file at ${oldFilePath}!`)
+      } catch (error) {
+        logger.error(`Failed to delete old contract details file at ${oldFilePath}: ${error}`)
+      }
     }
   }
 }
