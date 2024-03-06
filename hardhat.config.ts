@@ -7,11 +7,13 @@ import {
 } from 'hardhat/types'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 // Plugins
-import '@nomicfoundation/hardhat-toolbox'
-import '@nomiclabs/hardhat-etherscan'
+import '@typechain/hardhat'
+import '@nomicfoundation/hardhat-verify'
 import 'solidity-coverage'
-import 'hardhat-docgen'
+import 'solidity-docgen' // Markdown doc generator
+// import 'hardhat-docgen' // HTML doc generator
 import 'hardhat-contract-sizer'
+import 'hardhat-gas-reporter'
 import '@openzeppelin/hardhat-upgrades'
 import './plugins/abiPlugins'
 // Project Config
@@ -85,7 +87,7 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     accounts: testnetAccounts,
   },
   arbitrum: {
-    url: getEnv('ARBITRUM_RPC_URL') || 'https://endpoints.omniatech.io/v1/arbitrum/one/public	',
+    url: getEnv('ARBITRUM_RPC_URL') || 'https://arbitrum.llamarpc.com',
     getExplorerUrl: (address: string) => `https://arbiscan.io/address/${address}`,
     chainId: 42161,
     accounts: mainnetAccounts,
@@ -172,11 +174,17 @@ const config: HardhatUserConfig = {
     excludeContracts: [],
   },
   docgen: {
-    path: './docs',
-    clear: true,
-    // TODO: Enable for each compile (disabled for template to avoid unnecessary generation)
-    runOnCompile: false,
+    outputDir: './docs-site/docs/contracts',
+    pages: 'files',
+    exclude: ['/external', 'Migrations.sol', '/mocks'],
   },
+  // hardhat-docgen
+  // docgen: {
+  //   output: './docs',
+  //   clear: true,
+  //   // TODO: Enable for each compile (disabled for template to avoid unnecessary generation)
+  //   runOnCompile: false,
+  // },
   typechain: {
     // outDir: 'src/types', // defaults to './typechain-types/'
     target: 'ethers-v5',
