@@ -1,5 +1,5 @@
 import { logger } from '../../../hardhat/utils'
-import { setupFork } from '../../../test/utils'
+import { setupFork } from '../../../lib/evm/forkHelper'
 import { DeployableNetworks } from '../deploy.config'
 
 /**
@@ -23,7 +23,10 @@ import { DeployableNetworks } from '../deploy.config'
  *   const deployConfig = getDeployConfig(deployConfigNetwork, accounts)
  * })();
  */
-export async function forkIfHardhat(currentNetwork: DeployableNetworks, desiredFork: DeployableNetworks) {
+export async function forkIfHardhat(
+  currentNetwork: DeployableNetworks,
+  desiredFork: DeployableNetworks
+): Promise<DeployableNetworks> {
   let deployConfigNetwork = currentNetwork
   if (currentNetwork === 'hardhat') {
     logger.log(`Hardhat network detected, setting up fork for network ${desiredFork}`, '🍴')

@@ -1,6 +1,6 @@
 import hre, { artifacts } from 'hardhat'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { writeJSONToFile } from '../utils/files'
+import { writeJSONToFile } from '../../lib/node/files'
 import * as fs from 'fs'
 
 async function convertAbiToSol_FromPath(abiPath: string, contractName: string, solidityVersion: string) {

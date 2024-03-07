@@ -1,5 +1,5 @@
 import { getExplorerUrlForNetwork } from '../../hardhat.config'
-import { Networks } from '../networks'
+import { Networks } from '../../hardhat/networks'
 
 export const isAddress = (address?: string) =>
   address ? (address.length === 42 && address.slice(0, 2) === '0x' ? true : false) : false

@@ -1,5 +1,5 @@
 import { logger } from '../../../hardhat/utils'
-import { getErrorMessage } from '../../utils/getErrorMessage'
+import { getErrorMessage } from '../../../lib/node/getErrorMessage'
 
 /**
   // Usage

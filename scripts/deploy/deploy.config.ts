@@ -1,9 +1,9 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Networks } from '../../hardhat'
 import path from 'path'
-import { convertAddressesToExplorerLinksByNetwork } from '../../hardhat/utils'
-import { writeObjectToTsFile } from '../utils/files'
-import { getDateMinuteString } from '../utils/dates'
+import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/convertAddresses'
+import { writeObjectToTsFile } from '../../lib/node/files'
+import { getDateMinuteString } from '../../lib/node/dateHelper'
 
 // Define a base directory for deployments
 export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
