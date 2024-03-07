@@ -26,7 +26,6 @@
     "docs:serve": "yarn --cwd docs-site serve",
     "deploy": "hardhat run ./scripts/deploy/deployLock.ts --network",
     "deploy:safe": "hardhat run ./scripts/deploy/deployCreate2Safe.ts --network",
-    "script:fork": "hardhat run $SCRIPT_PATH --config hardhat-fork.config.ts --network hardhat",
     "verify": "hardhat verify-contract",
     "semgrep": "semgrep --config modules/semgrep-smart-contracts/solidity ./contracts",
     "test": "hardhat test",
