@@ -71,6 +71,7 @@
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
     "@ethersproject/providers": "^5.4.7",
+    "@moralisweb3/common-evm-utils": "^2.25.1",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.4",
@@ -90,6 +91,7 @@
     "hardhat": "^2.10.1",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.10",
+    "moralis": "^2.25.1",
     "node-fetch": "^2.6.7",
     "openai": "^4.26.0",
     "prettier": "^2.7.1",
