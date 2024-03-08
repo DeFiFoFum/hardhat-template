@@ -174,7 +174,7 @@ const config: HardhatUserConfig = {
     excludeContracts: [],
   },
   docgen: {
-    outputDir: './docs-site/docs/contracts',
+    outputDir: './docs/contracts',
     pages: 'files',
     exclude: ['/external', 'Migrations.sol', '/mocks'],
   },
