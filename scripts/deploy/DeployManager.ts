@@ -12,6 +12,7 @@ import {
 } from '../../typechain-types'
 import { getDateMinuteString } from '../../lib/node/dateHelper'
 import { addBNStr, mulBNStr } from '../../test/utils/bnHelper'
+import { FactoryOptions } from 'hardhat/types'
 
 /*
 This is a TypeScript class called `DeployManager` that is used to deploy contracts, verify them and save the deployment details to a file. The class has the following methods:
@@ -187,14 +188,15 @@ export class DeployManager {
    * Deploys a contract from name.
    * @param contractName - The name of the contract.
    * @param params - The parameters for the contract's deploy method.
+   * @param factoryOptions - The factory options for the contract.
    * @returns - A promise that resolves to the deployed contract instance.
    */
   async deployContract<CF extends ContractFactory>(
     contractName: string,
     params: Parameters<CF['deploy']>,
-    options: {} = {}
+    factoryOptions?: FactoryOptions
   ): Promise<ReturnType<CF['deploy']>> {
-    const factory = (await ethers.getContractFactory(contractName)) as CF
+    const factory = (await ethers.getContractFactory(contractName, factoryOptions)) as CF
     return this.deployContractFromFactory(factory, params, { name: contractName })
   }
 
@@ -329,19 +331,21 @@ export class DeployManager {
    * @param contractName - The name of the contract.
    * @param initializerParams - The parameters for initializing the contract.
    * @param options - The deployment options.
+   * @param factoryOptions - The factory options for the contract.
    */
   async deployUpgradeableContract<CF extends ContractFactory>(
     contractName: string,
     // NOTE: The main deploy method passes in constructors, but this passes in initializer params after deployment
     initializerParams: Parameters<ReturnType<CF['attach']>['initialize']>,
-    options: UpgradeableContractFromFactoryOptions = {}
+    options: UpgradeableContractFromFactoryOptions = {},
+    factoryOptions: FactoryOptions = {}
   ): Promise<{
     implementationThroughProxy: ReturnType<CF['attach']> // Returns the interface of the implementation, at the proxy address.
     proxyAdmin: ProxyAdmin
     transparentProxy: TransparentUpgradeableProxy
     implementation: Awaited<ReturnType<CF['deploy']>>
   }> {
-    const factory = (await ethers.getContractFactory(contractName)) as CF
+    const factory = (await ethers.getContractFactory(contractName, factoryOptions)) as CF
     return this.deployUpgradeableContractFromFactory(factory, initializerParams, { name: contractName, ...options })
   }
 
