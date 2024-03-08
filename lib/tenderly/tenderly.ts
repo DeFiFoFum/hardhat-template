@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getEnv } from '../../hardhat/utils'
 
 /**
  * Defines the configuration for a simulation in Tenderly.
@@ -36,12 +37,11 @@ export async function runTenderlySimulation(
   transaction: TenderlyEVMTransaction,
   config: SimulationConfig
 ): Promise<void> {
-  const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env
-  if (!TENDERLY_USER || !TENDERLY_PROJECT || !TENDERLY_ACCESS_KEY) {
-    throw new Error(
-      'runTenderlySimulation: Missing one or more of TENDERLY_USER, TENDERLY_PROJECT or TENDERLY_ACCESS_KEY'
-    )
-  }
+  const [TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY] = [
+    getEnv('TENDERLY_USER', true),
+    getEnv('TENDERLY_PROJECT', true),
+    getEnv('TENDERLY_ACCESS_KEY', true),
+  ]
 
   try {
     const resp = await axios.post(
