@@ -29,7 +29,9 @@ _Some features are apart of gitmodules which may need to be initialized. Run `ya
 
 ## Fork Testing
 
-This repo has support for forking networks and running tests against the forked network. Update [hardhat-fork.config.ts](./hardhat-fork.config.ts) with the network you want to fork and run `yarn test:fork` to run tests against the forked network with the tests in [test-fork](./test-fork).
+This repo has a helper function included to be able to fork any network when deploying on hardhat. Use the [setupFork](./lib/evm/forkHelper.ts) function to fork a network and the [resetFork](./lib/evm/forkHelper.ts) function to reset the fork.
+
+This can be used inside of [tests](./test) or [scripts](./scripts) to fork a network and test against it.
 
 ### Tenderly TX Simulations
 
