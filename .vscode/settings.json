@@ -17,6 +17,8 @@
         "Cheatcodes",
         "dont",
         "mixedcase",
+        "Moralis",
+        "moralisweb",
         "nomicfoundation",
         "nomiclabs",
         "Numberish",
@@ -26,6 +28,7 @@
         "Snapshotter",
         "telos",
         "TELOSSCAN",
-        "WBNB"
+        "WBNB",
+        "YYYYMMDDTHH"
     ]
 }
