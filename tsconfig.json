@@ -21,6 +21,7 @@
     "src",
     "tasks",
     "scripts",
+    "lib",
     "test",
     "hardhat.config.ts",
     "test-fork",
