@@ -2,7 +2,7 @@ import { ethers, network } from 'hardhat'
 import { getDeployConfig, DeployableNetworks, saveDeploymentOutput } from './deploy.config'
 import { DeployManager } from './DeployManager'
 import { logger } from '../../hardhat/utils'
-import { setupFork } from '../../test/utils'
+import { setupFork } from '../../lib/evm/forkHelper'
 import { createActionLog } from './utils/actionLog'
 
 async function main() {
@@ -20,7 +20,7 @@ async function main() {
   const deployer = accounts[0]
   const deployerAddress = await deployer.getAddress()
   // Setup deploy manager
-  const deployManager = await DeployManager.create(deployer)
+  const deployManager = await DeployManager.create({ signer: deployer })
   // Extract config for the network
   const deployConfig = getDeployConfig(deployConfigNetwork, accounts)
   // Contract overrides

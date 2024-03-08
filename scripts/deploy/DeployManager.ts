@@ -10,7 +10,8 @@ import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxy__factory,
 } from '../../typechain-types'
-import { getDateMinuteString } from '../utils/dates'
+import { getDateMinuteString } from '../../lib/node/dateHelper'
+import { addBNStr, mulBNStr } from '../../test/utils/bnHelper'
 
 /*
 This is a TypeScript class called `DeployManager` that is used to deploy contracts, verify them and save the deployment details to a file. The class has the following methods:
@@ -33,16 +34,26 @@ The class also defines a property called `baseDir` which is set to the current d
 // Interfaces
 // -----------------------------------------------------------------------------------------------
 
+interface GasEstimation {
+  gasLimit: string
+  gasPriceWei: string
+  gasPriceGei: string
+  ethCost: string
+}
+
 interface DeployedContractDetails {
   name: string
   address: string
   encodedConstructorArgs: string
   constructorArguments: any[]
   verificationCommand: string
+  gasEstimate: GasEstimation | null
 }
 
 interface ContractFromFactoryOptions {
   name?: string
+  estimateGas?: boolean
+  gasPriceOverride?: BigNumber
 }
 
 /**
@@ -76,7 +87,14 @@ type UpgradeableContractFromFactoryOptions_SkipInitialize = Omit<
   'skipInitialization'
 >
 
+interface DeployManagerConstructor {
+  signer?: Signer
+  baseDir?: string
+  gasPriceOverride?: BigNumberish
+}
+
 /**
+ * Version 3.1.1
  * A class to deploy contracts, verify them and save the deployment details to a file.
  *
  * See docs at top of file for more details.
@@ -84,6 +102,7 @@ type UpgradeableContractFromFactoryOptions_SkipInitialize = Omit<
 export class DeployManager {
   private signer?: Signer
   baseDir: string
+  gasPriceOverride?: BigNumber
   deployedContracts: DeployedContractDetails[] = []
   maxDeployRetries: number = 20
 
@@ -93,11 +112,14 @@ export class DeployManager {
    * @param signer - The signer instance.
    * @param baseDir - The base directory for saving deployment details.
    */
-  private constructor(signer?: Signer, baseDir = DEPLOYMENTS_BASE_DIR) {
+  private constructor({ signer, baseDir = DEPLOYMENTS_BASE_DIR, gasPriceOverride }: DeployManagerConstructor) {
     logger.log(`Setting up DeployManager. Your simple and friendly contract deployment, uhhh, manager.`, `👋🤓`)
     this.baseDir = baseDir
-    this.signer = signer ? signer : undefined
-    logger.log(`Deployment information will be saved in: ${baseDir}`, `💾`)
+    this.signer = signer
+    if (gasPriceOverride) {
+      this.gasPriceOverride = BigNumber.from(gasPriceOverride)
+    }
+    logger.log(`Deployment information will be saved in: ${this.baseDir}`, `💾`)
   }
 
   /**
@@ -106,8 +128,12 @@ export class DeployManager {
    * @param baseDir - The base directory for saving deployment details.
    * @returns - A promise that resolves to an instance of the DeployManager class.
    */
-  static async create(signer?: Signer, baseDir = DEPLOYMENTS_BASE_DIR): Promise<DeployManager> {
-    const instance = new DeployManager(signer, baseDir)
+  static async create({
+    signer,
+    baseDir = DEPLOYMENTS_BASE_DIR,
+    gasPriceOverride,
+  }: DeployManagerConstructor): Promise<DeployManager> {
+    const instance = new DeployManager({ signer, baseDir, gasPriceOverride })
     if (instance.signer) {
       logger.log(`Signer address: ${await instance.signer.getAddress()}`, `🖊️`)
     }
@@ -183,6 +209,8 @@ export class DeployManager {
     params: Parameters<CF['deploy']>, // NOTE: For upgradeable proxy
     {
       name = 'Contract', // Default contract name if not provided
+      estimateGas = true,
+      gasPriceOverride,
     }: ContractFromFactoryOptions = {}
   ): Promise<ReturnType<CF['deploy']>> {
     logger.logHeader(`Deploying ${name}`, `🚀`)
@@ -194,14 +222,48 @@ export class DeployManager {
     let encodedConstructorArgs = ''
     let contractInstance: Awaited<ReturnType<CF['deploy']>> | undefined = undefined
     let deployAttempt = 0
+    // Gas estimation
+    let gasEstimate: GasEstimation | null = null
+    if (estimateGas) {
+      try {
+        logger.log(`Estimating gas cost for deployment...`, `⛽`)
+        const currentGasPrice = gasPriceOverride
+          ? BigNumber.from(gasPriceOverride)
+          : this.gasPriceOverride
+          ? this.gasPriceOverride
+          : await (await this.getSigner()).getGasPrice()
+        const increasedGasPrice = currentGasPrice.mul(110).div(100) // Increase by 10%
+        const estimatedGas = await ethers.provider.estimateGas(contractFactory.getDeployTransaction(...params))
+        const ethCost = ethers.utils.formatEther(increasedGasPrice.mul(estimatedGas))
+        gasEstimate = {
+          gasLimit: estimatedGas.toString(),
+          gasPriceWei: increasedGasPrice.toString(),
+          gasPriceGei: ethers.utils.formatUnits(increasedGasPrice, 'gwei'),
+          ethCost,
+        }
+        logger.log(`Estimated gas cost for deployment: ${estimatedGas.toString()}`, `⛽`)
+        logger.log(`Estimated gas price: ${ethers.utils.formatUnits(increasedGasPrice.toString(), 'gwei')} gwei`, `⛽`)
+        logger.log(`Estimated cost: ${ethCost} ETH`, `⛽`)
+      } catch (error) {
+        logger.error(`Failed to estimate gas cost: ${error}`)
+      }
+    }
 
+    // Check if the last parameter is an options object and merge with nonce
+    const lastParam = params[params.length - 1]
+    const isOptionsObject = typeof lastParam === 'object' && lastParam !== null && !Array.isArray(lastParam)
+    const deployOptions = isOptionsObject ? lastParam : {}
+
+    // Retry deployment if nonce is already used
     while (deployAttempt < this.maxDeployRetries) {
       try {
         const nextNonce = await this.getNextNonce()
+        const mergedOptions = { ...deployOptions, nonce: nextNonce }
+        params = (isOptionsObject ? params.slice(0, -1).concat(mergedOptions) : params) as Parameters<CF['deploy']>
         logger.log(`Attempting to deploy ${name} with nonce: ${nextNonce}`, `🚀`)
-        contractInstance = (await contractFactory.connect(await this.getSigner()).deploy(...params, {
-          nonce: nextNonce,
-        })) as Awaited<ReturnType<CF['deploy']>>
+        contractInstance = (await contractFactory.connect(await this.getSigner()).deploy(...params)) as Awaited<
+          ReturnType<CF['deploy']>
+        >
         await contractInstance.deployed()
         logger.success(`Deployed ${name} at ${contractInstance.address}`)
         break // Break out of loop if successful
@@ -241,6 +303,7 @@ export class DeployManager {
       encodedConstructorArgs,
       constructorArguments: params,
       verificationCommand: '',
+      gasEstimate,
     }
 
     try {
@@ -366,7 +429,7 @@ export class DeployManager {
     // Deploy the TransparentUpgradeableProxy contract
     const transparentProxy = await this.deployTransparentProxy(
       implementation.address,
-      proxyAdminAddress,
+      proxyAdminAddress as string,
       initializerData
     )
     // Return the proxy contract as an instance of the implementation contract
@@ -438,12 +501,20 @@ export class DeployManager {
    * Verifies all the contracts in the deployedContracts array without compiling.
    */
   async verifyContracts() {
+    if (network.name === 'hardhat') {
+      logger.log('Skipping contract verification on hardhat network.', '⚠️')
+      return
+    }
     for (const contract of this.deployedContracts) {
       await this.verifyContract(contract)
     }
   }
 
   async verifyContract(contract: DeployedContractDetails, noCompile = true) {
+    if (network.name === 'hardhat') {
+      logger.log('Skipping contract verification on hardhat network.', '⚠️')
+      return
+    }
     logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
     try {
       // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
@@ -470,14 +541,34 @@ export class DeployManager {
     return verificationCommand
   }
 
+  // -----------------------------------------------------------------------------------------------
+  // Deployment Output
+  // -----------------------------------------------------------------------------------------------
+
   /**
    * Saves contract details to the deploy directory.
    */
   saveContractsToFile() {
     logger.log(`Saving contract details to file.`, `💾`)
+    // Calculate the total gas cost for all deployments
+    let deploymentCost: GasEstimation = { gasLimit: '0', gasPriceWei: '0', gasPriceGei: '0', ethCost: '0' }
+    for (const contract of this.deployedContracts) {
+      if (contract.gasEstimate) {
+        deploymentCost.gasLimit = addBNStr(deploymentCost.gasLimit, contract.gasEstimate.gasLimit)
+        deploymentCost.gasPriceWei = BigNumber.from(deploymentCost.gasPriceWei).gt(contract.gasEstimate.gasPriceWei)
+          ? deploymentCost.gasPriceWei
+          : contract.gasEstimate.gasPriceWei
+      }
+    }
+    deploymentCost.ethCost = ethers.utils.formatEther(mulBNStr(deploymentCost.gasPriceWei, deploymentCost.gasLimit))
+    deploymentCost.gasPriceGei = ethers.utils.formatUnits(deploymentCost.gasPriceWei, 'gwei')
+    logger.log(`Total gas cost for all deployments: ${deploymentCost.ethCost} ETH`, `⛽`)
 
-    const paramsString = JSON.stringify(this.deployedContracts, null, 2) // The 'null, 2' arguments add indentation for readability
-
+    const deploymentSummary = {
+      deployedContracts: this.deployedContracts,
+      totalDeploymentCost: deploymentCost,
+    }
+    const deploymentSummaryString = JSON.stringify(deploymentSummary, null, 2)
     const getFilePath = (dateString: string) => {
       return this.baseDir + `/${dateString}-${network.name}-deployment.js`
     }
@@ -486,12 +577,12 @@ export class DeployManager {
     const currentDateString = getDateMinuteString(currentDate) // e.g. 20230330T12:50
     const filePath = getFilePath(currentDateString)
     try {
-      fs.writeFileSync(filePath, `module.exports = ${paramsString};`)
-      logger.success(`Contract details saved to ${filePath}!`)
+      fs.writeFileSync(filePath, `module.exports = ${deploymentSummaryString};`)
+      logger.success(`Contract details saved to ${filePath} !`)
     } catch (error) {
       logger.error(`Failed saving contract details to file: ${error}`)
     }
-
+    // This helps to ensure that only the most recent deployment details are saved
     // Calculate the date string for one minute before the current time
     const oneMinuteBefore = getDateMinuteString(new Date(currentDate.getTime() - 60000))
     const oldFilePath = getFilePath(oneMinuteBefore)
