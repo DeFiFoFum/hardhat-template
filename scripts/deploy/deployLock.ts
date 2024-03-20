@@ -1,10 +1,12 @@
-import { ethers, network } from 'hardhat'
-import { getDeployConfig, DeployableNetworks } from './deploy.config'
+import hre, { ethers, network } from 'hardhat'
+import { getDeployConfig, DeployableNetworks, saveDeploymentOutput } from './deploy.config'
 import { DeployManager } from './DeployManager'
 import { logger } from '../../hardhat/utils'
 import { getCurrentGasPriceForNetwork } from '../../lib/evm/getCurrentGasPrice'
 import { forkIfHardhat } from './utils/forkDeployHelper'
 import { Lock__factory, LockUpgradeable__factory } from '../../typechain-types'
+import { deployLockFixture } from './fixtures/deployLockFixture'
+import { createActionLog } from './utils/actionLog'
 
 /**
  * // NOTE: This is an example of the default hardhat deployment approach.
@@ -23,47 +25,56 @@ async function main() {
   // Estimate gas price
   const estimatedGasPrice = await getCurrentGasPriceForNetwork(deployConfigNetwork)
   logger.log(`Deploy estimated gas price: ${ethers.utils.formatUnits(estimatedGasPrice.toString(), 'gwei')} gwei`, `⛽`)
+
   // Setup accounts
   const accounts = await ethers.getSigners()
-  const deployerAccount = accounts[0]
+  const [deployerAccount, hardhatAdminAccount, hardhatProxyAdminOwnerAddress] = accounts
   // Optionally pass in accounts to be able to use them in the deployConfig
-  const deploymentVariables = getDeployConfig(deployConfigNetwork, accounts)
+  let deploymentVariables = getDeployConfig(deployConfigNetwork)
+  if (currentNetwork === 'hardhat') {
+    logger.warn(`Using hardhat network, deploying with overriding accounts`)
+    deploymentVariables = getDeployConfig(deployConfigNetwork, {
+      accountOverrides: {
+        adminAddress: hardhatAdminAccount.address,
+        proxyAdminOwnerAddress: hardhatProxyAdminOwnerAddress.address,
+      },
+    })
+  }
 
   // Setup deploy manager, optionally pass in signer
   const deployManager = await DeployManager.create({ signer: deployerAccount, gasPriceOverride: estimatedGasPrice })
+  // Actions to take after deployment to finalize deployment setup
+  const { pushActionsAndLog, pushActions, getActions, tryActionCatchAndLog } = createActionLog()
 
   // -------------------------------------------------------------------------------------------------------------------
   // Deployment
   // -------------------------------------------------------------------------------------------------------------------
-
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000)
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS
-
-  const lockedAmount = ethers.utils.parseEther('.00001')
-
-  const lock = await deployManager.deployContract<Lock__factory>('Lock', [
-    unlockTime,
-    accounts[0].address,
-    { value: lockedAmount },
-  ])
-  logger.log(`Lock with 1 ETH deployed to: ${lock.address}`, '🔒')
-
-  const { implementationThroughProxy: lockUpgradable } =
-    await deployManager.deployUpgradeableContract<LockUpgradeable__factory>('LockUpgradeable', [
-      unlockTime,
-      accounts[0].address,
-    ])
-  logger.log(`LockUpgradeable to: ${lockUpgradable.address}`, '🔒')
-  await deployerAccount.sendTransaction({
-    to: lockUpgradable.address,
-    value: lockedAmount,
+  const lockDeployment = await deployLockFixture(hre, deployManager, {
+    accountOverrides: deploymentVariables.accounts,
+    contractOverrides: deploymentVariables.contractOverrides,
   })
-  logger.log(
-    `Transferred ${ethers.utils.formatEther(lockedAmount)} ETH to LockUpgradeable at: ${lockUpgradable.address}`,
-    '💸'
-  )
 
+  // -------------------------------------------------------------------------------------------------------------------
+  // Output
+  // -------------------------------------------------------------------------------------------------------------------
+
+  let output = {
+    deployedContracts: {
+      // Add in contract details here
+      ...lockDeployment.addressOutput,
+    },
+    deploymentVariables,
+    NEXT_ACTIONS: getActions(),
+  }
+
+  try {
+    await saveDeploymentOutput(currentNetwork, output, true, true)
+  } catch (e) {
+    logger.error(`Error saving deployment output to file: ${e}`)
+  }
+
+  // NOTE: Verifications are verbose, would be nice to cut down on that. The contracts compile each time
+  logger.log('Verifying contracts...', '🔎')
   await deployManager.verifyContracts()
 }
 

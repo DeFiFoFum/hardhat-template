@@ -1,11 +1,15 @@
-import { ethers, network } from 'hardhat'
+import hre, { ethers, network } from 'hardhat'
 import { getDeployConfig, DeployableNetworks, saveDeploymentOutput } from './deploy.config'
 import { DeployManager } from './DeployManager'
 import { logger } from '../../hardhat/utils'
 import { setupFork } from '../../lib/evm/forkHelper'
 import { createActionLog } from './utils/actionLog'
+import { deployLockFixture } from './fixtures/deployLockFixture'
 
 async function main() {
+  // -------------------------------------------------------------------------------------------------------------------
+  // Network Setup and Configuration
+  // -------------------------------------------------------------------------------------------------------------------
   const currentNetwork = network.name as DeployableNetworks
   let deployConfigNetwork = currentNetwork
   if (currentNetwork === 'hardhat') {
@@ -17,35 +21,35 @@ async function main() {
   }
 
   const accounts = await ethers.getSigners()
-  const deployer = accounts[0]
-  const deployerAddress = await deployer.getAddress()
-  // Setup deploy manager
-  const deployManager = await DeployManager.create({ signer: deployer })
   // Extract config for the network
-  const deployConfig = getDeployConfig(deployConfigNetwork, accounts)
+  const [deployerAccount, hardhatAdminAccount, hardhatProxyAdminOwnerAddress] = accounts
+  // Setup deploy manager
+  const deployManager = await DeployManager.create({ signer: deployerAccount })
+  // Optionally pass in accounts to be able to use them in the deployConfig
+  let deploymentVariables = getDeployConfig(deployConfigNetwork)
+  if (currentNetwork === 'hardhat') {
+    logger.warn(`Using hardhat network, deploying with overriding accounts`)
+    deploymentVariables = getDeployConfig(deployConfigNetwork, {
+      accountOverrides: {
+        adminAddress: hardhatAdminAccount.address,
+        proxyAdminOwnerAddress: hardhatProxyAdminOwnerAddress.address,
+      },
+    })
+  }
   // Contract overrides
-  const contractOverrides = deployConfig.contractOverrides
+  const contractOverrides = deploymentVariables.contractOverrides
   // Optional, used throughout the script and will be deployed if not passed
   let proxyAdminContractAddress = contractOverrides?.proxyAdminContractAddress
   // Actions to take after deployment to finalize deployment setup
   const { pushActionsAndLog, pushActions, getActions, tryActionCatchAndLog } = createActionLog()
 
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000)
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS
-
-  const lockedAmount = ethers.utils.parseEther('.00001')
-
-  const lock = await deployManager.deployContract('Lock', [unlockTime, accounts[0].address, { value: lockedAmount }])
-  logger.log(`Lock with 1 ETH deployed to: ${lock.address}`, '🔒')
-
-  const { implementationThroughProxy: lockUpgradable } = await deployManager.deployUpgradeableContract(
-    'LockUpgradeable',
-    [unlockTime, accounts[0].address]
-  )
-  logger.log(`LockUpgradeable to: ${lockUpgradable.address}`, '🔒')
-
-  await deployManager.verifyContracts()
+  // -------------------------------------------------------------------------------------------------------------------
+  // Deployment
+  // -------------------------------------------------------------------------------------------------------------------
+  const lockDeployment = await deployLockFixture(hre, deployManager, {
+    accountOverrides: deploymentVariables.accounts,
+    contractOverrides: deploymentVariables.contractOverrides,
+  })
 
   // -----------------------------------------------------------------------------------------------
   // Output
@@ -54,24 +58,21 @@ async function main() {
   let output = {
     deployedContracts: {
       // Add in contract details here
+      ...lockDeployment.addressOutput,
     },
-    deployConfig,
+    deploymentVariables,
     NEXT_ACTIONS: getActions(),
   }
 
   try {
-    console.dir(output)
-    logger.log('Writing deployment output to file...', '📝')
-    await saveDeploymentOutput(currentNetwork, output, true)
+    await saveDeploymentOutput(currentNetwork, output, true, true)
   } catch (e) {
     logger.error(`Error saving deployment output to file: ${e}`)
   }
 
   // NOTE: Verifications are verbose, would be nice to cut down on that. The contracts compile each time
-  if (currentNetwork !== 'hardhat') {
-    logger.log('Verifying contracts...', '🔎')
-    await deployManager.verifyContracts()
-  }
+  logger.log('Verifying contracts...', '🔎')
+  await deployManager.verifyContracts()
 }
 
 // We recommend this pattern to be able to use async/await everywhere
