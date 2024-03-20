@@ -4,9 +4,7 @@ import { DeployManager } from './DeployManager'
 import { logger } from '../../hardhat/utils'
 import { getCurrentGasPriceForNetwork } from '../../lib/evm/getCurrentGasPrice'
 import { forkIfHardhat } from './utils/forkDeployHelper'
-import { Networks } from '../../hardhat'
-import { Lock__factory } from '../../typechain-types'
-import { LockUpgradeable__factory } from '../../typechain-types/factories/contracts'
+import { Lock__factory, LockUpgradeable__factory } from '../../typechain-types'
 
 /**
  * // NOTE: This is an example of the default hardhat deployment approach.

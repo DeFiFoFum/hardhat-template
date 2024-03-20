@@ -8,13 +8,13 @@ import {
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 // Plugins
 import '@typechain/hardhat'
+import "@nomiclabs/hardhat-ethers"
 import '@nomicfoundation/hardhat-verify'
 import 'solidity-coverage'
 import 'solidity-docgen' // Markdown doc generator
 // import 'hardhat-docgen' // HTML doc generator
 import 'hardhat-contract-sizer'
 import 'hardhat-gas-reporter'
-import '@openzeppelin/hardhat-upgrades'
 import './plugins/abiPlugins'
 // Project Config
 import solhintConfig from './solhint.config'

@@ -89,7 +89,7 @@
     "dotenv": "^16.0.1",
     "ethers": "^5.4.7",
     "fs": "^0.0.1-security",
-    "hardhat": "^2.10.1",
+    "hardhat": "2.14.0",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.10",
     "husky": "^9.0.11",
@@ -108,7 +108,6 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "4.9.3",
-    "@openzeppelin/contracts-upgradeable": "4.9.3",
-    "@openzeppelin/hardhat-upgrades": "^1.22.1"
+    "@openzeppelin/contracts-upgradeable": "4.9.3"
   }
 }
