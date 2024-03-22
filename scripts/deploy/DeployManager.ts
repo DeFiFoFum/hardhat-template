@@ -146,11 +146,16 @@ export class DeployManager {
    * @returns - A promise that resolves to a signer instance.
    */
   async getSigner(): Promise<Signer> {
-    if (!this.signer) {
+    let signer = this.signer
+    if (!signer) {
       // NOTE: Defaults to the first signer if not provided
-      return (await ethers.getSigners())[0]
+      signer = (await ethers.getSigners())[0]
     }
-    return this.signer
+
+    if (!signer) {
+      throw new Error(logger.error(`Signer not available, please check your mnemonic/private key.`))
+    }
+    return signer
   }
 
   /**

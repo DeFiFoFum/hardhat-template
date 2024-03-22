@@ -38,33 +38,38 @@ export class Logger {
     this.silent = silent
   }
 
-  info(msg: string): void {
-    if (!DEFAULTS.verbose) return
+  info(msg: string): string {
+    if (!DEFAULTS.verbose) return msg
     this.log(msg, '️  ', 'white')
+    return msg
   }
 
-  success(msg: string): void {
+  success(msg: string): string {
     this.log(msg, '✅', 'green')
+    return msg
   }
 
-  warn(msg: string, error?: Error): void {
+  warn(msg: string, error?: Error): string {
     this.log(msg, '⚠️ ', 'yellow')
     if (error) console.error(error)
+    return msg
   }
 
-  error(msg: string, error?: Error): void {
+  error(msg: string, error?: Error): string {
     this.log(msg, '🚨', 'red')
     if (error) console.error(error)
+    return msg
   }
 
-  log(msg: string, emoji: string, color = 'white'): void {
-    if (DEFAULTS.silent) return
+  log(msg: string, emoji: string, color = 'white'): string {
     let formattedMessage = chalk.keyword(color)(`${emoji}  ${msg}`)
     if (DEFAULTS.verbose) {
       const formattedPrefix = chalk.keyword(this.color)(`[${this.actor}]`)
       formattedMessage = `${formattedPrefix} ${formattedMessage}`
     }
+    if (DEFAULTS.silent) return formattedMessage
     console.error(formattedMessage)
+    return formattedMessage
   }
 
   logHeader(msg: string, emoji: string, color = 'white'): void {
