@@ -8,7 +8,7 @@ import {
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 // Plugins
 import '@typechain/hardhat'
-import "@nomiclabs/hardhat-ethers"
+import '@nomiclabs/hardhat-ethers'
 import '@nomicfoundation/hardhat-verify'
 import 'solidity-coverage'
 import 'solidity-docgen' // Markdown doc generator
@@ -134,6 +134,10 @@ export function getExplorerUrlForNetwork(networkName: Networks) {
 
 export function convertToExplorerUrlForNetwork(networkName: Networks, address: string) {
   return getExplorerUrlForNetwork(networkName)(address)
+}
+
+export function geRpcUrlForNetwork(networkName: Networks) {
+  return (networkConfig[networkName] as HttpNetworkUserConfig).url
 }
 
 /**

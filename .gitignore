@@ -1,6 +1,9 @@
 # Local
 __*
 
+# Deployment
+deployments/*-deployment.js
+
 # Hardhat files
 cache
 artifacts

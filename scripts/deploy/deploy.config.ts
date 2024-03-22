@@ -67,8 +67,7 @@ export interface FixtureOverrides {
 
 /**
  * DeploymentAccounts defines the structure for account-related configurations
- * needed during the deployment process. It currently includes an adminAddress
- * which can be a string or a SignerWithAddress object.
+ * needed during the deployment process.
  *
  * Extend or modify this interface to include additional account-related configurations as needed.
  */
