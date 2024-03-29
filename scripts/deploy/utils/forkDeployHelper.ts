@@ -10,6 +10,7 @@ import { DeployableNetworks } from '../deploy.config'
  *
  * @param currentNetwork - The network on which the deployment script is currently running.
  * @param desiredFork - The network you wish to fork if running on Hardhat.
+ * @param desiredBlock - The block number to fork from. If not provided, the latest block will be used.
  * @returns The network that should be used for deployment configuration. This will be the
  *          desired fork network if a fork was set up, or the original network otherwise.
  *
@@ -25,12 +26,13 @@ import { DeployableNetworks } from '../deploy.config'
  */
 export async function forkIfHardhat(
   currentNetwork: DeployableNetworks,
-  desiredFork: DeployableNetworks
-): Promise<DeployableNetworks> {
+  desiredFork: DeployableNetworks,
+  desiredBlock?: number
+) {
   let deployConfigNetwork = currentNetwork
   if (currentNetwork === 'hardhat') {
     logger.log(`Hardhat network detected, setting up fork for network ${desiredFork}`, '🍴')
-    await setupFork(desiredFork)
+    await setupFork(desiredFork, desiredBlock)
     deployConfigNetwork = desiredFork
   }
   return deployConfigNetwork
