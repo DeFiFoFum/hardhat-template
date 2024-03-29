@@ -36,6 +36,7 @@
     "test:coverage": "hardhat coverage",
     "test:ci": "yarn compile && yarn test",
     "test:fork": "yarn hardhat --config hardhat-fork.config.ts test ./test-fork/**/*.spec.ts",
+    "monitor:get-proxy-admin": "hardhat run ./scripts/monitor/getProxyAdminForDeployment.ts --network",
     "size": "hardhat size-contracts",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:fix": "yarn lint:sol:fix && yarn lint:ts:fix",
@@ -103,7 +104,6 @@
     "solidity-coverage": "^0.8.2",
     "solidity-docgen": "^0.6.0-beta.36",
     "ts-node": ">=8.0.0",
-    "typechain": "^8.1.0",
     "typescript": ">=4.5.0"
   },
   "dependencies": {

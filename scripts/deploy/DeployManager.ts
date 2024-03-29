@@ -579,7 +579,7 @@ export class DeployManager {
     }
     const deploymentSummaryString = JSON.stringify(deploymentSummary, null, 2)
     const getFilePath = (dateString: string) => {
-      return this.baseDir + `/${dateString}-${network.name}-deployment.js`
+      return this.baseDir + `/${dateString}-${network.name}-deployment-artifact.js`
     }
 
     const currentDate = new Date()

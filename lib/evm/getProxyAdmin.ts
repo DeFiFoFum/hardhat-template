@@ -1,5 +1,7 @@
+import { ethers } from 'hardhat'
 import { Networks } from '../../hardhat'
 import { geRpcUrlForNetwork } from '../../hardhat.config'
+import { logger } from '../../hardhat/utils'
 
 /**
  * Retrieves the proxy admin address for a given proxy contract on a specified network.
@@ -47,6 +49,15 @@ export async function getProxyAdminOfProxyContract(networkName: Networks, addres
     throw new Error('Failed to get the storage from the network')
   }
 
-  const formattedAddress = '0x' + response.result.slice(26)
-  return formattedAddress
+  const proxyAdminAddress = '0x' + response.result.slice(26)
+
+  let proxyAdminOwner
+  try {
+    proxyAdminOwner = await ethers.getContractAt('Ownable', proxyAdminAddress).then((contract) => contract.owner())
+  } catch (e) {
+    logger.error('Error getting proxy admin owner.')
+    console.dir(e)
+    proxyAdminOwner = 'no-owner-found'
+  }
+  return { proxyAdminAddress, proxyAdminOwner }
 }

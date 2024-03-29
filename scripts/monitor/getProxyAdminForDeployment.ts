@@ -10,12 +10,16 @@ async function script() {
   const currentNetwork = network.name as Networks
 
   const proxyContractAddress = '0x'
-  const proxyAdminAddress = await getProxyAdminOfProxyContract(currentNetwork, proxyContractAddress)
+  const { proxyAdminAddress, proxyAdminOwner } = await getProxyAdminOfProxyContract(
+    currentNetwork,
+    proxyContractAddress
+  )
 
   const output = convertAddressesToExplorerLinksByNetwork(
     {
       proxyContractAddress,
       proxyAdminAddress,
+      proxyAdminOwner,
     },
     currentNetwork,
     true
