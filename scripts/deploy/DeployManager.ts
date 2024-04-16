@@ -338,6 +338,7 @@ export class DeployManager {
    * @param options - The deployment options.
    * @param factoryOptions - The factory options for the contract.
    */
+  // TODO: These functions don't seem to be using all of the options. (i.e., seems to be able to pass a ContractFactory and Implementation)
   async deployUpgradeableContract<CF extends ContractFactory>(
     contractName: string,
     // NOTE: The main deploy method passes in constructors, but this passes in initializer params after deployment
@@ -411,18 +412,16 @@ export class DeployManager {
     let proxyAdmin
     if (!proxyAdminAddress) {
       proxyAdminOwner = proxyAdminOwner ? proxyAdminOwner : await (await this.getSigner()).getAddress()
-      logger.log(
-        `deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${proxyAdminOwner}`,
-        '⚠️'
+      logger.warn(
+        `deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${proxyAdminOwner}`
       )
       proxyAdmin = await this.deployProxyAdmin(proxyAdminOwner)
       proxyAdminAddress = proxyAdmin.address
     } else {
       proxyAdmin = (await ethers.getContractAt('ProxyAdmin', proxyAdminAddress)) as ProxyAdmin
       if (proxyAdminOwner) {
-        logger.log(
-          `deployUpgradeableContract:: Proxy Admin passed. ProxyAdminOwner: ${proxyAdminOwner} will NOT be used`,
-          '⚠️'
+        logger.warn(
+          `deployUpgradeableContract:: Proxy Admin passed. ProxyAdminOwner: ${proxyAdminOwner} will NOT be used`
         )
       }
     }
