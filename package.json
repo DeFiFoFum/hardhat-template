@@ -1,6 +1,6 @@
 {
   "name": "@defifofum/hardhat-template",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain, Foundry and more.",
   "main": "./dist/index.js",
   "files": [
