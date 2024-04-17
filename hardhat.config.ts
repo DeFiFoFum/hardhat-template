@@ -73,6 +73,7 @@ type ExtendedHardhatNetworkConfig = {
   [K in Networks]: K extends 'hardhat' ? HardhatUserConfig & ExtendedNetworkOptions : NetworkUserConfigExtended
 }
 
+// NOTE: RPC Urls can be found at https://chainlist.org/
 const networkConfig: ExtendedHardhatNetworkConfig = {
   mainnet: {
     url: getEnv('MAINNET_RPC_URL') || 'https://eth.llamarpc.com',
@@ -123,7 +124,7 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     accounts: testnetAccounts,
   },
   polygon: {
-    url: getEnv('POLYGON_RPC_URL') || 'https://polygon.llamarpc.com',
+    url: getEnv('POLYGON_RPC_URL') || 'https://polygon-rpc.com',
     getExplorerUrl: (address: string) => `https://polygonscan.com/address/${address}`,
     chainId: 137,
     accounts: mainnetAccounts,

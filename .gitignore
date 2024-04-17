@@ -1,5 +1,7 @@
 # Local
 __*
+**/output/*
+!**/output/.gitkeep
 
 # Deployment
 deployments/*-deployment.js

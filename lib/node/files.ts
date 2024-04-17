@@ -18,11 +18,14 @@ export const getDateString = () => new Date().toISOString().slice(0, 10).replace
  */
 export const writeObjectToTsFile = async (fileName: string, constName: string, data: {}): Promise<boolean> => {
   try {
-    // If the file name includes an extension, remove it
-    const extension = path.extname(fileName)
-    const baseName = extension ? path.basename(fileName, extension) : fileName
+    // Regular expression to remove the file extension:
+    // \.       - matches the literal '.' character
+    // [^/.]+   - matches one or more characters that are not a '.' or '/' (to avoid matching directories)
+    // $        - asserts position at the end of the line
+    const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, '')
     const formattedData = `export const ${constName} = ${JSON.stringify(data, null, 2)};`
-    await fs.promises.writeFile(baseName + '.ts', formattedData)
+
+    await fs.promises.writeFile(`${fileNameWithoutExt}.ts`, formattedData)
     return true
   } catch (e) {
     console.error(`${writeObjectToTsFile.name}:: Error writing ${fileName}: ${e}`)
