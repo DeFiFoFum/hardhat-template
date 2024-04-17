@@ -3,6 +3,7 @@ __*
 
 # Deployment
 deployments/*-deployment.js
+deployments/*-deployment-artifact.js
 
 # Hardhat files
 cache

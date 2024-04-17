@@ -51,6 +51,7 @@ export async function setupFork(networkName: Networks, blockNumber?: number) {
   const latestBlock = await hre.network.provider.send('eth_blockNumber')
   blockNumber = parseInt(latestBlock, 16)
   logger.log(`Fork has been setup. Starting a block: ${blockNumber}.`, '🍴')
+  return blockNumber
 }
 
 /**

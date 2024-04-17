@@ -110,6 +110,18 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     chainId: 97,
     accounts: testnetAccounts,
   },
+  linea: {
+    url: getEnv('LINEA_RPC_URL') || 'https://rpc.linea.build',
+    getExplorerUrl: (address: string) => `https://lineascan.build/address/${address}`,
+    chainId: 59144,
+    accounts: mainnetAccounts,
+  },
+  lineaTestnet: {
+    url: getEnv('LINEA_TESTNET_RPC_URL') || 'https://rpc.goerli.linea.build',
+    getExplorerUrl: (address: string) => `https://goerli.lineascan.build/address/${address}`,
+    chainId: 59140,
+    accounts: testnetAccounts,
+  },
   polygon: {
     url: getEnv('POLYGON_RPC_URL') || 'https://polygon.llamarpc.com',
     getExplorerUrl: (address: string) => `https://polygonscan.com/address/${address}`,
