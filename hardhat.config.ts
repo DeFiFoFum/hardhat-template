@@ -1,4 +1,5 @@
 import { HardhatUserConfig, task, types } from 'hardhat/config'
+import { run } from 'hardhat'
 import {
   HardhatRuntimeEnvironment,
   HttpNetworkAccountsUserConfig,
@@ -35,6 +36,45 @@ task('blockNumber', '🫶 Prints the current block number', async (_, hre: Hardh
     console.log('Current block number: ' + blockNumber)
   })
 })
+
+/**
+ * Quickly deploy an implementation contract to the network of choice.
+ * npx hardhat deploy-implementation --name MyContract --network <networkName>
+ */
+task('deploy-implementation', 'Deploys an implementation contract to the network of choice.')
+  .addParam('name', 'The name of the implementation contract')
+  .setAction(async (taskArgs, hre) => {
+    // TODO: Extract into a reusable function
+    const [deployer] = await hre.ethers.getSigners()
+    if (!deployer) {
+      throw new Error('Deployer not found, please check mnemonic.')
+    }
+    const currentNetwork = hre.network.name
+    const contractName: string = taskArgs.name // Access the passed contract name
+    logger.log(`Deploying ${contractName} on network ${currentNetwork} from deployer ${deployer.address}`, '⚙️')
+
+    // Get the Contract Factory using the contract name
+    const ContractFactory = await hre.ethers.getContractFactory(contractName)
+    logger.log(`Deploying ${contractName}...`, '🚀')
+    const contract = await ContractFactory.deploy()
+    await contract.deployed()
+
+    logger.log(`${contractName} deployed to ${contract.address}`, '📜')
+    console.log(getExplorerUrlForNetwork(currentNetwork as Networks)(contract.address))
+
+    try {
+      // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
+      await run('verify:verify', {
+        address: contract.address,
+        constructorArguments: [], // Implementation contracts don't have constructor arguments
+        noCompile: true, // This replaces the --no-compile flag
+      })
+      logger.success(`Verified ${contractName} at ${contract.address}`)
+    } catch (error) {
+      logger.error(`Failed trying to verify ${contractName} at ${contract.address}: ${error}`)
+      logger.log(`npx hardhat verify --network ${currentNetwork} ${contract.address}`, '🔍')
+    }
+  })
 
 /**
  * Provide additional fork testing options
@@ -147,6 +187,13 @@ export function getExplorerUrlForNetwork(networkName: Networks) {
 
 export function convertToExplorerUrlForNetwork(networkName: Networks, address: string) {
   return getExplorerUrlForNetwork(networkName)(address)
+}
+
+export function getTxExplorerUrlForNetwork(networkName: Networks, txHash: string) {
+  const addressUrl = convertToExplorerUrlForNetwork(networkName, txHash)
+  // Hacky way to keep the code dry
+  const txUrl = addressUrl.replace('/address/', '/tx/')
+  return txUrl
 }
 
 export function geRpcUrlForNetwork(networkName: Networks) {
