@@ -1,5 +1,4 @@
 import { HardhatUserConfig, task, types } from 'hardhat/config'
-import { run } from 'hardhat'
 import {
   HardhatRuntimeEnvironment,
   HttpNetworkAccountsUserConfig,
@@ -64,7 +63,7 @@ task('deploy-implementation', 'Deploys an implementation contract to the network
 
     try {
       // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
-      await run('verify:verify', {
+      await hre.run('verify:verify', {
         address: contract.address,
         constructorArguments: [], // Implementation contracts don't have constructor arguments
         noCompile: true, // This replaces the --no-compile flag
