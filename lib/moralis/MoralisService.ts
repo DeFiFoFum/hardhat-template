@@ -59,14 +59,21 @@ export class MoralisService {
    */
   async getAllContractEvents<T>(request: GetContractEventsRequest) {
     await this.start()
-    let allEvents: MoralisEventData<T>[] = []
 
+    let nextPage = 1
+    console.log(`${MoralisService.name}.${this.getAllContractEvents.name}:: Fetching next page ${nextPage} of events..`)
+
+    let allEvents: MoralisEventData<T>[] = []
     let response = await this.getContractEvents(request)
     allEvents = allEvents.concat(response.toJSON().result as unknown as MoralisEventData<T>)
 
     while (response.hasNext()) {
       // Work through pagination to gather all events for this time frame
       try {
+        nextPage++
+        console.log(
+          `${MoralisService.name}.${this.getAllContractEvents.name}:: Fetching next page ${nextPage} of events..`
+        )
         response = await response.next()
         allEvents = allEvents.concat(response.toJSON().result as unknown as MoralisEventData<T>)
       } catch (error) {
