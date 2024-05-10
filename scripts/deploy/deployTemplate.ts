@@ -1,43 +1,25 @@
 import hre, { ethers, network } from 'hardhat'
-import { getDeployConfig, DeployableNetworks, saveDeploymentOutput } from './deploy.config'
+import { getDeployConfig, DeployableNetworks, saveDeploymentOutput, FixtureOverrides } from './deploy.config'
 import { DeployManager } from './DeployManager'
 import { logger } from '../../hardhat/utils'
-import { setupFork } from '../../lib/evm/forkHelper'
 import { createActionLog } from './utils/actionLog'
 import { deployLockFixture } from './fixtures/deployLockFixture'
+import { forkIfHardhat } from './utils/forkDeployHelper'
 
 async function main() {
   // -------------------------------------------------------------------------------------------------------------------
   // Network Setup and Configuration
   // -------------------------------------------------------------------------------------------------------------------
-  const currentNetwork = network.name as DeployableNetworks
-  let deployConfigNetwork = currentNetwork
-  if (currentNetwork === 'hardhat') {
-    logger.log('Hardhat network detected, setting up fork...', '🍴')
-    // NOTE: choosing fork network
-    const forkedNetwork = 'bsc'
-    await setupFork(forkedNetwork)
-    deployConfigNetwork = forkedNetwork
-  }
+  const initialNetwork = network.name as DeployableNetworks
+  const currentNetwork = await forkIfHardhat(initialNetwork, 'bsc') // Fork if on hardhat network
+  // Setup DeployManager
+  const [deployerSigner] = await ethers.getSigners()
+  const deployManager = await DeployManager.create({ signer: deployerSigner })
+  // Setup deployment configuration variables. Optionally pass in accounts to be able to use them in the deployConfig
+  const fixtureOverrides: FixtureOverrides = { accountOverrides: {}, contractOverrides: {} } // Template to override fixture data
+  const deploymentVariables = await getDeployConfig(currentNetwork, fixtureOverrides)
+  const { accounts: deploymentAccounts, contractOverrides } = deploymentVariables
 
-  const accounts = await ethers.getSigners()
-  // Extract config for the network
-  const [deployerAccount, hardhatAdminAccount, hardhatProxyAdminOwnerAddress] = accounts
-  // Setup deploy manager
-  const deployManager = await DeployManager.create({ signer: deployerAccount })
-  // Optionally pass in accounts to be able to use them in the deployConfig
-  let deploymentVariables = await getDeployConfig(deployConfigNetwork)
-  if (currentNetwork === 'hardhat') {
-    logger.warn(`Using hardhat network, deploying with overriding accounts`)
-    deploymentVariables = await getDeployConfig(deployConfigNetwork, {
-      accountOverrides: {
-        adminAddress: hardhatAdminAccount.address,
-        proxyAdminOwnerAddress: hardhatProxyAdminOwnerAddress.address,
-      },
-    })
-  }
-  // Contract overrides
-  const contractOverrides = deploymentVariables.contractOverrides
   // Optional, used throughout the script and will be deployed if not passed
   let proxyAdminContractAddress = contractOverrides?.proxyAdminContractAddress
   // Actions to take after deployment to finalize deployment setup
