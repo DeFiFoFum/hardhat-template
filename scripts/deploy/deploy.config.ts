@@ -5,6 +5,7 @@ import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/convertA
 import { writeObjectToTsFile } from '../../lib/node/files'
 import { getDateMinuteString } from '../../lib/node/dateHelper'
 import { logger } from '../../hardhat/utils'
+import { ethers } from 'hardhat'
 
 // Define a base directory for deployments
 export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
@@ -14,12 +15,15 @@ export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
  * @param network
  * @returns
  */
-export const getDeployConfig = (network: DeployableNetworks, overrides: FixtureOverrides = {}): DeploymentVariables => {
+export async function getDeployConfig(
+  network: DeployableNetworks,
+  overrides: FixtureOverrides = {}
+): Promise<DeploymentVariables> {
   const config = deployableNetworkConfig[network]
   if (!config) {
     throw new Error(`No deploy config for network ${network}`)
   }
-  return config(overrides)
+  return await config(overrides)
 }
 
 /**
@@ -62,7 +66,7 @@ export type DeployableNetworks = Extract<Networks, 'hardhat' | 'bsc' | 'bscTestn
  */
 export interface FixtureOverrides {
   accountOverrides?: Partial<DeploymentAccounts> // Overrides for account-related configurations
-  contractOverrides?: DeploymentContractOverrides // Overrides for contract addresses or settings
+  contractOverrides?: Partial<DeploymentContractOverrides> // Overrides for contract addresses or settings
 }
 
 /**
@@ -100,6 +104,25 @@ interface DeploymentVariables {
 }
 
 /**
+ * Apply overrides to the production values. This is useful for composing and testing fixtures,
+ *  as well as for certain scripts.
+ *
+ * @param {DeploymentVariables} productionValues
+ * @param {FixtureOverrides} fixtureOverrides
+ * @returns
+ */
+function applyFixtureOverrides(
+  productionValues: DeploymentVariables,
+  { accountOverrides, contractOverrides }: FixtureOverrides
+): DeploymentVariables {
+  return {
+    ...productionValues,
+    accounts: { ...productionValues.accounts, ...accountOverrides },
+    contractOverrides: { ...productionValues.contractOverrides, ...contractOverrides },
+  }
+}
+
+/**
  * Configuration for each deployable network. The structure is based on the interfaces above.
  *
  * accountOverrides and contractOverrides are optional and can be used to override configured values in this file.
@@ -107,42 +130,58 @@ interface DeploymentVariables {
 const addressPlaceholder = '0x-address-not-set-in_deploy.config'
 const deployableNetworkConfig: Record<
   DeployableNetworks,
-  ({ accountOverrides, contractOverrides }: FixtureOverrides) => DeploymentVariables
+  (fixtureOverrides: FixtureOverrides) => Promise<DeploymentVariables>
 > = {
-  bsc: ({ accountOverrides: ao, contractOverrides: co }: FixtureOverrides) => {
-    return {
+  bsc: async (fixtureOverrides: FixtureOverrides) => {
+    const productionValues = {
       accounts: {
-        adminAddress: ao?.adminAddress || addressPlaceholder,
-        proxyAdminOwnerAddress: ao?.proxyAdminOwnerAddress || addressPlaceholder,
+        adminAddress: addressPlaceholder,
+        proxyAdminOwnerAddress: addressPlaceholder,
       },
+      // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        proxyAdminContractAddress: co?.proxyAdminContractAddress || '',
+        // proxyAdminContractAddress: '',
       },
       wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
     }
+    // Optionally pass override values over production for easier reusability in fixtures
+    return applyFixtureOverrides(productionValues, fixtureOverrides)
   },
-  bscTestnet: ({ accountOverrides: ao, contractOverrides: co }: FixtureOverrides) => {
-    return {
+  bscTestnet: async (fixtureOverrides: FixtureOverrides) => {
+    const productionValues = {
       accounts: {
-        adminAddress: ao?.adminAddress || addressPlaceholder,
-        proxyAdminOwnerAddress: ao?.proxyAdminOwnerAddress || addressPlaceholder,
+        adminAddress: addressPlaceholder,
+        proxyAdminOwnerAddress: addressPlaceholder,
       },
+      // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        proxyAdminContractAddress: co?.proxyAdminContractAddress || '',
+        // proxyAdminContractAddress: '',
       },
       wNative: addressPlaceholder,
     }
+    // Optionally pass override values over production for easier reusability in fixtures
+    return applyFixtureOverrides(productionValues, fixtureOverrides)
   },
-  hardhat: ({ accountOverrides: ao, contractOverrides: co }: FixtureOverrides) => {
-    return {
+  hardhat: async (fixtureOverrides: FixtureOverrides) => {
+    if (!fixtureOverrides.accountOverrides) {
+      logger.log(
+        `deploy.config:: No FixtureOverrides passed, using default account overrides for hardhat network`,
+        '📝'
+      )
+    }
+    const accounts = await ethers.getSigners()
+    const productionValues = {
       accounts: {
-        adminAddress: ao?.adminAddress || '',
-        proxyAdminOwnerAddress: ao?.proxyAdminOwnerAddress || '',
+        adminAddress: accounts[0].address,
+        proxyAdminOwnerAddress: accounts[0].address,
       },
+      // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        proxyAdminContractAddress: co?.proxyAdminContractAddress || '',
+        // proxyAdminContractAddress: '',
       },
       wNative: addressPlaceholder,
     }
+    // Optionally pass override values over production for easier reusability in fixtures
+    return applyFixtureOverrides(productionValues, fixtureOverrides)
   },
 }

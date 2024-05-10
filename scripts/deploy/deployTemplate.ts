@@ -26,10 +26,10 @@ async function main() {
   // Setup deploy manager
   const deployManager = await DeployManager.create({ signer: deployerAccount })
   // Optionally pass in accounts to be able to use them in the deployConfig
-  let deploymentVariables = getDeployConfig(deployConfigNetwork)
+  let deploymentVariables = await getDeployConfig(deployConfigNetwork)
   if (currentNetwork === 'hardhat') {
     logger.warn(`Using hardhat network, deploying with overriding accounts`)
-    deploymentVariables = getDeployConfig(deployConfigNetwork, {
+    deploymentVariables = await getDeployConfig(deployConfigNetwork, {
       accountOverrides: {
         adminAddress: hardhatAdminAccount.address,
         proxyAdminOwnerAddress: hardhatProxyAdminOwnerAddress.address,

@@ -11,7 +11,7 @@ export async function deployLockFixture(
   fixtureOverrides: FixtureOverrides = {}
 ) {
   const currentNetwork = hre.network.name as DeployableNetworks
-  const deployConfig = getDeployConfig(currentNetwork, fixtureOverrides)
+  const deployConfig = await getDeployConfig(currentNetwork, fixtureOverrides)
 
   const currentTimestampInSeconds = Math.round(Date.now() / 1000)
   const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60
