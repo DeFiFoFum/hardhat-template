@@ -174,6 +174,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     chainId: 80001,
     accounts: testnetAccounts,
   },
+  sepolia: {
+    url: getEnv('SEPOLIA_TESTNET_RPC_URL') || 'https://rpc2.sepolia.org',
+    getExplorerUrl: (address: string) => `https://sepolia.etherscan.io/address/${address}`,
+    chainId: 11155111,
+    accounts: testnetAccounts,
+  },
   // Placeholder for the configuration below.
   hardhat: {
     getExplorerUrl: (address: string) => `(NO DEV EXPLORER): ${address}`,
