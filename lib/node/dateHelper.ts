@@ -1,5 +1,4 @@
-const toISOStringNoHyphens = (date: Date) => date.toISOString().replace(/-/g, '')
-
+const toISOStringNoHyphens = (date: Date) => date.toISOString().replace(/[-:]/g, '')
 /**
  * Gets the current date as a string in the format YYYYMMDD.
  * This can be used for generating file names or any other date-based identifiers.
@@ -8,7 +7,7 @@ const toISOStringNoHyphens = (date: Date) => date.toISOString().replace(/-/g, ''
  * @param {Date} date (optional) The date to convert to a string in the format YYYYMMDD. Defaults to the current date.
  * @returns {string} The current date as a string in the format YYYYMMDD.
  */
-export const getDateDayString = (date = new Date()) => toISOStringNoHyphens(date).slice(0, 8)
+export const getDateDayString = (date = new Date()) => toISOStringNoHyphens(date).slice(0, 7)
 
 /**
  * Gets the current date and time as a string in the format YYYYMMDDTHH:MM.
@@ -18,7 +17,7 @@ export const getDateDayString = (date = new Date()) => toISOStringNoHyphens(date
  * @param {Date} date (optional) The date to convert to a string in the format YYYYMMDDTHH:MM. Defaults to the current date.
  * @returns {string} The current date and time as a string in the format YYYYMMDDTHH:MM.
  */
-export const getDateMinuteString = (date = new Date()) => toISOStringNoHyphens(date).slice(0, 14)
+export const getDateMinuteString = (date = new Date()) => toISOStringNoHyphens(date).slice(0, 13)
 
 export const getDaysAgo = (dateString: string): number => {
   const date = new Date(dateString)
