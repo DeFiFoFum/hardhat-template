@@ -1139,5 +1139,9 @@
             "stateMutability": "payable",
             "type": "receive"
         }
-    ]
+    ],
+    "bytecode": "",
+    "deployedBytecode": "",
+    "linkReferences": {},
+    "deployedLinkReferences": {}
 }

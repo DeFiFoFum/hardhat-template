@@ -1,0 +1,24 @@
+{
+    "_format": "hh-sol-artifact-1",
+    "contractName": "MultiSendCallOnly",
+    "sourceName": "contracts/MultiSendCallOnly.sol",
+    "abi": [
+        {
+            "inputs": [
+                {
+                    "internalType": "bytes",
+                    "name": "transactions",
+                    "type": "bytes"
+                }
+            ],
+            "name": "multiSend",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        }
+    ],
+    "bytecode": "",
+    "deployedBytecode": "",
+    "linkReferences": {},
+    "deployedLinkReferences": {}
+}

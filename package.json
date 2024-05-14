@@ -89,6 +89,7 @@
     "chalk": "4.1.1",
     "dotenv": "^16.0.1",
     "ethers": "^5.4.7",
+    "ethers-multisend": "^3.0.0",
     "fs": "^0.0.1-security",
     "hardhat": "2.14.0",
     "hardhat-contract-sizer": "^2.8.0",
