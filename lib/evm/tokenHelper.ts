@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat'
-import { getErrorMessage } from '../node/getErrorMessage'
 import { logger } from '../../hardhat/utils'
+import { getErrorMessage } from '../node/getErrorMessage'
 
 /**
  * Creates a closure to cache the decimals values for token addresses. This
@@ -56,6 +56,7 @@ export type TokenDetails = {
   symbol: string
   name: string
   totalSupply: string
+  address: string
 }
 
 /**
@@ -106,11 +107,11 @@ export const getDetailsForTokenAddress = (() => {
       // Cache the result
       tokenDetailsCache[tokenAddress] = decimals
 
-      return { decimals, symbol, name, totalSupply }
+      return { decimals, symbol, name, totalSupply, address: tokenAddress }
     } catch (error) {
       // Log the error and return a default value of 18 decimals
       logger.warn(`${getDetailsForTokenAddress.name}:: Error pulling token details: ${getErrorMessage(error)}`)
-      return { decimals: 18, symbol: 'N/A', name: 'N/A', totalSupply: 'N/A' }
+      return { decimals: 18, symbol: 'N/A', name: 'N/A', totalSupply: 'N/A', address: tokenAddress }
     }
   }
 })()

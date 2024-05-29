@@ -1,8 +1,8 @@
 import { BigNumberish, Contract } from 'ethers'
 import { formatBNValueToString } from './bnHelper'
 
-export type SnapshotCall = {
-  functionName: string
+export type SnapshotCall<T extends Contract> = {
+  functionName: keyof T['functions']
   functionArgs?: BigNumberish[]
 }
 
@@ -41,43 +41,48 @@ main().catch(console.error);
  * Provide a contract with an array of view functions which contain zero arguments
  *  and return an object of all values.
  *
- * @param {*} contract
- * @param {*} snapshotFunctions Array of SnapshotCall | string matching the names of
+ * @param contract The contract instance
+ * @param snapshotCalls Array of SnapshotCall | string matching the names of
  *  functions to call with optional arguments
- * @returns
+ * @returns An object with the snapshot values, where the keys match the function names
  */
-// TODO: Can use generics to return the proper shape of the object
 export async function getContractGetterSnapshot<C extends Contract>(
   contract: C,
-  snapshotCalls: (SnapshotCall | string)[]
-) {
-  let promises = []
-  let snapshot = {}
+  snapshotCalls: (SnapshotCall<C> | keyof C['functions'])[]
+): Promise<{
+  [K in keyof C['functions']]: C['functions'][K] extends (...args: any) => Promise<infer R> ? string : never
+}> {
+  const promises: Promise<void>[] = []
+  const snapshot: Record<string, string> = {}
 
-  for (let index = 0; index < snapshotCalls.length; index++) {
-    let functionName: string
+  for (const snapshotCall of snapshotCalls) {
+    let functionName: keyof C['functions']
     let functionArgs: BigNumberish[] | undefined = undefined
-    const snapshotCall = snapshotCalls[index]
+
     if (typeof snapshotCall === 'string') {
       functionName = snapshotCall
-    } else {
+    } else if (typeof snapshotCall === 'object' && 'functionName' in snapshotCall) {
       functionName = snapshotCall.functionName
       functionArgs = snapshotCall.functionArgs
+    } else {
+      throw new Error('Invalid snapshot call')
     }
+
     // Handle return from both functions below
-    const handleValue = (value: any) =>
-      (snapshot = {
-        ...snapshot,
-        [`${index}-${functionName}`]: formatBNValueToString(value),
-      })
+    const handleValue = (value: any) => {
+      snapshot[functionName as string] = formatBNValueToString(value)
+    }
+
     // Setup calls
     const promise =
-      functionArgs == undefined
+      functionArgs === undefined
         ? contract[functionName]().then(handleValue)
         : contract[functionName](...functionArgs).then(handleValue)
     promises.push(promise)
   }
 
   await Promise.all(promises)
-  return snapshot
+  return snapshot as {
+    [K in keyof C['functions']]: C['functions'][K] extends (...args: any) => Promise<infer R> ? string : never
+  }
 }
