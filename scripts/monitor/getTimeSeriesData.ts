@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { getTimeSeriesData } from '../../lib/evm/getTimeSeriesData'
 import { DeployableNetworks } from '../deploy/deploy.config'
-import { setupFork } from '../../lib/evm/forkHelper'
+import { setupFork } from '../../lib/evm/fork-testing/forkHelper'
 import { formatUnits } from 'ethers/lib/utils'
 import { writeObjectToTsFile } from '../../lib/node/files'
 import path from 'path'

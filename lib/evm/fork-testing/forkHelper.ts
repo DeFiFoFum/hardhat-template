@@ -1,6 +1,6 @@
 import hre, { network } from 'hardhat'
-import { logger } from '../../hardhat/utils'
-import { Networks } from '../../hardhat'
+import { logger } from '../../../hardhat/utils'
+import { Networks } from '../../../hardhat'
 import { HttpNetworkConfig } from 'hardhat/types'
 
 /**

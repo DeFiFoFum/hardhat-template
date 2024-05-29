@@ -1,7 +1,7 @@
 import { ethers, network } from 'hardhat'
 import { Networks } from '../../hardhat'
 import { logger } from '../../hardhat/utils'
-import { setupFork } from '../../lib/evm/forkHelper'
+import { setupFork } from './fork-testing/forkHelper'
 import { getErrorMessage } from '../../lib/node/getErrorMessage'
 import { Contract } from 'ethers'
 import { DeployableNetworks } from '../../scripts/deploy/deploy.config'

@@ -7,7 +7,9 @@
     "dist/index.js",
     "dist/index.d.ts",
     "dist/src/**/*",
-    "dist/typechain-types/**/*"
+    "dist/typechain-types/**/*",
+    "artifacts/**/*.json",
+    "artifacts-external/**/*.json"
   ],
   "scripts": {
     "init:submodules": "git submodule update --init --recursive",
@@ -29,13 +31,12 @@
     "verify": "hardhat verify-contract",
     "semgrep": "semgrep --config modules/semgrep-smart-contracts/solidity ./contracts",
     "test": "hardhat test",
+    "test:ci": "yarn compile && yarn test",
     "test:all": "yarn test && yarn forge:test",
     "test:gas": "env REPORT_GAS=true yarn test",
-    "forge:test": "forge test -vv",
-    "forge:test:gas": "forge test -vv --gas-report",
     "test:coverage": "hardhat coverage",
-    "test:ci": "yarn compile && yarn test",
-    "test:fork": "yarn hardhat --config hardhat-fork.config.ts test ./test-fork/**/*.spec.ts",
+    "test:forge": "forge test -vv",
+    "test:gas:forge": "forge test -vv --gas-report",
     "monitor:get-proxy-admin": "hardhat run ./scripts/monitor/getProxyAdminForDeployment.ts --network",
     "size": "hardhat size-contracts",
     "lint": "yarn lint:sol && yarn lint:ts",

@@ -1,5 +1,5 @@
 import { logger } from '../../../hardhat/utils'
-import { setupFork } from '../../../lib/evm/forkHelper'
+import { setupFork } from '../../../lib/evm/fork-testing/forkHelper'
 import { DeployableNetworks } from '../deploy.config'
 
 /**

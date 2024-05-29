@@ -1,4 +1,4 @@
-import { ethers, network } from 'hardhat'
+import { ethers } from 'hardhat'
 import { impersonateAccount, setBalance } from '@nomicfoundation/hardhat-network-helpers'
 
 /**
