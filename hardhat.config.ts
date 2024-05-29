@@ -1,5 +1,6 @@
 import { HardhatUserConfig, task, types } from 'hardhat/config'
 import {
+  HardhatNetworkAccountsUserConfig,
   HardhatRuntimeEnvironment,
   HttpNetworkAccountsUserConfig,
   HttpNetworkUserConfig,
@@ -85,6 +86,9 @@ task(TASK_TEST, '🫶 Test Task')
   .addOptionalParam('blockNumber', 'Optional block number to fork in case of running fork tests.', undefined, types.int)
   .setAction(testRunner)
 
+/**
+ * Account setup for mainnet / testnet networks.
+ */
 const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
 const mainnetPrivateKey = getEnv('MAINNET_PRIVATE_KEY')
 const mainnetAccounts: HttpNetworkAccountsUserConfig | undefined = mainnetMnemonic
@@ -101,6 +105,25 @@ const testnetAccounts: HttpNetworkAccountsUserConfig | undefined = testnetMnemon
   ? [testnetPrivateKey] // Fallback to private key
   : undefined
 
+const getHardhatNetworkAccounts = (
+  networkAccounts: HttpNetworkAccountsUserConfig | undefined
+): HardhatNetworkAccountsUserConfig | undefined => {
+  if (!networkAccounts) {
+    return undefined
+  }
+  if (Array.isArray(networkAccounts)) {
+    return networkAccounts.map((privateKey) => ({ privateKey, balance: '10000000000000000000000' }))
+  }
+  // TODO: Not sure where this type is coming from, but ts is complaining.
+  if (networkAccounts == 'remote') {
+    throw new Error('getHardhatNetworkAccounts:: Remote accounts not supported')
+  }
+  return networkAccounts
+}
+
+/**
+ * Extended network options for networks and a specific setup for hardhat.
+ */
 type ExtendedNetworkOptions = {
   getExplorerUrl: (address: string) => string
 }
@@ -233,6 +256,8 @@ const config: HardhatUserConfig = {
     hardhat: {
       gas: 'auto',
       gasPrice: 'auto',
+      // Pass in accounts to use in the hardhat network. Helpful with forkIfHardhat().
+      accounts: getHardhatNetworkAccounts(mainnetAccounts),
     },
   },
   gasReporter: {
