@@ -14,18 +14,18 @@
   // Include TS files to type check. 
   // Only specific files are packaged in package.json > files.
   "include": [
-    "hardhat",
-    "index.ts",
-    "artifacts/**/*.json",
-    "typechain-types",
-    "src",
-    "tasks",
-    "scripts",
-    "lib",
-    "test",
-    "hardhat.config.ts",
-    "test-fork",
-    "hardhat-fork.config.ts",
+    "./hardhat",
+    "./typechain-types",
+    "./src",
+    "./scripts",
+    "./lib",
+    "./test",
   ],
-  "exclude": []
+  "exclude": [
+    "./dist",
+    "./node_modules"
+  ],
+  "files": [
+    "./hardhat.config.ts",
+  ]
 }
