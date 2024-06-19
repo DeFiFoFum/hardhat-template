@@ -20,7 +20,28 @@ import './plugins/abiPlugins'
 // Project Config
 import solhintConfig from './solhint.config'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
-import { Networks } from './hardhat'
+
+// Network Config
+export const NETWORKS = <const>[
+  'hardhat', // Internal network for testing
+  'mainnet', // Ethereum mainnet
+  // Alphabetic order
+  'arbitrum',
+  'arbitrumGoerli',
+  'base',
+  'bsc',
+  'bscTestnet',
+  'goerli',
+  'iotaEvm',
+  'lightLink',
+  'linea',
+  'lineaTestnet',
+  'polygon',
+  'polygonTestnet',
+  'sepolia',
+]
+// Create a type out of the network array
+export type Networks = (typeof NETWORKS)[number]
 
 /**
  * Example of accessing ethers and performing Web3 calls inside a task
@@ -161,6 +182,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     chainId: 421613,
     accounts: testnetAccounts,
   },
+  base: {
+    url: getEnv('BASE_RPC_URL') || 'https://mainnet.base.org/',
+    getExplorerUrl: (address: string) => `https://basescan.org/address/${address}`,
+    chainId: 8453,
+    accounts: mainnetAccounts,
+  },
   bsc: {
     url: getEnv('BSC_RPC_URL') || 'https://bsc-dataseed1.binance.org',
     getExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
@@ -172,6 +199,18 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     getExplorerUrl: (address: string) => `https://testnet.bscscan.com/address/${address}`,
     chainId: 97,
     accounts: testnetAccounts,
+  },
+  iotaEvm: {
+    url: getEnv('IOTA_EVM_RPC_URL') || 'https://json-rpc.evm.iotaledger.net/',
+    getExplorerUrl: (address: string) => `https://explorer.evm.iota.org/address/${address}`,
+    chainId: 8822,
+    accounts: mainnetAccounts,
+  },
+  lightLink: {
+    url: getEnv('LIGHTLINK_RPC_URL') || 'https://replicator.phoenix.lightlink.io/rpc/v1',
+    getExplorerUrl: (address: string) => `https://phoenix.lightlink.io/address/${address}`,
+    chainId: 1890,
+    accounts: mainnetAccounts,
   },
   linea: {
     url: getEnv('LINEA_RPC_URL') || 'https://rpc.linea.build',
@@ -305,6 +344,7 @@ const config: HardhatUserConfig = {
       mainnet: getEnv('ETHERSCAN_API_KEY'),
       optimisticEthereum: getEnv('OPTIMISTIC_ETHERSCAN_API_KEY'),
       arbitrumOne: getEnv('ARBISCAN_API_KEY'),
+      base: getEnv('BASESCAN_API_KEY'),
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),

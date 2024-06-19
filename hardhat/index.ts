@@ -1,3 +1,3 @@
 export * from './types'
-export * from './networks'
+export { Networks } from '../hardhat.config' // Backward compatibility
 export * as utils from './utils'
