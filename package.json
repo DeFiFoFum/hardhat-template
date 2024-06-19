@@ -69,7 +69,9 @@
     "node-fetch": "^2.6.7",
     "minimatch": "^3.0.5",
     "flat": "^5.0.1",
-    "semver": "^7.5.2"
+    "semver": "^7.5.2",
+    "ws": "^7.5.10",
+    "braces": "^3.0.3"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
