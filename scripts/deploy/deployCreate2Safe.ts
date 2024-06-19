@@ -3,7 +3,7 @@ import { writeObjectToTsFile } from '../../lib/node/files'
 import { logger } from '../../hardhat/utils'
 import { Networks } from '../../hardhat'
 import { convertToExplorerUrlForNetwork } from '../../hardhat.config'
-import { getCREATE2SafeInitializer } from './CREATE2/create2Safe'
+import { getCREATE2SafeInitializer } from '../../lib/evm/safe-wallet/create2Safe'
 import { CREATE2_DEPLOYER } from './CREATE2'
 import { getErrorMessage } from '../../lib/node/getErrorMessage'
 import GnosisSafeL2_Artifact from '../../artifacts-external/GnosisSafeL2.json'
@@ -59,6 +59,7 @@ async function deployCreate2Safe(salt: number, name?: string) {
     logger.log('Attempting to setup newly created Gnosis Safe', '🛠️')
     // NOTE: Pulling in abi manually as these artifacts are in a `/artifacts-external` directory
     const gnosisSafe = new ethers.Contract(gnosisSafeAddress, GnosisSafeL2_Artifact.abi, deployer) as GnosisSafeL2
+    // TODO: Can probably pass in the proper ownership data here instead of needing to send another tx.
     await gnosisSafe.setup(...initializerParams)
     logger.log('Successfully setup Gnosis Safe', '🚀')
   } catch (e) {

@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat'
-import { CREATE2_DEPLOYER } from '.'
+import { CREATE2_DEPLOYER } from '../../../scripts/deploy/CREATE2'
 
 import GnosisSafeProxyFactory_1_3_0 from '../../../artifacts-external/GnosisSafeProxyFactory_1.3.0.json'
 import { GnosisSafeL2, GnosisSafeProxyFactory_130 } from '../../../typechain-types'
