@@ -33,6 +33,7 @@
         "Numberish",
         "POLYGONSCAN",
         "precommit",
+        "remappings",
         "semgrep",
         "sepolia",
         "Snapshotter",
