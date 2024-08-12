@@ -2,6 +2,7 @@ import hre, { network } from 'hardhat'
 import { logger } from '../../../hardhat/utils'
 import { Networks } from '../../../hardhat'
 import { HttpNetworkConfig } from 'hardhat/types'
+import { getErrorMessage } from '../../node/getErrorMessage'
 
 /**
  * Sets up a network fork for testing purposes.
@@ -36,17 +37,23 @@ export async function setupFork(networkName: Networks, blockNumber?: number) {
   const forkingNetworkConfig = hre.config.networks[networkName] as HttpNetworkConfig
   if (!forkingNetworkConfig.url) throw Error(`Could not find a RPC url in network config for ${networkName}`)
 
-  await network.provider.request({
-    method: 'hardhat_reset',
-    params: [
-      {
-        forking: {
-          jsonRpcUrl: forkingNetworkConfig.url,
-          blockNumber: blockNumber,
+  try {
+    await network.provider.request({
+      method: 'hardhat_reset',
+      params: [
+        {
+          forking: {
+            jsonRpcUrl: forkingNetworkConfig.url,
+            blockNumber: blockNumber,
+          },
         },
-      },
-    ],
-  })
+      ],
+    })
+  } catch (e) {
+    const errorMessage = getErrorMessage(e)
+    logger.error(`setupFork:: Error setting up fork: ${errorMessage}`)
+    throw new Error(errorMessage)
+  }
 
   const latestBlock = await hre.network.provider.send('eth_blockNumber')
   blockNumber = parseInt(latestBlock, 16)
