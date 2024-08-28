@@ -296,7 +296,9 @@ const config: HardhatUserConfig = {
       gas: 'auto',
       gasPrice: 'auto',
       // Pass in accounts to use in the hardhat network. Helpful with forkIfHardhat().
-      accounts: getHardhatNetworkAccounts(mainnetAccounts),
+      accounts: getEnv('TESTING')
+        ? getHardhatNetworkAccounts(testnetAccounts)
+        : getHardhatNetworkAccounts(mainnetAccounts),
     },
   },
   gasReporter: {
