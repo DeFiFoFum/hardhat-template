@@ -71,7 +71,10 @@
     "flat": "^5.0.1",
     "semver": "^7.5.2",
     "ws": "^7.5.10",
-    "braces": "^3.0.3"
+    "braces": "^3.0.3",
+    "elliptic": "^6.5.7",
+    "axios": "^1.7.4",
+    "micromatch": "^4.0.8"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
