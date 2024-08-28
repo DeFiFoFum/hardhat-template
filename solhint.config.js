@@ -21,7 +21,7 @@ module.exports = {
   rules: {
     // Best Practice Rules
     'constructor-syntax': 'warn',
-    'max-line-length': ['error', 120],
+    'max-line-length': ['warn', 120],
     // "code-complexity": ["warn", 7], // Not included in recommended
     // "function-max-lines": [ "warn",50 ], // Not included in recommended
 
