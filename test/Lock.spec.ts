@@ -4,7 +4,7 @@
  * `time`: Adjust block timestamp
  */
 import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
-import { deployOneYearLockFixture } from './fixtures'
+import { deployOneYearLockFixture } from './fixtures/deployLock'
 /**
  * hardhat-chai-matchers reference
  * https://hardhat.org/hardhat-chai-matchers/docs/reference

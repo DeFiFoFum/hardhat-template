@@ -1,10 +1,11 @@
-import { ethers } from 'hardhat'
+import { artifacts, ethers } from 'hardhat'
 // https://hardhat.org/hardhat-network-helpers/docs/reference
 import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
 
 import { dynamicFixture } from './fixtures'
+import { Lock__factory } from '../typechain-types'
 
 /**
  * Configurable fixture to use for each test file.
@@ -20,7 +21,8 @@ type FixtureReturn = Awaited<ReturnType<typeof fixture>>
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
-  const deployment = await dynamicFixture(ethers, 'YourContractName')
+  const [unlockTime, owner] = [(await time.latest()) + 24 * 3600, accounts[0].address]
+  const deployment = (await dynamicFixture)<Lock__factory>(ethers, 'Lock', [unlockTime, owner])
   return { ...deployment, accounts }
 }
 
@@ -37,5 +39,16 @@ describe('Test Template', function () {
 
   it('Should be able to load fixture', async () => {
     expect(FR).to.not.be.undefined
+  })
+
+  it('Should be under the contract size limit', async function () {
+    const contractArtifact = await artifacts.readArtifact('Lock')
+    const contractSize = Buffer.byteLength(contractArtifact.deployedBytecode, 'utf8') / 2 // bytecode is hex-encoded
+
+    const sizeLimit = 24576 // 24 KB limit
+    expect(contractSize).to.be.lessThan(
+      sizeLimit,
+      `Contract size is ${contractSize} bytes, which exceeds the limit of ${sizeLimit} bytes`
+    )
   })
 })
