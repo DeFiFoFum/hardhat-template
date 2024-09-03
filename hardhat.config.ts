@@ -356,14 +356,22 @@ const config: HardhatUserConfig = {
     },
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#adding-support-for-other-networks
     customChains: [
-      // {
-      //   network: '',
-      //   chainId: 1,
-      //   urls: {
-      //     apiURL: '',
-      //     browserURL: 'https://www.etherscan.io',
-      //   },
-      // },
+      {
+        network: 'linea',
+        chainId: 59144,
+        urls: {
+          apiURL: 'https://api.lineascan.build/api/',
+          browserURL: 'https://lineascan.build/',
+        },
+      },
+      {
+        network: 'lineaTestnet',
+        chainId: 59140,
+        urls: {
+          apiURL: 'https://api.lineascan.build/api/',
+          browserURL: 'https://goerli.lineascan.build/',
+        },
+      },
     ],
   },
 }
