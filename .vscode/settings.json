@@ -9,6 +9,10 @@
     "mochaExplorer.files": [
         "test/**/*.+(js|ts)",
     ],
+    // Uncomment the following lines to turn on inlay hints for TypeScript
+    // "typescript.inlayHints.parameterNames.enabled": "all",
+    // "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+    // "typescript.inlayHints.variableTypes.enabled": true,
     // Enable markdown snippets
     "[markdown]": {
         "editor.quickSuggestions": {
