@@ -21,13 +21,29 @@ type FixtureReturn = Awaited<ReturnType<typeof fixture>>
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
+  const [deployer, admin, notAdmin] = accounts
+  // Compose other fixtures to create a meta fixture
   const [unlockTime, owner] = [(await time.latest()) + 24 * 3600, accounts[0].address]
-  const deployment = (await dynamicFixture)<Lock__factory>(ethers, 'Lock', [unlockTime, owner])
-  return { ...deployment, accounts }
+  const lock = await dynamicFixture<Lock__factory>(ethers, 'Lock', [unlockTime, owner])
+  // Deploy other contracts within this fixture to gain efficiency of fixtures
+
+  return {
+    contracts: {
+      lock,
+    },
+    accounts: {
+      deployer,
+      admin,
+      notAdmin,
+    },
+  }
 }
 
 describe('Test Template', function () {
   let FR: FixtureReturn
+  let accounts: FixtureReturn['accounts']
+  let contracts: FixtureReturn['contracts']
+
   before(async function () {
     // Add code here to run before all tests
   })
@@ -35,10 +51,14 @@ describe('Test Template', function () {
   beforeEach(async function () {
     // Add code here to run before each test
     FR = await loadFixture(fixture)
+    accounts = FR.accounts
+    contracts = FR.contracts
   })
 
   it('Should be able to load fixture', async () => {
     expect(FR).to.not.be.undefined
+    expect(accounts).to.not.be.undefined
+    expect(contracts).to.not.be.undefined
   })
 
   it('Should be under the contract size limit', async function () {
