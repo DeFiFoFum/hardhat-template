@@ -74,7 +74,8 @@
     "braces": "^3.0.3",
     "elliptic": "^6.5.7",
     "axios": "^1.7.4",
-    "micromatch": "^4.0.8"
+    "micromatch": "^4.0.8",
+    "cookie": "^0.7.0"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
