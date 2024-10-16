@@ -1,7 +1,10 @@
 import { ethers } from 'hardhat'
 import { Networks } from '../../hardhat'
-import { geRpcUrlForNetwork } from '../../hardhat.config'
 import { logger } from '../../hardhat/utils'
+import { convertStorageValueToAddress, getStorageAtNetwork } from './storage/getStorageAt'
+
+export const EIP1967_ADMIN_SLOT = `0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103`
+export const EIP1967_IMPLEMENTATION_SLOT = `0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`
 
 /**
  * Retrieves the proxy admin address for a given proxy contract on a specified network.
@@ -23,41 +26,23 @@ import { logger } from '../../hardhat/utils'
  * @throws Will throw an error if the network is not found or if the storage cannot be fetched.
  */
 
-export async function getProxyAdminOfProxyContract(networkName: Networks, address: string) {
-  const networkUrl = geRpcUrlForNetwork(networkName)
-
-  if (!networkUrl) {
-    throw new Error('getProxyAdminOfProxyContract:: Network not found')
-  }
-
-  const data = JSON.stringify({
-    jsonrpc: '2.0',
-    method: 'eth_getStorageAt',
-    params: [address, '0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103', 'latest'],
-    id: 1,
-  })
-
-  const response = await fetch(networkUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: data,
-  }).then((res) => res.json())
-
-  if (!response.result) {
-    throw new Error('Failed to get the storage from the network')
-  }
-
-  const proxyAdminAddress = '0x' + response.result.slice(26)
+export async function getProxyAdminOfProxyContract(networkName: Networks, contractAddress: string) {
+  const storageValue = await getStorageAtNetwork(contractAddress, EIP1967_ADMIN_SLOT, networkName)
+  const proxyAdminAddress = convertStorageValueToAddress(storageValue)
 
   let proxyAdminOwner
   try {
     proxyAdminOwner = await ethers.getContractAt('Ownable', proxyAdminAddress).then((contract) => contract.owner())
   } catch (e) {
-    logger.error('Error getting proxy admin owner.')
-    console.dir(e)
+    logger.warn(`getProxyAdminOfProxyContract:: No ProxyAdmin Contract owner found for ${proxyAdminAddress}`)
     proxyAdminOwner = 'no-owner-found'
   }
   return { proxyAdminAddress, proxyAdminOwner }
+}
+
+export async function getImplementationOfProxyContract(networkName: Networks, contractAddress: string) {
+  const storageValue = await getStorageAtNetwork(contractAddress, EIP1967_IMPLEMENTATION_SLOT, networkName)
+  const implementationAddress = convertStorageValueToAddress(storageValue)
+
+  return implementationAddress
 }
