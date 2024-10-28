@@ -105,6 +105,7 @@ export default class TimelockEncoder {
     )
     const { populatedTx: executeEncoded } = await this.encodeExecute({ target, value, data, predecessor, salt, from })
     const cancelEncoded = await this.encodeCancelOperation(operationId)
+    cancelEncoded.from = from
 
     return { scheduleEncoded, executeEncoded, cancelEncoded, operationId }
   }
@@ -184,6 +185,7 @@ export default class TimelockEncoder {
       from,
     })
     const cancelBatchEncoded = await this.encodeCancelOperation(operationId)
+    cancelBatchEncoded.from = from
 
     return { scheduleBatchEncoded, executeBatchEncoded, cancelBatchEncoded, operationId }
   }
