@@ -28,6 +28,7 @@ export const NETWORKS = <const>[
   // Alphabetic order
   'arbitrum',
   'arbitrumGoerli',
+  'avax',
   'base',
   'bsc',
   'bscTestnet',
@@ -181,6 +182,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     getExplorerUrl: (address: string) => `https://testnet.arbiscan.io/address/${address}`,
     chainId: 421613,
     accounts: testnetAccounts,
+  },
+  avax: {
+    url: getEnv('AVAX_RPC_URL') || 'https://avalanche.drpc.org',
+    getExplorerUrl: (address: string) => `https://snowscan.xyz/address/${address}`,
+    chainId: 43114,
+    accounts: mainnetAccounts,
   },
   base: {
     url: getEnv('BASE_RPC_URL') || 'https://mainnet.base.org/',
@@ -338,14 +345,11 @@ const config: HardhatUserConfig = {
     // outputFile: './contract-size.md', // Optional output file to write to
   },
   etherscan: {
-    /**
-     * // NOTE This is valid in the latest version of "@nomiclabs/hardhat-etherscan.
-     *  This version breaks the src/task.ts file which hasn't been refactored yet
-     */
     apiKey: {
       mainnet: getEnv('ETHERSCAN_API_KEY'),
       optimisticEthereum: getEnv('OPTIMISTIC_ETHERSCAN_API_KEY'),
       arbitrumOne: getEnv('ARBISCAN_API_KEY'),
+      avalanche: getEnv('AVAX_SCAN_API_KEY'),
       base: getEnv('BASESCAN_API_KEY'),
       bsc: getEnv('BSCSCAN_API_KEY'),
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
