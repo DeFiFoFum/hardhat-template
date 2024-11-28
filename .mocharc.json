@@ -2,7 +2,8 @@
     "require": "hardhat/register",
     "timeout": 40000,
     "_": [
-        "test/**/*.ts"
+        "test/**/*.ts",
+        "lib/**/*.spec.ts"
     ],
     "DEV-COMMENTS": {
         "warning": "Running test directly from Visual Studio Code won't compile your contracts automatically. Make sure compile them manually.",
