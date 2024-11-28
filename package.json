@@ -72,10 +72,11 @@
     "semver": "^7.5.2",
     "ws": "^7.5.10",
     "braces": "^3.0.3",
-    "elliptic": "^6.5.7",
+    "elliptic": "^6.6.0",
     "axios": "^1.7.4",
     "micromatch": "^4.0.8",
-    "cookie": "^0.7.0"
+    "cookie": "^0.7.0",
+    "secp256k1": "^4.0.4"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
