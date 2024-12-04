@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @notice Added constructor to set initial owner
  */
 contract ProxyAdmin is Ownable {
-    /// @dev ADDED by DeFiFoFum to set initial owner
+    /// @dev ADDED to set initial owner
     constructor(address _initialOwner) Ownable() {
         _transferOwnership(_initialOwner);
     }
