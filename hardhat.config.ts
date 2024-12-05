@@ -30,6 +30,7 @@ export const NETWORKS = <const>[
   'arbitrumGoerli',
   'avax',
   'base',
+  'blast',
   'bsc',
   'bscTestnet',
   'goerli',
@@ -193,6 +194,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     url: getEnv('BASE_RPC_URL') || 'https://mainnet.base.org/',
     getExplorerUrl: (address: string) => `https://basescan.org/address/${address}`,
     chainId: 8453,
+    accounts: mainnetAccounts,
+  },
+  blast: {
+    url: getEnv('BLAST_RPC_URL') || 'https://blast-rpc.publicnode.com/',
+    getExplorerUrl: (address: string) => `https://blastscan.io/address/${address}`,
+    chainId: 81457,
     accounts: mainnetAccounts,
   },
   bsc: {
