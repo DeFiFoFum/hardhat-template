@@ -41,6 +41,8 @@ export const NETWORKS = <const>[
   'polygon',
   'polygonTestnet',
   'sepolia',
+  'zircuit',
+  'zircuitTestnet',
 ]
 // Create a type out of the network array
 export type Networks = (typeof NETWORKS)[number]
@@ -254,6 +256,18 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     url: getEnv('SEPOLIA_TESTNET_RPC_URL') || 'https://rpc2.sepolia.org',
     getExplorerUrl: (address: string) => `https://sepolia.etherscan.io/address/${address}`,
     chainId: 11155111,
+    accounts: testnetAccounts,
+  },
+  zircuit: {
+    url: getEnv('ZIRCUIT_RPC_URL') || 'https://zircuit-mainnet.drpc.org',
+    getExplorerUrl: (address: string) => `https://explorer.zircuit.com/address/${address}`,
+    chainId: 48900,
+    accounts: mainnetAccounts,
+  },
+  zircuitTestnet: {
+    url: getEnv('ZIRCUIT_TESTNET_RPC_URL') || 'https://zircuit1-testnet.p2pify.com',
+    getExplorerUrl: (address: string) => `https://explorer.testnet.zircuit.com/address/${address}`,
+    chainId: 48899,
     accounts: testnetAccounts,
   },
   // Placeholder for the configuration below.
