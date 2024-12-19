@@ -2,12 +2,12 @@ import { MockToken, MockToken__factory } from '../../typechain-types'
 import { DeployManager } from '../../scripts/deploy/DeployManager'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
-type Template_ContextManager_Accounts = {
+export type Template_ContextManager_Accounts = {
   admin: SignerWithAddress
   deployer: SignerWithAddress
 }
 
-type Template_ContextManager_Props = {
+export type Template_ContextManager_Props = {
   accounts: Template_ContextManager_Accounts
   tokens: {
     principalToken: MockToken
