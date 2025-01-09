@@ -112,23 +112,30 @@ task(TASK_TEST, '🫶 Test Task')
   .setAction(testRunner)
 
 /**
- * Account setup for mainnet / testnet networks.
+ * Follows a standard environment variable setup for accounts. Uses MNEMONIC first, falls back to PRIVATE_KEY and
+ *  returns undefined if either are not present.
+ *
+ * Environment variables: <environment>_MNEMONIC or <environment>_PRIVATE_KEY
  */
-const mainnetMnemonic = getEnv('MAINNET_MNEMONIC')
-const mainnetPrivateKey = getEnv('MAINNET_PRIVATE_KEY')
-const mainnetAccounts: HttpNetworkAccountsUserConfig | undefined = mainnetMnemonic
-  ? { mnemonic: mainnetMnemonic }
-  : mainnetPrivateKey
-  ? [mainnetPrivateKey] // Fallback to private key
-  : undefined
+function getAccountsForEnvironment(
+  environment: 'MAINNET' | 'TESTNET' | 'BASE_PAD'
+): HttpNetworkAccountsUserConfig | undefined {
+  const mnemonic = getEnv(`${environment}_MNEMONIC`)
+  if (mnemonic) {
+    return { mnemonic }
+  }
 
-const testnetMnemonic = getEnv('TESTNET_MNEMONIC')
-const testnetPrivateKey = getEnv('TESTNET_PRIVATE_KEY')
-const testnetAccounts: HttpNetworkAccountsUserConfig | undefined = testnetMnemonic
-  ? { mnemonic: testnetMnemonic }
-  : testnetPrivateKey
-  ? [testnetPrivateKey] // Fallback to private key
-  : undefined
+  const privateKey = getEnv(`${environment}_PRIVATE_KEY`)
+  if (privateKey) {
+    return [privateKey] // Fallback to private key
+  }
+
+  return undefined // Return undefined if neither mnemonic or private key are present
+}
+
+// Account setup for supported environments
+const mainnetAccounts = getAccountsForEnvironment('MAINNET')
+const testnetAccounts = getAccountsForEnvironment('TESTNET')
 
 const getHardhatNetworkAccounts = (
   networkAccounts: HttpNetworkAccountsUserConfig | undefined
