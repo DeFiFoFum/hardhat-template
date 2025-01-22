@@ -1,0 +1,4 @@
+# This file is needed for husky + lint-staged
+yarn.lock
+.husky/*
+.github/workflows/*
