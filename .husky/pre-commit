@@ -1,1 +1,1 @@
-yarn lint:ci
+yarn lint-staged
