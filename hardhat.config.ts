@@ -341,6 +341,8 @@ const config: HardhatUserConfig = {
     // https://www.npmjs.com/package/hardhat-gas-reporter
     enabled: getEnv('REPORT_GAS') ? true : false,
     currency: 'USD',
+    // Provide API Key for gas costs in USD. Get your API key from https://coinmarketcap.com/api/
+    coinmarketcap: getEnv('COINMARKETCAP_API_KEY'),
     excludeContracts: [],
   },
   docgen: {
