@@ -23,9 +23,9 @@ jobs:
       - name: Cache node_modules
         uses: actions/cache/save@v4
         with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          path: node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          enableCrossOsArchive: false
 
   lint:
     needs: setup
@@ -41,9 +41,10 @@ jobs:
       - name: Restore node_modules
         uses: actions/cache/restore@v4
         with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          path: node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          fail-on-cache-miss: true
+          enableCrossOsArchive: false
           
       - name: Run linting
         run: yarn lint:ci
@@ -62,9 +63,10 @@ jobs:
       - name: Restore node_modules
         uses: actions/cache/restore@v4
         with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          path: node_modules
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          fail-on-cache-miss: true
+          enableCrossOsArchive: false
           
       - name: Run tests
         run: yarn test:ci
