@@ -65,7 +65,8 @@
   },
   "homepage": "https://github.com/DeFiFoFum/hardhat-template#readme",
   "lint-staged": {
-    "*": "yarn lint:ci"
+    "*.ts": "yarn lint:ts",
+    "*.sol": "yarn lint:sol"
   },
   "resolutions": {
     "got": "^11.8.5",
