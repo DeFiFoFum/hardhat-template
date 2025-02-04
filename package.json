@@ -31,6 +31,7 @@
     "verify": "hardhat verify-contract",
     "semgrep": "semgrep --config modules/semgrep-smart-contracts/solidity ./contracts",
     "test": "env TESTING=true hardhat test",
+    "test:parallel": "bash lib/test/parallel/run-tests.sh",
     "test:ci": "yarn compile && yarn test",
     "test:all": "yarn test && yarn forge:test",
     "test:gas": "env REPORT_GAS=true yarn test",

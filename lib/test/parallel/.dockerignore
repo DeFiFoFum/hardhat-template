@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+.yarn
+.pnp.*
+
+# Build outputs
+artifacts
+artifacts-external
+cache
+coverage
+typechain-types
+dist
+
+# Development files
+.git
+.github
+.vscode
+.idea
+*.log
+*.env*
+
+# Test outputs
+coverage.json
