@@ -20,11 +20,33 @@ check_docker() {
     fi
 }
 
+# Get the project-specific image prefix
+get_image_prefix() {
+    # Get the last part of the current directory as project name
+    PROJECT_NAME=$(basename "$PWD")
+    # Get current git branch, fallback to unknown
+    BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+    # Sanitize names
+    PROJECT_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+    BRANCH_NAME=$(echo "$BRANCH_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+    echo "${PROJECT_NAME}-${BRANCH_NAME}"
+}
+
 # Clean up function
 cleanup() {
     if [ -f "docker-compose.test.yml" ]; then
-        echo -e "${YELLOW}Cleaning up containers...${NC}"
-        docker-compose -f docker-compose.test.yml down 2>/dev/null || true
+        echo -e "${YELLOW}Cleaning up containers and test-specific images...${NC}"
+        
+        # Get our project-specific image prefix
+        PREFIX=$(get_image_prefix)
+        
+        # Stop and remove containers
+        docker-compose -f docker-compose.test.yml down --rmi local 2>/dev/null || true
+        
+        # Remove any leftover test images for this project/branch
+        echo -e "${YELLOW}Cleaning up any leftover test images for ${PREFIX}...${NC}"
+        docker images "${PREFIX}-test-*" --format "{{.ID}}" | xargs -r docker rmi 2>/dev/null || true
+        
         rm -f docker-compose.test.yml
     fi
 }
@@ -45,7 +67,14 @@ check_docker
 
 echo -e "${GREEN}Preparing test environment...${NC}"
 
+# Install ts-node if not already installed (needed for our TypeScript scripts)
+if ! command -v ts-node &> /dev/null; then
+    echo -e "${YELLOW}Installing ts-node...${NC}"
+    npm install -g ts-node typescript @types/node
+fi
+
 echo -e "${GREEN}Generating Docker Compose configuration...${NC}"
+# The generate-compose script now handles base image management
 npx ts-node lib/test/parallel/generate-compose.ts
 
 # Verify docker-compose file was generated

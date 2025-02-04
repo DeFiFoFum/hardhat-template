@@ -1,0 +1,19 @@
+FROM node:22
+
+WORKDIR /app
+
+# Copy the entire project first
+COPY . .
+
+# Install dependencies and compile
+RUN yarn install --frozen-lockfile --ignore-engines && \
+    yarn compile && \
+    # Verify typechain types were generated
+    ls typechain-types
+
+# Add label for content hash (will be set during build)
+LABEL content_hash=""
+
+# Add healthcheck to detect hanging processes
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD ps aux | grep "node" | grep -v grep || exit 1

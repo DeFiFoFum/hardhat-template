@@ -1,0 +1,9 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+# The test file to run will be passed as a build arg
+ARG TEST_FILE
+ENV TEST_FILE=${TEST_FILE}
+
+# Run single test file with a timeout and proper Node.js flags
+CMD ["sh", "-c", "node --max-old-space-size=4096 --no-warnings node_modules/.bin/hardhat test $TEST_FILE"]

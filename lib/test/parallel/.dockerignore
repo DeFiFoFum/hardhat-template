@@ -3,21 +3,28 @@ node_modules
 .yarn
 .pnp.*
 
-# Build outputs
-artifacts
-artifacts-external
-cache
+# Build outputs (but keep hardhat artifacts)
+dist
+build
 coverage
 typechain-types
-dist
+out
 
-# Development files
+# Git
 .git
 .github
+.gitignore
+.gitmodules
+
+# IDE
 .vscode
 .idea
-*.log
-*.env*
 
-# Test outputs
+# Misc
+.env*
+*.log
 coverage.json
+
+# Keep necessary files
+!hardhat.config.ts
+!tsconfig.json

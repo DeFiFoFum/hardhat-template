@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import glob from 'glob'
+import { ensureBaseImage, getImagePrefix } from './image-manager'
 
 // Function to find all test files in the repository
 function findTestFiles(): string[] {
@@ -37,6 +38,10 @@ function generateDockerCompose(): void {
   const testFiles = findTestFiles()
   console.log('Found test files:', testFiles)
 
+  // Ensure base image is built/up-to-date and get its tag
+  const baseImageTag = ensureBaseImage()
+  console.log('Using base image:', baseImageTag)
+
   const dockerCompose = {
     services: Object.fromEntries(
       testFiles.map((file) => [
@@ -44,12 +49,13 @@ function generateDockerCompose(): void {
         {
           build: {
             context: '.',
-            dockerfile: 'lib/test/parallel/Dockerfile',
+            dockerfile: 'lib/test/parallel/Dockerfile.runner',
             args: {
+              BASE_IMAGE: baseImageTag,
               TEST_FILE: file,
             },
           },
-          image: `hardhat-parallel-test-runner-${generateServiceName(file)}`,
+          image: `${getImagePrefix()}-test-${generateServiceName(file)}`,
           environment: {
             // Pass through any environment variables needed for tests
             NODE_ENV: 'test',
