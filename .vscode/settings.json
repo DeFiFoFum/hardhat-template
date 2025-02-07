@@ -7,7 +7,8 @@
     },
     "editor.formatOnSave": true,
     "mochaExplorer.files": [
-        "test/**/*.+(js|ts)",
+        "test/**/*.{spec,test}.{ts,js}",
+        // "**/*.{spec,test}.{ts,js}",
     ],
     // Uncomment the following lines to turn on inlay hints for TypeScript
     // "typescript.inlayHints.parameterNames.enabled": "all",

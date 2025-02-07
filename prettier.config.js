@@ -1,7 +1,7 @@
 const solhintConfig = require('./solhint.config')
 
 module.exports = {
-  trailingComma: 'es5',
+  trailingComma: 'all',
   tabWidth: 2,
   semi: false,
   singleQuote: true,
