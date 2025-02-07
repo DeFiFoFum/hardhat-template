@@ -1,4 +1,3 @@
-// https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
 import { BigNumber, BigNumberish, Contract, ContractFactory, Signer, utils } from 'ethers'
 import { network, run, ethers } from 'hardhat'
 import { logger } from '../../hardhat/utils/logger'
@@ -13,80 +12,20 @@ import {
 import { getDateMinuteString } from '../../lib/node/dateHelper'
 import { addBNStr, mulBNStr } from '../../test/utils/bnHelper'
 import { FactoryOptions } from 'hardhat/types'
-
-/*
-This is a TypeScript class called `DeployManager` that is used to deploy contracts, verify them and save the deployment details to a file. The class has the following methods:
-
-- `deployContractFromFactory`: This method deploys a contract from a given ContractFactory instance by calling its `deploy` method with the provided parameters. It then saves the deployment details to an array of objects called `contracts` and calls the `saveContractsToFile` method to save the details to a file.
-- `verifyContracts`: This method verifies all the contracts in the `contracts` array by calling the Hardhat `verify:verify` task with the contract's address and constructor arguments.
-- `saveContractsToFile`: This method saves the deployment details of all the contracts in the `contracts` array to a JavaScript file with a name that includes the current date and network name.
-
-The `DeployManager` class imports the following modules:
-
-- `ethers`: A library for interacting with Ethereum.
-- `hardhat`: A development environment for building, testing, and deploying smart contracts.
-- `logger`: A custom logger module for logging messages to the console.
-- `fs`: A Node.js module for working with the file system.
-
-The class also defines a property called `baseDir` which is set to the current directory by default, and an array of objects called `contracts` which stores the deployment details of all the contracts deployed using this class.
-*/
+import {
+  BaseDeployOptions,
+  DeployedContractDetails,
+  GasEstimation,
+  IDeployManager,
+  IDeployManagerFactory,
+  InitializerParams,
+  UpgradeableDeployOptions,
+  UpgradeableDeployResult,
+} from './IDeployManager'
 
 // -----------------------------------------------------------------------------------------------
-// Interfaces
+// Types
 // -----------------------------------------------------------------------------------------------
-
-interface GasEstimation {
-  gasLimit: string
-  gasPriceWei: string
-  gasPriceGei: string
-  ethCost: string
-}
-
-interface DeployedContractDetails {
-  name: string
-  address: string
-  encodedConstructorArgs: string
-  constructorArguments: any[]
-  verificationCommand: string
-  gasEstimate: GasEstimation | null
-}
-
-interface ContractFromFactoryOptions {
-  name?: string
-  estimateGas?: boolean
-  gasPriceOverride?: BigNumber
-}
-
-/**
- * Extended diagram of the Proxy Pattern used for upgradeable contracts including the admin of the ProxyAdmin:
- *
- *  +-------+                      +----------------+           +-------------------+           +-------------------+
- *  |       |                      |                |           |                   |           |                   |
- *  | Owner |                      |  ProxyAdmin    |           |  Transparent      |           |  Implementation   |
- *  |       +--------------------->|                |  admin    |  UpgradeableProxy |  delegate |  Contract (Logic) |
- *  |       |                      |                +---------->+                   +---------->+                   |
- *  +-------+                      |                |           |                   |           |                   |
- *                                 +----------------+           +-------------------+           +-------------------+
- *
- * - Owner: The external owner/administrator that has the rights to upgrade the proxy by interacting with the ProxyAdmin.
- * - ProxyAdmin: The contract that administers the proxy contract, capable of upgrading it.
- *      The ProxyAdmin CANNOT interact with the implementation contract directly.
- * - TransparentUpgradeableProxy: The proxy contract that delegates calls to the implementation contract.
- * - Implementation Contract (Logic): The contract containing the logic, which can be upgraded.
- */
-interface UpgradeableContractFromFactoryOptions extends ContractFromFactoryOptions {
-  // Used to skip initializer when deploying upgradeable contracts
-  skipInitialization?: boolean
-  // Skip deploying proxy admin and use existing one
-  proxyAdminAddress?: string
-  // Proxy admin owner (Only used if proxyAdminAddress is not provided)
-  proxyAdminOwner?: string
-}
-
-type UpgradeableContractFromFactoryOptions_SkipInitialize = Omit<
-  UpgradeableContractFromFactoryOptions,
-  'skipInitialization'
->
 
 interface DeployManagerConstructor {
   signer?: Signer
@@ -95,12 +34,12 @@ interface DeployManagerConstructor {
 }
 
 /**
- * Version 3.1.1
+ * Version 3.1.2
  * A class to deploy contracts, verify them and save the deployment details to a file.
  *
  * See docs at top of file for more details.
  */
-export class DeployManager {
+export class DeployManager implements IDeployManager {
   private signer?: Signer
   baseDir: string
   gasPriceOverride?: BigNumber
@@ -199,26 +138,22 @@ export class DeployManager {
   async deployContract<CF extends ContractFactory>(
     contractName: string,
     params: Parameters<CF['deploy']>,
-    factoryOptions?: FactoryOptions
+    factoryOptions?: FactoryOptions,
   ): Promise<ReturnType<CF['deploy']>> {
     const factory = (await ethers.getContractFactory(contractName, factoryOptions)) as CF
     return this.deployContractFromFactory(factory, params, { name: contractName })
   }
 
   /**
-   * Deploys an upgradeable contract by name.
-   * @param contractName - The name of the contract.
-   * @param initializerParams - The parameters for initializing the contract.
+   * Deploys a contract from a contract factory.
+   * @param contractFactory - The contract factory instance.
+   * @param params - The parameters for the contract's deploy method.
    * @param options - The deployment options.
    */
   async deployContractFromFactory<CF extends ContractFactory>(
     contractFactory: CF,
-    params: Parameters<CF['deploy']>, // NOTE: For upgradeable proxy
-    {
-      name = 'Contract', // Default contract name if not provided
-      estimateGas = true,
-      gasPriceOverride,
-    }: ContractFromFactoryOptions = {}
+    params: Parameters<CF['deploy']>,
+    { name = 'Contract', estimateGas = true, gasPriceOverride }: BaseDeployOptions = {},
   ): Promise<ReturnType<CF['deploy']>> {
     logger.logHeader(`Deploying ${name}`, `🚀`)
     // Get the balance of the account before deployment
@@ -280,7 +215,7 @@ export class DeployManager {
           const seconds = 1
           deployAttempt++
           logger.warn(
-            `${deployAttempt}/${this.maxDeployRetries}: Nonce already used, retrying with a new nonce in ${seconds} seconds...`
+            `${deployAttempt}/${this.maxDeployRetries}: Nonce already used, retrying with a new nonce in ${seconds} seconds...`,
           )
           // Optionally, wait for a short period before retrying
           await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
@@ -317,7 +252,7 @@ export class DeployManager {
       deployedContractDetails.verificationCommand = this.getVerificationCommand(deployedContractDetails)
     } catch (e: any) {
       console.error(
-        `Failed to generate verification command for deployedContractDetails: ${deployedContractDetails} with error: ${e}`
+        `Failed to generate verification command for deployedContractDetails: ${deployedContractDetails} with error: ${e}`,
       )
     }
 
@@ -338,19 +273,12 @@ export class DeployManager {
    * @param options - The deployment options.
    * @param factoryOptions - The factory options for the contract.
    */
-  // TODO: These functions don't seem to be using all of the options. (i.e., seems to be able to pass a ContractFactory and Implementation)
   async deployUpgradeableContract<CF extends ContractFactory>(
     contractName: string,
-    // NOTE: The main deploy method passes in constructors, but this passes in initializer params after deployment
     initializerParams: Parameters<ReturnType<CF['attach']>['initialize']>,
-    options: UpgradeableContractFromFactoryOptions = {},
-    factoryOptions: FactoryOptions = {}
-  ): Promise<{
-    implementationThroughProxy: ReturnType<CF['attach']> // Returns the interface of the implementation, at the proxy address.
-    proxyAdmin: ProxyAdmin
-    transparentProxy: TransparentUpgradeableProxy
-    implementation: Awaited<ReturnType<CF['deploy']>>
-  }> {
+    options: UpgradeableDeployOptions = {},
+    factoryOptions: FactoryOptions = {},
+  ): Promise<UpgradeableDeployResult<ReturnType<CF['attach']>, Awaited<ReturnType<CF['deploy']>>>> {
     const factory = (await ethers.getContractFactory(contractName, factoryOptions)) as CF
     return this.deployUpgradeableContractFromFactory(factory, initializerParams, { name: contractName, ...options })
   }
@@ -362,13 +290,8 @@ export class DeployManager {
    */
   async deployUpgradeableContract_SkipInitialize<CF extends ContractFactory>(
     contractName: string,
-    options: UpgradeableContractFromFactoryOptions_SkipInitialize = {}
-  ): Promise<{
-    implementationThroughProxy: ReturnType<CF['attach']> // Returns the interface of the implementation, at the proxy address.
-    proxyAdmin: ProxyAdmin
-    transparentProxy: TransparentUpgradeableProxy
-    implementation: Awaited<ReturnType<CF['deploy']>>
-  }> {
+    options: Omit<UpgradeableDeployOptions, 'skipInitialization'> = {},
+  ): Promise<UpgradeableDeployResult<ReturnType<CF['attach']>, Awaited<ReturnType<CF['deploy']>>>> {
     const factory = (await ethers.getContractFactory(contractName)) as CF
     return this.deployUpgradeableContractFromFactory(factory, [], {
       name: contractName,
@@ -383,21 +306,11 @@ export class DeployManager {
    * @param initializerParams - The parameters for initializing the contract.
    * @param options - The deployment options.
    */
-  async deployUpgradeableContractFromFactory<
-    CF extends ContractFactory,
-    O extends UpgradeableContractFromFactoryOptions
-  >(
+  async deployUpgradeableContractFromFactory<CF extends ContractFactory>(
     contractFactory: CF,
-    initializerParams: O['skipInitialization'] extends true ? [] : Parameters<ReturnType<CF['attach']>['initialize']>,
-    options: O
-  ): Promise<{
-    implementationThroughProxy: ReturnType<CF['attach']>
-    proxyAdmin: ProxyAdmin
-    proxyAdminOwner: string
-    transparentProxy: TransparentUpgradeableProxy
-    implementation: Awaited<ReturnType<CF['deploy']>>
-    initialized: boolean
-  }> {
+    initializerParams: InitializerParams<CF>,
+    options: UpgradeableDeployOptions,
+  ): Promise<UpgradeableDeployResult<ReturnType<CF['attach']>, Awaited<ReturnType<CF['deploy']>>>> {
     const { name = 'Contract', skipInitialization = false } = options
     let { proxyAdminOwner, proxyAdminAddress } = options
     logger.log(`Deploying upgradeable ${name}`, `🚀`)
@@ -413,7 +326,7 @@ export class DeployManager {
     if (!proxyAdminAddress) {
       proxyAdminOwner = proxyAdminOwner ? proxyAdminOwner : await (await this.getSigner()).getAddress()
       logger.warn(
-        `deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${proxyAdminOwner}`
+        `deployUpgradeableContract:: Proxy Admin not passed. Deploying ProxyAdmin with owner: ${proxyAdminOwner}`,
       )
       proxyAdmin = await this.deployProxyAdmin(proxyAdminOwner)
       proxyAdminAddress = proxyAdmin.address
@@ -421,7 +334,7 @@ export class DeployManager {
       proxyAdmin = (await ethers.getContractAt('ProxyAdmin', proxyAdminAddress)) as ProxyAdmin
       if (proxyAdminOwner) {
         logger.warn(
-          `deployUpgradeableContract:: Proxy Admin passed. ProxyAdminOwner: ${proxyAdminOwner} will NOT be used`
+          `deployUpgradeableContract:: Proxy Admin passed. ProxyAdminOwner: ${proxyAdminOwner} will NOT be used`,
         )
       }
     }
@@ -438,7 +351,8 @@ export class DeployManager {
     const transparentProxy = await this.deployTransparentProxy(
       implementation.address,
       proxyAdminAddress as string,
-      initializerData
+      initializerData,
+      name,
     )
     // Return the proxy contract as an instance of the implementation contract
     const implementationThroughProxy = (await contractFactory.attach(transparentProxy.address)) as ReturnType<
@@ -483,19 +397,34 @@ export class DeployManager {
   async deployTransparentProxy(
     implementationAddress: string,
     proxyAdminAddress: string,
-    initializerData: string
+    initializerData: string,
+    implementationContractName: string,
   ): Promise<TransparentUpgradeableProxy> {
+    // If contract name is provided, check for a named proxy
+    const proxyName = `${implementationContractName}Proxy`
+    try {
+      logger.log(`Checking for named proxy: ${proxyName}`, `🔍`)
+      const NamedProxyFactory = (await ethers.getContractFactory(proxyName)) as TransparentUpgradeableProxy__factory
+      logger.log(`Found named proxy contract: ${proxyName}`, `✅`)
+      const namedProxy = await this.deployContractFromFactory(
+        NamedProxyFactory,
+        [implementationAddress, proxyAdminAddress, initializerData],
+        { name: proxyName },
+      )
+      return namedProxy
+    } catch (error) {
+      logger.log(`No named proxy found for ${implementationContractName}, using TransparentUpgradeableProxy`, `i️`)
+    }
+
     logger.log(`Deploying Transparent Proxy`, `🚀`)
     const TransparentUpgradeableProxyFactory = (await ethers.getContractFactory(
       'TransparentUpgradeableProxy',
-      this.signer
+      this.signer,
     )) as TransparentUpgradeableProxy__factory
     const transparentProxy = await this.deployContractFromFactory(
       TransparentUpgradeableProxyFactory,
       [implementationAddress, proxyAdminAddress, initializerData],
-      {
-        name: 'TransparentUpgradeableProxy',
-      }
+      { name: 'TransparentUpgradeableProxy' },
     )
 
     return transparentProxy

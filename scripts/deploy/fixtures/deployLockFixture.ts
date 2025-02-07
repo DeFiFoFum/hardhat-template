@@ -8,7 +8,7 @@ import { formatEther } from 'ethers/lib/utils'
 export async function deployLockFixture(
   hre: HardhatRuntimeEnvironment,
   deployManager: DeployManager,
-  fixtureOverrides: FixtureOverrides = {}
+  fixtureOverrides: FixtureOverrides = {},
 ) {
   const currentNetwork = hre.network.name as DeployableNetworks
   const deployConfig = await getDeployConfig(currentNetwork, fixtureOverrides)
@@ -35,7 +35,7 @@ export async function deployLockFixture(
       name: 'LockUpgradeable', // Pass in contract name to log contract
       proxyAdminAddress: deployConfig.contractOverrides.proxyAdminContractAddress,
       proxyAdminOwner: deployConfig.accounts.proxyAdminOwnerAddress,
-    }
+    },
   )
   logger.log(`LockUpgradeable to: ${lock.address}`, '🔒')
 
