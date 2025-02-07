@@ -14,7 +14,7 @@ import { BigNumber, Contract } from 'ethers'
 export async function estimateReadOperationGas<C extends Contract, F extends keyof C>(
   contract: C,
   functionName: F,
-  args: Parameters<C[F]>
+  args: Parameters<C[F]>,
 ): Promise<BigNumber> {
   const transaction = {
     to: contract.address,

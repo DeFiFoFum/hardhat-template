@@ -23,6 +23,7 @@ _**For testing features see [README-testing.md](./README-testing.md)**_
   - [Safe Wallet](https://docs.safe.global/safe-smart-account/supported-networks/v1.3.0): Deploy Safe Wallets to the same address on multiple networks. (See [README-safe.md](./README-safe.md) for more info.)
 - Typescript
   - [Typechain](https://www.npmjs.com/package/typechain): Generate smart contract typings for Ethers during
+- [Contract Versions Guide](./docs/guides/contract-versions.md): Documentation on Solidity version organization (0.6.x vs 0.8.x)
 - Docs
   - [Solidity Docgen](https://github.com/OpenZeppelin/solidity-docgen): Generate markdown files from the NatSpec comments in your Solidity code.
     - [solidity-docgen config](https://github.com/OpenZeppelin/solidity-docgen/blob/HEAD/src/config.ts)

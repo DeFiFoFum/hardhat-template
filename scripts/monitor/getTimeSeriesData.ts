@@ -26,7 +26,7 @@ async function script() {
       contract: tokenContract,
       functionName: 'totalSupply',
       params: [],
-    }
+    },
   )
 
   // Convert the BigNumber values to strings

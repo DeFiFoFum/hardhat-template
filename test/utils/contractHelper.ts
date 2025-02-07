@@ -48,7 +48,7 @@ main().catch(console.error);
  */
 export async function getContractGetterSnapshot<C extends Contract>(
   contract: C,
-  snapshotCalls: (SnapshotCall<C> | keyof C['functions'])[]
+  snapshotCalls: (SnapshotCall<C> | keyof C['functions'])[],
 ): Promise<{
   [K in keyof C['functions']]: C['functions'][K] extends (...args: any) => Promise<infer R> ? string : never
 }> {

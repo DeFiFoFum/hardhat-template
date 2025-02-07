@@ -28,7 +28,7 @@ const compareAbis = async (
     contract2: string
     subDir?: string
     baseName?: string
-  }
+  },
 ) => {
   const { baseAbi, contract1ExtendedAbi, contract2ExtendedAbi } = await hre.abiCompare(contract1, contract2, subDir)
 

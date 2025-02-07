@@ -29,7 +29,7 @@ export class Template_ContextManager {
   static async createWithBondConfig(
     accounts: Template_ContextManager_Accounts,
     principalSupply: string,
-    payoutSupply: string
+    payoutSupply: string,
   ): Promise<Template_ContextManager> {
     const deployManager = await DeployManager.create({ signer: accounts.deployer })
 

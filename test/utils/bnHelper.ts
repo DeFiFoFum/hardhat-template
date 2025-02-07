@@ -71,7 +71,7 @@ export function isWithinLimit(
   bnToCheck: BigNumberish,
   bnExpected: BigNumberish,
   tolerancePercentage = 1e4,
-  direction: 'both' | 'greater' | 'less' = 'both'
+  direction: 'both' | 'greater' | 'less' = 'both',
 ) {
   bnToCheck = BigNumber.from(bnToCheck)
   bnExpected = BigNumber.from(bnExpected)
@@ -81,7 +81,7 @@ export function isWithinLimit(
     console.error(
       `bnHelper::isWithinLimit - ${bnToCheck.toString()} gte upper tolerance limit of ${
         tolerancePercentage / 1e4
-      }% to a value of ${bnExpected.add(tolerance).toString()}`
+      }% to a value of ${bnExpected.add(tolerance).toString()}`,
     )
     withinTolerance = false
   }
@@ -90,7 +90,7 @@ export function isWithinLimit(
     console.error(
       `bnHelper::isWithinLimit - ${bnToCheck.toString()} lte lower tolerance limit of ${
         tolerancePercentage / 1e4
-      }% to a value of ${bnExpected.sub(tolerance).toString()}`
+      }% to a value of ${bnExpected.sub(tolerance).toString()}`,
     )
     withinTolerance = false
   }
@@ -110,7 +110,7 @@ export function isWithinWeiLimit(
   bnToCheck: BigNumberish,
   bnExpected: BigNumberish,
   tolerance = BigNumber.from(0),
-  direction: 'both' | 'greater' | 'less' = 'both'
+  direction: 'both' | 'greater' | 'less' = 'both',
 ) {
   bnToCheck = BigNumber.from(bnToCheck)
   bnExpected = BigNumber.from(bnExpected)
@@ -119,7 +119,7 @@ export function isWithinWeiLimit(
     console.error(
       `bnHelper::isWithinWeiLimit - ${bnToCheck.toString()} gte upper tolerance limit of ${tolerance} wei to a value of ${bnExpected
         .add(tolerance)
-        .toString()}`
+        .toString()}`,
     )
     withinTolerance = false
   }
@@ -128,7 +128,7 @@ export function isWithinWeiLimit(
     console.error(
       `bnHelper::isWithinWeiLimit - ${bnToCheck.toString()} lte lower tolerance limit of ${tolerance} wei to a value of ${bnExpected
         .sub(tolerance)
-        .toString()}`
+        .toString()}`,
     )
     withinTolerance = false
   }

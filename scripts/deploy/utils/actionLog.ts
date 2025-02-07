@@ -66,7 +66,7 @@ export const createActionLog = () => {
       logger.error(
         `Error performing action on ${actionInfo.contract} at address ${actionInfo.address}: ${
           actionInfo.action
-        } - ${getErrorMessage(e, 500)}`
+        } - ${getErrorMessage(e, 500)}`,
       )
       pushActionsAndLog(actionInfo)
     }

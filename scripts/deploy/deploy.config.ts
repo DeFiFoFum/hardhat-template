@@ -17,7 +17,7 @@ export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
  */
 export async function getDeployConfig(
   network: DeployableNetworks,
-  overrides: FixtureOverrides = {}
+  overrides: FixtureOverrides = {},
 ): Promise<DeploymentVariables> {
   const config = deployableNetworkConfig[network]
   if (!config) {
@@ -35,7 +35,7 @@ export async function saveDeploymentOutput(
   networkName: Networks,
   deploymentDetails: {},
   convertAddressesToExplorerLinks: boolean,
-  logOutput: boolean
+  logOutput: boolean,
 ): Promise<{}> {
   // getDateMinuteString: YYYYMMDDTHH:MM
   const filePath = path.resolve(DEPLOYMENTS_BASE_DIR, `${getDateMinuteString()}-${networkName}-deployment`)
@@ -113,7 +113,7 @@ interface DeploymentVariables {
  */
 function applyFixtureOverrides(
   productionValues: DeploymentVariables,
-  { accountOverrides, contractOverrides }: FixtureOverrides
+  { accountOverrides, contractOverrides }: FixtureOverrides,
 ): DeploymentVariables {
   return {
     ...productionValues,
@@ -181,7 +181,7 @@ const deployableNetworkConfig: Record<
     if (!fixtureOverrides.accountOverrides) {
       logger.log(
         `deploy.config:: No FixtureOverrides passed, using default account overrides for hardhat network`,
-        '📝'
+        '📝',
       )
     }
     const accounts = await ethers.getSigners()

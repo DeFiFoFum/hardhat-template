@@ -27,7 +27,7 @@ import { DeployableNetworks } from '../deploy.config'
 export async function forkIfHardhat(
   currentNetwork: DeployableNetworks,
   desiredFork: DeployableNetworks,
-  desiredBlock?: number
+  desiredBlock?: number,
 ) {
   let deployConfigNetwork = currentNetwork
   if (currentNetwork === 'hardhat') {

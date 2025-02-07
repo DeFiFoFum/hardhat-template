@@ -65,7 +65,7 @@ async function deployCreate2Safe(salt: number, name?: string) {
   } catch (e) {
     logger.error(`Error setting up Gnosis Safe: ${getErrorMessage(e)}`)
     logger.warn(
-      `You will need to setup the Gnosis Safe manually by calling setup on ${gnosisSafeAddress} with the initializerParams in output.`
+      `You will need to setup the Gnosis Safe manually by calling setup on ${gnosisSafeAddress} with the initializerParams in output.`,
     )
   }
 
@@ -86,7 +86,7 @@ async function deployCreate2Safe(salt: number, name?: string) {
   await writeObjectToTsFile(
     __dirname + `/${name || 'create2SafeOutput'}.${salt}.${network.name}.ts`,
     'create2Deployment',
-    output
+    output,
   )
 }
 

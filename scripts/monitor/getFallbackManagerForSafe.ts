@@ -19,7 +19,7 @@ async function script() {
       fallbackManagerAddress,
     },
     currentNetwork,
-    true
+    true,
   )
 
   console.dir(output, { depth: null })

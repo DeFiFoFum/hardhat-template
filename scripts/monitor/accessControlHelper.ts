@@ -48,7 +48,7 @@ export async function getRoleMembersForAddresses(accessControlEnumerable: string
  */
 export async function getRoleMembersForContracts<C extends AccessControlEnumerable, Role extends string>(
   accessControlEnumerableArray: C[],
-  roles: Role[]
+  roles: Role[],
 ) {
   const finalOutput = {} as Record<C['address'], Record<Role, string[]>>
   for (const accessControlEnumerable of accessControlEnumerableArray) {

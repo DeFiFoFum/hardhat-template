@@ -13,7 +13,7 @@ async function script() {
   const proxyContractAddress = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' // Arbitrum WETH
   const { proxyAdminAddress, proxyAdminOwner } = await getProxyAdminOfProxyContract(
     currentNetwork,
-    proxyContractAddress
+    proxyContractAddress,
   )
   const implementationAddress = await getImplementationOfProxyContract(currentNetwork, proxyContractAddress)
 
@@ -25,7 +25,7 @@ async function script() {
       implementationAddress,
     },
     currentNetwork,
-    true
+    true,
   )
 
   console.dir(output, { depth: null })

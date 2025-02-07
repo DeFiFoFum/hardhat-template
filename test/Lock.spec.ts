@@ -66,7 +66,7 @@ describe('Lock', function () {
       const latestTime = await time.latest()
       const Lock = await ethers.getContractFactory('Lock')
       await expect(Lock.deploy(latestTime, FR.owner.address, { value: 1 })).to.be.revertedWith(
-        'Unlock time should be in the future'
+        'Unlock time should be in the future',
       )
     })
   })
@@ -109,7 +109,7 @@ describe('Lock', function () {
 
         await expect(FR.lock.withdraw()).to.changeEtherBalances(
           [FR.owner, FR.lock],
-          [FR.lockedAmount, -FR.lockedAmount]
+          [FR.lockedAmount, -FR.lockedAmount],
         )
       })
     })

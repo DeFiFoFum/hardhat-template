@@ -10,7 +10,7 @@ import { ContractFactory } from 'ethers'
 export async function dynamicFixture<CF extends ContractFactory>(
   _ethers: typeof ethers,
   contractName: string,
-  params: Parameters<CF['deploy']>
+  params: Parameters<CF['deploy']>,
 ): Promise<ReturnType<CF['deploy']>> {
   // Will return undefined if contract artifact doesn't exist
   const Contract = (await _ethers.getContractFactory(contractName).catch(() => undefined)) as CF

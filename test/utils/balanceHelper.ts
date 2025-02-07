@@ -43,7 +43,7 @@ console.log('Updated Snapshots:', updatedSnapshots)
 */
 export const createNativeBalanceSnapshotter = (
   _ethers: typeof ethers,
-  accountAddresses: (string | SignerWithAddress)[]
+  accountAddresses: (string | SignerWithAddress)[],
 ): (() => Promise<{
   [address: string]: Snapshot
 }>) => {
@@ -95,7 +95,7 @@ export const createNativeBalanceSnapshotter = (
             snapshots: snapshots[accountAddress],
           }
         }
-      })
+      }),
     )
 
     return currentSnapshot
@@ -131,7 +131,7 @@ console.log('Updated ERC20 Snapshots:', updatedERC20Snapshots)
 export const createERC20BalanceSnapshotter = (
   _ethers: typeof ethers,
   accountAddresses: (string | SignerWithAddress)[],
-  tokenAddresses: string[]
+  tokenAddresses: string[],
 ): (() => Promise<{
   [address: string]: {
     [token: string]: Snapshot
@@ -205,9 +205,9 @@ export const createERC20BalanceSnapshotter = (
                 snapshots: snapshots[accountAddress][tokenAddress],
               }
             }
-          })
+          }),
         )
-      })
+      }),
     )
 
     return currentSnapshot
