@@ -7,6 +7,7 @@ import '@nomicfoundation/hardhat-chai-matchers'
 import { dynamicFixture } from './fixtures'
 import { Erc7201__factory, Lock__factory } from '../typechain-types'
 import { DeployManager } from '../scripts/deploy/DeployManager'
+import { Accounts_ContextManager } from './context-managers/Accounts_ContextManager'
 
 /**
  * Configurable fixture to use for each test file.
@@ -22,8 +23,9 @@ type FixtureReturn = Awaited<ReturnType<typeof fixture>>
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
-  const [deployer, admin, notAdmin] = accounts
-  const deployManager = await DeployManager.create({ signer: deployer })
+  const accounts_ContextManager = await Accounts_ContextManager.createWithAccountsArray(accounts)
+  const signers = accounts_ContextManager.props.signers
+  const deployManager = await DeployManager.create({ signer: signers.deployer })
 
   const erc7201 = await deployManager.deployContract<Erc7201__factory>('Erc7201', [])
 
@@ -31,10 +33,9 @@ async function fixture() {
     contracts: {
       erc7201,
     },
+    accounts_ContextManager,
     accounts: {
-      deployer,
-      admin,
-      notAdmin,
+      ...signers,
     },
   }
 }

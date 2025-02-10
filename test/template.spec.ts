@@ -4,6 +4,7 @@ import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helper
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
 
+import { Accounts_ContextManager } from './context-managers/Accounts_ContextManager'
 import { dynamicFixture } from './fixtures'
 import { Lock__factory } from '../typechain-types'
 
@@ -21,20 +22,20 @@ type FixtureReturn = Awaited<ReturnType<typeof fixture>>
 async function fixture() {
   // Contracts are deployed using the first signer/account by default
   const accounts = await ethers.getSigners()
-  const [deployer, admin, notAdmin] = accounts
+  const accounts_ContextManager = await Accounts_ContextManager.createWithAccountsArray(accounts)
+  const signers = accounts_ContextManager.props.signers
   // Compose other fixtures to create a meta fixture
-  const [unlockTime, owner] = [(await time.latest()) + 24 * 3600, accounts[0].address]
-  const lock = await dynamicFixture<Lock__factory>(ethers, 'Lock', [unlockTime, owner])
+  const unlockTime = (await time.latest()) + 24 * 3600
+  const lock = await dynamicFixture<Lock__factory>(ethers, 'Lock', [unlockTime, signers.admin.address])
   // Deploy other contracts within this fixture to gain efficiency of fixtures
 
   return {
     contracts: {
       lock,
     },
+    accounts_ContextManager,
     accounts: {
-      deployer,
-      admin,
-      notAdmin,
+      ...signers,
     },
   }
 }
