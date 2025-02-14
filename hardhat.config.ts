@@ -118,7 +118,7 @@ task(TASK_TEST, '🫶 Test Task')
  * Environment variables: <environment>_MNEMONIC or <environment>_PRIVATE_KEY
  */
 function getAccountsForEnvironment(
-  environment: 'MAINNET' | 'TESTNET' | 'BASE_PAD'
+  environment: 'MAINNET' | 'TESTNET' | 'BASE_PAD',
 ): HttpNetworkAccountsUserConfig | undefined {
   const mnemonic = getEnv(`${environment}_MNEMONIC`)
   if (mnemonic) {
@@ -138,7 +138,7 @@ const mainnetAccounts = getAccountsForEnvironment('MAINNET')
 const testnetAccounts = getAccountsForEnvironment('TESTNET')
 
 const getHardhatNetworkAccounts = (
-  networkAccounts: HttpNetworkAccountsUserConfig | undefined
+  networkAccounts: HttpNetworkAccountsUserConfig | undefined,
 ): HardhatNetworkAccountsUserConfig | undefined => {
   if (!networkAccounts) {
     return undefined
@@ -242,9 +242,9 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     accounts: mainnetAccounts,
   },
   lineaTestnet: {
-    url: getEnv('LINEA_TESTNET_RPC_URL') || 'https://rpc.goerli.linea.build',
-    getExplorerUrl: (address: string) => `https://goerli.lineascan.build/address/${address}`,
-    chainId: 59140,
+    url: getEnv('LINEA_TESTNET_RPC_URL') || 'https://rpc.sepolia.linea.build',
+    getExplorerUrl: (address: string) => `https://sepolia.lineascan.build//address/${address}`,
+    chainId: 59141,
     accounts: testnetAccounts,
   },
   polygon: {
