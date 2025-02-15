@@ -385,8 +385,8 @@ const config: HardhatUserConfig = {
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonMumbai: getEnv('POLYGONSCAN_API_KEY'),
-      lineascan: getEnv('LINEASCAN_API_KEY'),
-      lineascanTestnet: getEnv('LINEASCAN_API_KEY'),
+      linea: getEnv('LINEASCAN_API_KEY'),
+      lineaTestnet: getEnv('LINEASCAN_API_KEY'),
     },
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#adding-support-for-other-networks
     customChains: [
@@ -400,10 +400,10 @@ const config: HardhatUserConfig = {
       },
       {
         network: 'lineaTestnet',
-        chainId: 59140,
+        chainId: 59141,
         urls: {
-          apiURL: 'https://api.lineascan.build/api/',
-          browserURL: 'https://goerli.lineascan.build/',
+          apiURL: 'https://api-sepolia.lineascan.build/api/',
+          browserURL: 'https://sepolia.lineascan.build/',
         },
       },
     ],
