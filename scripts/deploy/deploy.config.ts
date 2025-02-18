@@ -56,7 +56,7 @@ export async function saveDeploymentOutput(
  * networks where deployment scripts will be executed. To support additional networks,
  * extend the Extract type with the network's key as defined in the Networks type.
  */
-export type DeployableNetworks = Extract<Networks, 'hardhat' | 'bsc' | 'bscTestnet' | 'blast'>
+export type DeployableNetworks = Extract<Networks, 'hardhat' | 'bsc' | 'bscTestnet'>
 
 /**
  * The FixtureOverrides interface is used to provide custom overrides for the deployment configuration.
@@ -132,21 +132,6 @@ const deployableNetworkConfig: Record<
   DeployableNetworks,
   (fixtureOverrides: FixtureOverrides) => Promise<DeploymentVariables>
 > = {
-  blast: async (fixtureOverrides: FixtureOverrides) => {
-    const productionValues = {
-      accounts: {
-        adminAddress: addressPlaceholder,
-        proxyAdminOwnerAddress: addressPlaceholder,
-      },
-      // Optionally pass contract overrides to skip deployments already made in fixtures
-      contractOverrides: {
-        // proxyAdminContractAddress: '',
-      },
-      wNative: '',
-    }
-    // Optionally pass override values over production for easier reusability in fixtures
-    return applyFixtureOverrides(productionValues, fixtureOverrides)
-  },
   bsc: async (fixtureOverrides: FixtureOverrides) => {
     const productionValues = {
       accounts: {
