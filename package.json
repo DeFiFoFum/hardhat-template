@@ -47,6 +47,7 @@
     "lint:ts:fix": "prettier --write './{scripts,tasks,src,hardhat,test}/**/*.ts'",
     "lint:ci": "yarn lint",
     "list:networks": "hardhat verify --list-networks",
+    "todos": "ts-node ./lib/developer/todos/searchTodosCli.ts",
     "clean": "node ./hardhat/utils/clean.js",
     "prepare": "husky"
   },
@@ -96,6 +97,7 @@
     "@types/mocha": "^9.1.0",
     "@types/node": ">=12.0.0",
     "@types/node-fetch": "^2.6.2",
+    "@types/prompts": "^2.4.9",
     "abi-to-sol": "^0.8.0",
     "chai": "^4.2.0",
     "chalk": "4.1.1",
@@ -112,6 +114,7 @@
     "node-fetch": "^2.6.7",
     "prettier": "^2.7.1",
     "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "prompts": "^2.4.2",
     "solhint": "^3.3.7",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.8.2",
