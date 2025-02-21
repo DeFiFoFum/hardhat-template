@@ -1,5 +1,5 @@
 import { MockToken, MockToken__factory } from '../../typechain-types'
-import { DeployManager } from '../../scripts/deploy/DeployManager'
+import { DeployManager } from '../../scripts/deploy/DeployManager/DeployManager'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 export type Template_ContextManager_Accounts = {

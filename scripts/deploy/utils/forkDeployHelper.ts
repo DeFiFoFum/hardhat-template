@@ -31,6 +31,9 @@ export async function forkIfHardhat(
 ) {
   let deployConfigNetwork = currentNetwork
   if (currentNetwork === 'hardhat') {
+    if (desiredFork === 'hardhat') {
+      return deployConfigNetwork
+    }
     logger.log(`Hardhat network detected, setting up fork for network ${desiredFork}`, '🍴')
     await setupFork(desiredFork, desiredBlock)
     deployConfigNetwork = desiredFork

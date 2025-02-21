@@ -1,7 +1,7 @@
 // test/fixtures/deployLockFixture.ts
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployableNetworks, FixtureOverrides, getDeployConfig } from '../deploy.config'
-import { DeployManager } from '../DeployManager'
+import { DeployManager } from '../DeployManager/DeployManager'
 import { logger } from '../../../hardhat/utils'
 import { formatEther } from 'ethers/lib/utils'
 

@@ -118,7 +118,7 @@ task(TASK_TEST, '🫶 Test Task')
  * Environment variables: <environment>_MNEMONIC or <environment>_PRIVATE_KEY
  */
 function getAccountsForEnvironment(
-  environment: 'MAINNET' | 'TESTNET' | 'BASE_PAD',
+  environment: 'MAINNET' | 'TESTNET' | 'MAINNET_DUMMY',
 ): HttpNetworkAccountsUserConfig | undefined {
   const mnemonic = getEnv(`${environment}_MNEMONIC`)
   if (mnemonic) {
@@ -135,6 +135,7 @@ function getAccountsForEnvironment(
 
 // Account setup for supported environments
 const mainnetAccounts = getAccountsForEnvironment('MAINNET')
+const mainnetDummyAccounts = getAccountsForEnvironment('MAINNET_DUMMY')
 const testnetAccounts = getAccountsForEnvironment('TESTNET')
 
 const getHardhatNetworkAccounts = (

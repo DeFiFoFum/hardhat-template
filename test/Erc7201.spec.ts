@@ -4,9 +4,8 @@ import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helper
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
 
-import { dynamicFixture } from './fixtures'
-import { Erc7201__factory, Lock__factory } from '../typechain-types'
-import { DeployManager } from '../scripts/deploy/DeployManager'
+import { Erc7201__factory } from '../typechain-types'
+import { DeployManager } from '../scripts/deploy/DeployManager/DeployManager'
 import { Accounts_ContextManager } from './context-managers/Accounts_ContextManager'
 
 /**
