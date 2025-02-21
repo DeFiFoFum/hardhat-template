@@ -1,17 +1,16 @@
 import { BigNumber, BigNumberish, Contract, ContractFactory, Signer, utils } from 'ethers'
 import { network, run, ethers } from 'hardhat'
-import { logger } from '../../hardhat/utils/logger'
-import fs from 'fs'
-import { DEPLOYMENTS_BASE_DIR } from './deploy.config'
+import { logger } from '../../../hardhat/utils/logger'
+import { DEPLOYMENTS_BASE_DIR } from '../deploy.config'
 import {
   ProxyAdmin,
   ProxyAdmin__factory,
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxy__factory,
-} from '../../typechain-types'
-import { getDateMinuteString } from '../../lib/node/dateHelper'
-import { addBNStr, mulBNStr } from '../../test/utils/bnHelper'
+} from '../../../typechain-types'
 import { FactoryOptions } from 'hardhat/types'
+import { ISnapshotManager } from './SnapshotManager/ISnapshotManager'
+import { FileSystemSnapshotManager } from './SnapshotManager/FileSystemSnapshotManager'
 import {
   BaseDeployOptions,
   DeployedContractDetails,
@@ -31,20 +30,21 @@ interface DeployManagerConstructor {
   signer?: Signer
   baseDir?: string
   gasPriceOverride?: BigNumberish
+  snapshotManager?: ISnapshotManager
 }
 
 /**
- * Version 3.1.2
+ * Version 3.2.0
  * A class to deploy contracts, verify them and save the deployment details to a file.
  *
  * See docs at top of file for more details.
  */
 export class DeployManager implements IDeployManager {
   private signer?: Signer
-  baseDir: string
-  gasPriceOverride?: BigNumber
-  deployedContracts: DeployedContractDetails[] = []
-  maxDeployRetries: number = 20
+  private baseDir: string
+  private gasPriceOverride?: BigNumber
+  private maxDeployRetries: number = 20
+  readonly snapshotManager: ISnapshotManager
 
   /**
    * Private constructor to initialize the DeployManager class.
@@ -52,13 +52,19 @@ export class DeployManager implements IDeployManager {
    * @param signer - The signer instance.
    * @param baseDir - The base directory for saving deployment details.
    */
-  private constructor({ signer, baseDir = DEPLOYMENTS_BASE_DIR, gasPriceOverride }: DeployManagerConstructor) {
-    logger.log(`Setting up DeployManager. Your simple and friendly contract deployment, uhhh, manager.`, `👋🤓`)
+  private constructor({
+    signer,
+    baseDir = DEPLOYMENTS_BASE_DIR,
+    gasPriceOverride,
+    snapshotManager,
+  }: DeployManagerConstructor) {
+    logger.log(`Setting up DeployManager. Your simple and friendly contract deployment manager.`, `👋🤓`)
     this.baseDir = baseDir
     this.signer = signer
     if (gasPriceOverride) {
       this.gasPriceOverride = BigNumber.from(gasPriceOverride)
     }
+    this.snapshotManager = snapshotManager || new FileSystemSnapshotManager(baseDir)
     logger.log(`Deployment information will be saved in: ${this.baseDir}`, `💾`)
   }
 
@@ -72,8 +78,9 @@ export class DeployManager implements IDeployManager {
     signer,
     baseDir = DEPLOYMENTS_BASE_DIR,
     gasPriceOverride,
+    snapshotManager,
   }: DeployManagerConstructor): Promise<DeployManager> {
-    const instance = new DeployManager({ signer, baseDir, gasPriceOverride })
+    const instance = new DeployManager({ signer, baseDir, gasPriceOverride, snapshotManager })
     if (instance.signer) {
       logger.log(`Signer address: ${await instance.signer.getAddress()}`, `🖊️`)
     }
@@ -111,9 +118,7 @@ export class DeployManager implements IDeployManager {
    */
   private async getNextNonce(): Promise<number> {
     const signer = await this.getSigner()
-    // Get the nonce including pending transactions
-    const currentNonce = await signer.getTransactionCount('pending')
-    return currentNonce
+    return await signer.getTransactionCount('pending')
   }
 
   /**
@@ -155,17 +160,23 @@ export class DeployManager implements IDeployManager {
     params: Parameters<CF['deploy']>,
     { name = 'Contract', estimateGas = true, gasPriceOverride }: BaseDeployOptions = {},
   ): Promise<ReturnType<CF['deploy']>> {
+    // Get next contract name and check if it exists
+    const { snapshotName, existingContract } = this.snapshotManager.getNextContract(name)
+    if (existingContract) {
+      logger.log(`Reusing previously deployed ${name} at ${existingContract.address}`, '♻️')
+      return contractFactory.attach(existingContract.address) as ReturnType<CF['deploy']>
+    }
+
     logger.logHeader(`Deploying ${name}`, `🚀`)
-    // Get the balance of the account before deployment
     const balanceBefore = await this.signer?.getBalance()
     const balanceBeforeInEther = utils.formatEther(balanceBefore || 0)
     logger.log(`Balance before deployment: ${balanceBeforeInEther} ETH`, `💰`)
-    // Deploy contract with signer if available
+
     let encodedConstructorArgs = ''
     let contractInstance: Awaited<ReturnType<CF['deploy']>> | undefined = undefined
     let deployAttempt = 0
-    // Gas estimation
     let gasEstimate: GasEstimation | null = null
+
     if (estimateGas) {
       try {
         logger.log(`Estimating gas cost for deployment...`, `⛽`)
@@ -210,7 +221,7 @@ export class DeployManager implements IDeployManager {
         logger.success(`Deployed ${name} at ${contractInstance.address}`)
         break // Break out of loop if successful
       } catch (error: any) {
-        // NOTE: Handling Nonce errors here:
+        // Handling Nonce errors here:
         if (error.code === 'NONCE_EXPIRED' || error.message.includes('already known')) {
           const seconds = 1
           deployAttempt++
@@ -220,7 +231,6 @@ export class DeployManager implements IDeployManager {
           // Optionally, wait for a short period before retrying
           await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
         } else {
-          // If the error is not related to nonce, rethrow it
           throw error
         }
       }
@@ -233,14 +243,13 @@ export class DeployManager implements IDeployManager {
     try {
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     } catch {
-      // NOTE: The encode fails when the deploy options are passed in. So we pop the last element and try again.
       params.pop()
       encodedConstructorArgs = contractInstance.interface.encodeDeploy(params)
     }
 
-    // Save deployment details
     const deployedContractDetails: DeployedContractDetails = {
-      name: name,
+      name, // Original name for verification
+      snapshotName, // Unique name from getNextContract
       address: contractInstance.address,
       encodedConstructorArgs,
       constructorArguments: params,
@@ -256,8 +265,8 @@ export class DeployManager implements IDeployManager {
       )
     }
 
-    this.deployedContracts.push(deployedContractDetails)
-    this.saveContractsToFile()
+    // Save to snapshot
+    this.snapshotManager.saveContract(deployedContractDetails)
 
     return contractInstance
   }
@@ -273,6 +282,7 @@ export class DeployManager implements IDeployManager {
    * @param options - The deployment options.
    * @param factoryOptions - The factory options for the contract.
    */
+  // TODO: These functions don't seem to be using all of the options. (i.e., seems to be able to pass a ContractFactory and Implementation)
   async deployUpgradeableContract<CF extends ContractFactory>(
     contractName: string,
     initializerParams: Parameters<ReturnType<CF['attach']>['initialize']>,
@@ -280,7 +290,11 @@ export class DeployManager implements IDeployManager {
     factoryOptions: FactoryOptions = {},
   ): Promise<UpgradeableDeployResult<ReturnType<CF['attach']>, Awaited<ReturnType<CF['deploy']>>>> {
     const factory = (await ethers.getContractFactory(contractName, factoryOptions)) as CF
-    return this.deployUpgradeableContractFromFactory(factory, initializerParams, { name: contractName, ...options })
+    // NOTE: initializerParams as any, TS complaining even though it's typed in the options
+    return this.deployUpgradeableContractFromFactory(factory, initializerParams as any, {
+      name: contractName,
+      ...options,
+    })
   }
 
   /**
@@ -311,14 +325,12 @@ export class DeployManager implements IDeployManager {
     initializerParams: InitializerParams<CF>,
     options: UpgradeableDeployOptions,
   ): Promise<UpgradeableDeployResult<ReturnType<CF['attach']>, Awaited<ReturnType<CF['deploy']>>>> {
-    const { name = 'Contract', skipInitialization = false } = options
+    const { name: implementationName = 'Contract', skipInitialization = false } = options
     let { proxyAdminOwner, proxyAdminAddress } = options
-    logger.log(`Deploying upgradeable ${name}`, `🚀`)
 
-    // Deploy the logic/implementation contract
-    // NOTE: Assumes that no constructor arguments are passed in
+    logger.log(`Deploying upgradeable ${implementationName}`, `🚀`)
     const implementation = await this.deployContractFromFactory(contractFactory, [] as any, {
-      name,
+      name: implementationName,
     })
 
     // Deploy the ProxyAdmin if not provided
@@ -347,12 +359,11 @@ export class DeployManager implements IDeployManager {
       initializerData = contractFactory.interface.encodeFunctionData('initialize', initializerParams)
     }
 
-    // Deploy the TransparentUpgradeableProxy contract
     const transparentProxy = await this.deployTransparentProxy(
       implementation.address,
       proxyAdminAddress as string,
       initializerData,
-      name,
+      implementationName,
     )
     // Return the proxy contract as an instance of the implementation contract
     const implementationThroughProxy = (await contractFactory.attach(transparentProxy.address)) as ReturnType<
@@ -400,16 +411,17 @@ export class DeployManager implements IDeployManager {
     initializerData: string,
     implementationContractName: string,
   ): Promise<TransparentUpgradeableProxy> {
-    // If contract name is provided, check for a named proxy
-    const proxyName = `${implementationContractName}Proxy`
     try {
-      logger.log(`Checking for named proxy: ${proxyName}`, `🔍`)
-      const NamedProxyFactory = (await ethers.getContractFactory(proxyName)) as TransparentUpgradeableProxy__factory
-      logger.log(`Found named proxy contract: ${proxyName}`, `✅`)
+      const namedProxyName = `${implementationContractName}Proxy`
+      logger.log(`Checking for named proxy: ${namedProxyName}`, `🔍`)
+      const NamedProxyFactory = (await ethers.getContractFactory(
+        namedProxyName,
+      )) as TransparentUpgradeableProxy__factory
+      logger.log(`Found named proxy contract: ${namedProxyName}`, `✅`)
       const namedProxy = await this.deployContractFromFactory(
         NamedProxyFactory,
         [implementationAddress, proxyAdminAddress, initializerData],
-        { name: proxyName },
+        { name: namedProxyName },
       )
       return namedProxy
     } catch (error) {
@@ -437,32 +449,37 @@ export class DeployManager implements IDeployManager {
   /**
    * Verifies all the contracts in the deployedContracts array without compiling.
    */
-  async verifyContracts() {
-    if (network.name === 'hardhat') {
-      logger.log('Skipping contract verification on hardhat network.', '⚠️')
-      return
-    }
-    for (const contract of this.deployedContracts) {
-      await this.verifyContract(contract)
-    }
-  }
 
-  async verifyContract(contract: DeployedContractDetails, noCompile = true) {
-    if (network.name === 'hardhat') {
-      logger.log('Skipping contract verification on hardhat network.', '⚠️')
+  async verifyContract(snapshotName: string): Promise<void> {
+    if (network.name === 'hardhat' || this.snapshotManager.isContractVerified(snapshotName)) {
       return
     }
-    logger.logHeader(`Verifying ${contract.name} at ${contract.address}`, ` 🔍`)
+
+    const contract = this.snapshotManager.getContract(snapshotName)
+    if (!contract) return
+
+    logger.logHeader(`Verifying ${name} at ${contract.address}`, ` 🔍`)
     try {
-      // https://hardhat.org/hardhat-runner/plugins/nomiclabs-hardhat-etherscan#using-programmatically
       await run('verify:verify', {
         address: contract.address,
         constructorArguments: contract.constructorArguments,
-        // noCompile, // This replaces the --no-compile flag
       })
-      logger.success(`Verified ${contract.name} at ${contract.address}`)
+      this.snapshotManager.markContractVerified(snapshotName)
+      logger.success(`Verified ${snapshotName} at ${contract.address}`)
     } catch (error) {
-      logger.error(`Failed trying to verify ${contract.name} at ${contract.address}: ${error}`)
+      logger.error(`Failed trying to verify ${snapshotName} at ${contract.address}: ${error}`)
+    }
+  }
+
+  async verifyContracts(): Promise<void> {
+    if (network.name === 'hardhat') {
+      logger.log('Skipping contract verification on hardhat network.', '⚠️')
+      return
+    }
+
+    const contracts = this.snapshotManager.getAllContracts()
+    for (const [name] of Object.entries(contracts)) {
+      await this.verifyContract(name)
     }
   }
 
@@ -474,63 +491,6 @@ export class DeployManager implements IDeployManager {
   getVerificationCommand(contractDetails: DeployedContractDetails): string {
     const { address, constructorArguments } = contractDetails
     const constructorArgsString = constructorArguments.map((arg) => `'${arg.toString()}'`).join(' ')
-    const verificationCommand = `npx hardhat verify --network ${network.name} ${address} ${constructorArgsString}`
-    return verificationCommand
-  }
-
-  // -----------------------------------------------------------------------------------------------
-  // Deployment Output
-  // -----------------------------------------------------------------------------------------------
-
-  /**
-   * Saves contract details to the deploy directory.
-   */
-  saveContractsToFile() {
-    logger.log(`Saving contract details to file.`, `💾`)
-    // Calculate the total gas cost for all deployments
-    let deploymentCost: GasEstimation = { gasLimit: '0', gasPriceWei: '0', gasPriceGei: '0', ethCost: '0' }
-    for (const contract of this.deployedContracts) {
-      if (contract.gasEstimate) {
-        deploymentCost.gasLimit = addBNStr(deploymentCost.gasLimit, contract.gasEstimate.gasLimit)
-        deploymentCost.gasPriceWei = BigNumber.from(deploymentCost.gasPriceWei).gt(contract.gasEstimate.gasPriceWei)
-          ? deploymentCost.gasPriceWei
-          : contract.gasEstimate.gasPriceWei
-      }
-    }
-    deploymentCost.ethCost = ethers.utils.formatEther(mulBNStr(deploymentCost.gasPriceWei, deploymentCost.gasLimit))
-    deploymentCost.gasPriceGei = ethers.utils.formatUnits(deploymentCost.gasPriceWei, 'gwei')
-    logger.log(`Total gas cost for all deployments: ${deploymentCost.ethCost} ETH`, `⛽`)
-
-    const deploymentSummary = {
-      deployedContracts: this.deployedContracts,
-      totalDeploymentCost: deploymentCost,
-    }
-    const deploymentSummaryString = JSON.stringify(deploymentSummary, null, 2)
-    const getFilePath = (dateString: string) => {
-      return this.baseDir + `/${dateString}-${network.name}-deployment-artifact.js`
-    }
-
-    const currentDate = new Date()
-    const currentDateString = getDateMinuteString(currentDate) // e.g. 20230330T12:50
-    const filePath = getFilePath(currentDateString)
-    try {
-      fs.writeFileSync(filePath, `module.exports = ${deploymentSummaryString};`)
-      logger.success(`Contract details saved to ${filePath} !`)
-    } catch (error) {
-      logger.error(`Failed saving contract details to file: ${error}`)
-    }
-    // This helps to ensure that only the most recent deployment details are saved
-    // Calculate the date string for one minute before the current time
-    const oneMinuteBefore = getDateMinuteString(new Date(currentDate.getTime() - 60000))
-    const oldFilePath = getFilePath(oneMinuteBefore)
-    // Check if the file exists and delete it
-    if (fs.existsSync(oldFilePath)) {
-      try {
-        fs.unlinkSync(oldFilePath)
-        logger.success(`Deleted old contract details file at ${oldFilePath}!`)
-      } catch (error) {
-        logger.error(`Failed to delete old contract details file at ${oldFilePath}: ${error}`)
-      }
-    }
+    return `npx hardhat verify --network ${network.name} ${address} ${constructorArgsString}`
   }
 }

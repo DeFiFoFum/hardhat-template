@@ -1,6 +1,6 @@
 import hre, { ethers, network } from 'hardhat'
 import { getDeployConfig, DeployableNetworks, saveDeploymentOutput } from './deploy.config'
-import { DeployManager } from './DeployManager'
+import { DeployManager } from './DeployManager/DeployManager'
 import { logger } from '../../hardhat/utils'
 import { getCurrentGasPriceForNetwork } from '../../lib/evm/getCurrentGasPrice'
 import { forkIfHardhat } from './utils/forkDeployHelper'

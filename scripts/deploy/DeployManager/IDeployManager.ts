@@ -1,6 +1,6 @@
 import { BigNumber, BigNumberish, Contract, ContractFactory, Signer } from 'ethers'
 import { FactoryOptions } from 'hardhat/types'
-import { ProxyAdmin, TransparentUpgradeableProxy } from '../../typechain-types'
+import { ProxyAdmin, TransparentUpgradeableProxy } from '../../../typechain-types'
 
 // -----------------------------------------------------------------------------------------------
 // Common Types
@@ -15,6 +15,7 @@ export interface GasEstimation {
 
 export interface DeployedContractDetails {
   name: string
+  snapshotName: string
   address: string
   encodedConstructorArgs: string
   constructorArguments: any[]
@@ -68,12 +69,6 @@ export type InitializerParams<CF extends ContractFactory> = Parameters<ReturnTyp
 // -----------------------------------------------------------------------------------------------
 
 export interface IDeployManager {
-  // Basic Properties
-  baseDir: string
-  gasPriceOverride?: BigNumber
-  maxDeployRetries: number
-  deployedContracts: DeployedContractDetails[]
-
   // Signer Management
   getSigner(): Promise<Signer>
   setSigner(signer: Signer): void
@@ -123,11 +118,8 @@ export interface IDeployManager {
 
   // Verification
   verifyContracts(): Promise<void>
-  verifyContract(contract: DeployedContractDetails, noCompile?: boolean): Promise<void>
+  verifyContract(snapshotName: string): Promise<void>
   getVerificationCommand(contractDetails: DeployedContractDetails): string
-
-  // Deployment Output
-  saveContractsToFile(): void
 }
 
 // -----------------------------------------------------------------------------------------------

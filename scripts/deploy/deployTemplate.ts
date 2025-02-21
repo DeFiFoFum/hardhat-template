@@ -1,6 +1,6 @@
 import hre, { ethers, network } from 'hardhat'
 import { getDeployConfig, DeployableNetworks, saveDeploymentOutput, FixtureOverrides } from './deploy.config'
-import { DeployManager } from './DeployManager'
+import { DeployManager } from './DeployManager/DeployManager'
 import { logger } from '../../hardhat/utils'
 import { createActionLog } from './utils/actionLog'
 import { deployLockFixture } from './fixtures/deployLockFixture'
