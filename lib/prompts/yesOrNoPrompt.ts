@@ -1,4 +1,6 @@
-export function createYesOrNoPrompt(promptText: string, abortText: string): Promise<boolean> {
+import { logger } from '../node/logger'
+
+export function createYesOrNoPrompt(promptText: string, abortText: string, throwIfNo = false): Promise<boolean> {
   const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -10,7 +12,12 @@ export function createYesOrNoPrompt(promptText: string, abortText: string): Prom
       if (answer.trim().toUpperCase() === 'Y') {
         resolve(true)
       } else {
-        reject(new Error(abortText))
+        if (throwIfNo) {
+          reject(new Error(abortText))
+        } else {
+          logger.warn(abortText)
+          resolve(false)
+        }
       }
     })
   })
