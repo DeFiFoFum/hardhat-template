@@ -1,5 +1,6 @@
 import { BigNumber, BigNumberish, Contract, ContractFactory, Signer, utils } from 'ethers'
 import { network, run, ethers } from 'hardhat'
+import { FactoryOptions } from 'hardhat/types'
 import { logger } from '../../../hardhat/utils/logger'
 import { DEPLOYMENTS_BASE_DIR } from '../deploy.config'
 import {
@@ -8,9 +9,6 @@ import {
   TransparentUpgradeableProxy,
   TransparentUpgradeableProxy__factory,
 } from '../../../typechain-types'
-import { FactoryOptions } from 'hardhat/types'
-import { ISnapshotManager } from './SnapshotManager/ISnapshotManager'
-import { FileSystemSnapshotManager } from './SnapshotManager/FileSystemSnapshotManager'
 import {
   BaseDeployOptions,
   DeployedContractDetails,
@@ -21,6 +19,10 @@ import {
   UpgradeableDeployOptions,
   UpgradeableDeployResult,
 } from './IDeployManager'
+import { ISnapshotManager } from './SnapshotManager/ISnapshotManager'
+import { FileSystemSnapshotManager } from './SnapshotManager/FileSystemSnapshotManager'
+
+import { delayWithLoadingBar } from '../../../lib/cli/CliDelay'
 
 // -----------------------------------------------------------------------------------------------
 // Types
@@ -29,12 +31,17 @@ import {
 interface DeployManagerConstructor {
   signer?: Signer
   baseDir?: string
+  snapshotManager: ISnapshotManager
   gasPriceOverride?: BigNumberish
+  delaySecondsBetweenDeployments?: number
+}
+
+type CreateDeployManager = Omit<DeployManagerConstructor, 'snapshotManager'> & {
   snapshotManager?: ISnapshotManager
 }
 
 /**
- * Version 3.2.0
+ * Version 3.3.0
  * A class to deploy contracts, verify them and save the deployment details to a file.
  *
  * See docs at top of file for more details.
@@ -44,18 +51,24 @@ export class DeployManager implements IDeployManager {
   private baseDir: string
   private gasPriceOverride?: BigNumber
   private maxDeployRetries: number = 20
+  private delaySecondsBetweenDeployments: number
   readonly snapshotManager: ISnapshotManager
 
   /**
    * Private constructor to initialize the DeployManager class.
    *
-   * @param signer - The signer instance.
-   * @param baseDir - The base directory for saving deployment details.
+   * @param props - The constructor properties
+   * @param props.signer - Optional signer for transactions
+   * @param props.baseDir - Base directory for deployment artifacts (defaults to DEPLOYMENTS_BASE_DIR)
+   * @param props.gasPriceOverride - Optional override for gas price
+   * @param props.delaySecondsBetweenDeployments - Delay between deployments in seconds
+   * @param props.snapshotManager - Manager for deployment snapshots
    */
   private constructor({
     signer,
     baseDir = DEPLOYMENTS_BASE_DIR,
     gasPriceOverride,
+    delaySecondsBetweenDeployments,
     snapshotManager,
   }: DeployManagerConstructor) {
     logger.log(`Setting up DeployManager. Your simple and friendly contract deployment manager.`, `👋🤓`)
@@ -64,23 +77,26 @@ export class DeployManager implements IDeployManager {
     if (gasPriceOverride) {
       this.gasPriceOverride = BigNumber.from(gasPriceOverride)
     }
-    this.snapshotManager = snapshotManager || new FileSystemSnapshotManager(baseDir)
+    this.delaySecondsBetweenDeployments = delaySecondsBetweenDeployments || 0
+    this.snapshotManager = snapshotManager
     logger.log(`Deployment information will be saved in: ${this.baseDir}`, `💾`)
   }
 
-  /**
-   * Creates an instance of the DeployManager class.
-   * @param signer - The signer instance.
-   * @param baseDir - The base directory for saving deployment details.
-   * @returns - A promise that resolves to an instance of the DeployManager class.
-   */
   static async create({
     signer,
     baseDir = DEPLOYMENTS_BASE_DIR,
     gasPriceOverride,
+    delaySecondsBetweenDeployments,
     snapshotManager,
-  }: DeployManagerConstructor): Promise<DeployManager> {
-    const instance = new DeployManager({ signer, baseDir, gasPriceOverride, snapshotManager })
+  }: CreateDeployManager): Promise<DeployManager> {
+    const snapshotManagerInstance = snapshotManager || (await FileSystemSnapshotManager.create(baseDir))
+    const instance = new DeployManager({
+      signer,
+      baseDir,
+      gasPriceOverride,
+      snapshotManager: snapshotManagerInstance,
+      delaySecondsBetweenDeployments,
+    })
     if (instance.signer) {
       logger.log(`Signer address: ${await instance.signer.getAddress()}`, `🖊️`)
     }
@@ -99,7 +115,7 @@ export class DeployManager implements IDeployManager {
     }
 
     if (!signer) {
-      throw new Error(logger.error(`Signer not available, please check your mnemonic/private key.`))
+      throw new Error(`Signer not available, please check your mnemonic/private key.`)
     }
     return signer
   }
@@ -127,6 +143,14 @@ export class DeployManager implements IDeployManager {
    */
   setMaxDeployRetries(retires: number) {
     this.maxDeployRetries = retires
+  }
+
+  private async delay(secondsOverride?: number): Promise<void> {
+    const seconds = secondsOverride || this.delaySecondsBetweenDeployments
+    if (seconds > 0) {
+      logger.log(`Delaying deployments for ${seconds} seconds to help with RPC consistency...`, `⏳`)
+      await delayWithLoadingBar(seconds)
+    }
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -268,6 +292,7 @@ export class DeployManager implements IDeployManager {
     // Save to snapshot
     this.snapshotManager.saveContract(deployedContractDetails)
 
+    await this.delay()
     return contractInstance
   }
 
