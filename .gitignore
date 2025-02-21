@@ -6,6 +6,7 @@ ___*
 # Deployment
 deployments/*-deployment.js
 deployments/*-deployment-artifact.js
+deployments/snapshots/*.json
 
 # Hardhat files
 cache
