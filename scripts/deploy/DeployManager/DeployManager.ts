@@ -21,7 +21,7 @@ import {
 } from './IDeployManager'
 import { ISnapshotManager } from './SnapshotManager/ISnapshotManager'
 import { FileSystemSnapshotManager } from './SnapshotManager/FileSystemSnapshotManager'
-
+import { MemorySnapshotManager } from './SnapshotManager/MemorySnapshotManager'
 import { delayWithLoadingBar } from '../../../lib/cli/CliDelay'
 
 // -----------------------------------------------------------------------------------------------
@@ -101,6 +101,15 @@ export class DeployManager implements IDeployManager {
       logger.log(`Signer address: ${await instance.signer.getAddress()}`, `🖊️`)
     }
     return instance
+  }
+
+  static async createWithMemorySnapshotManager({
+    signer,
+    baseDir = DEPLOYMENTS_BASE_DIR,
+    gasPriceOverride,
+  }: DeployManagerConstructor): Promise<DeployManager> {
+    const snapshotManager = new MemorySnapshotManager()
+    return DeployManager.create({ signer, baseDir, gasPriceOverride, snapshotManager })
   }
 
   /**
