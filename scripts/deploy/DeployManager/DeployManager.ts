@@ -492,7 +492,7 @@ export class DeployManager implements IDeployManager {
     const contract = this.snapshotManager.getContract(snapshotName)
     if (!contract) return
 
-    logger.logHeader(`Verifying ${name} at ${contract.address}`, ` 🔍`)
+    logger.logHeader(`Verifying ${snapshotName} at ${contract.address}`, ` 🔍`)
     try {
       await run('verify:verify', {
         address: contract.address,
