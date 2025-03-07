@@ -38,6 +38,7 @@
     "test:forge": "forge test -vv",
     "test:gas:forge": "forge test -vv --gas-report",
     "monitor:get-proxy-admin": "hardhat run ./scripts/monitor/getProxyAdminForDeployment.ts --network",
+    "simulate:onchain": "hardhat run ./scripts/simulate/runOnChainSimulations.ts --network hardhat",
     "size": "hardhat size-contracts",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:fix": "yarn lint:sol:fix && yarn lint:ts:fix",
