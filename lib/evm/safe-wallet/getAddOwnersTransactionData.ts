@@ -13,7 +13,7 @@ export async function getAddOwnersTransactionData(
   safeAddress: string,
   create2Deployer: string,
   ownerAddresses: string[],
-  options: AddOwnersOptions = {}
+  options: AddOwnersOptions = {},
 ) {
   let { multiSendCallOnlyAddress } = options
   multiSendCallOnlyAddress = multiSendCallOnlyAddress || DEFAULT_MULTISEND_ADDRESS
@@ -35,7 +35,7 @@ export async function getAddOwnersTransactionData(
         data: tx.data || '0x',
       }
       return mt
-    })
+    }),
   )
   // Encode the owner transactions into a single multiSend call
   const encodedMulti = encodeMulti(ownerMultiSendTransactions, multiSendCallOnlyAddress)
@@ -51,7 +51,7 @@ export async function getAddOwnersTransactionData(
   const gasToken = ethers.constants.AddressZero // Use ETH, not a token
   const refundReceiver = ethers.constants.AddressZero // No refund receiver
   const signatures = `0x000000000000000000000000${addressToHexData(
-    create2Deployer
+    create2Deployer,
   )}000000000000000000000000000000000000000000000000000000000000000001` // Assuming 1 signature
 
   const finalData = await safeContract.populateTransaction.execTransaction(
@@ -64,7 +64,7 @@ export async function getAddOwnersTransactionData(
     gasPrice,
     gasToken,
     refundReceiver,
-    signatures
+    signatures,
   )
 
   console.log('Final Transaction Data:', finalData)
