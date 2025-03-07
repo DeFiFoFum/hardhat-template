@@ -2,20 +2,23 @@ import { BigNumber, utils } from 'ethers'
 import { Networks, convertToExplorerUrlForNetwork, getTxExplorerUrlForNetwork } from '../../../hardhat.config'
 import { unlockSigner } from '../fork-testing/accountHelper'
 import { setupFork } from '../fork-testing/forkHelper'
-import { EventDecoder } from './EventDecoder'
-import { SimulationConfig, SimulationResult, FormattedReceipt, FormattedLog } from './simulation-types'
+import { EventHandler } from './EventHandler'
+import { MultiSendHandler } from './MultiSendHandler'
+import { OnChainSimulationConfig, SimulationResult, FormattedReceipt, FormattedLog } from './simulation-types'
 import fs from 'fs'
 import path from 'path'
 import { logger } from '../../node/logger'
 
 export class OnChainSimulator {
   private network: Networks
-  private eventDecoder: EventDecoder
+  private eventHandler: EventHandler
+  private multiSendHandler: MultiSendHandler
   private outputDir: string
 
   constructor(network: Networks) {
     this.network = network
-    this.eventDecoder = new EventDecoder()
+    this.eventHandler = new EventHandler()
+    this.multiSendHandler = new MultiSendHandler(network, this.eventHandler)
     this.outputDir = path.join(__dirname, 'simulation-results')
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true })
@@ -42,7 +45,7 @@ export class OnChainSimulator {
             contractUrl: convertToExplorerUrlForNetwork(this.network, log.address),
             topics: log.topics,
             data: log.data,
-            decodedEvent: this.eventDecoder.decodeLog(log),
+            decodedEvent: this.eventHandler.decodeLog(log),
           }
         } catch (error) {
           logger.error(`Error formatting log: ${error}`)
@@ -64,25 +67,52 @@ export class OnChainSimulator {
     logger.log(`Simulation results saved to ${filename}`, '💾')
   }
 
-  async simulate(config: SimulationConfig): Promise<SimulationResult[]> {
+  async simulate(config: OnChainSimulationConfig): Promise<SimulationResult[]> {
     logger.log(`Simulating on-chain transactions on network ${config.network}`, '🚀')
     await setupFork(config.network)
     logger.log(`Forked to network ${config.network}`, '🍴')
 
     const results = await Promise.all(
       config.transactions.map(async (transaction): Promise<SimulationResult> => {
-        // Unlock signer
-        if (!transaction.from) throw new Error('Transaction must have a from address')
-        const fromSigner = await unlockSigner(transaction.from)
+        try {
+          // Unlock signer
+          if (!transaction.from) throw new Error('Transaction must have a from address')
+          const fromSigner = await unlockSigner(transaction.from)
 
-        // Send tx
-        const tx = await fromSigner.sendTransaction(transaction)
-        logger.log(`Transaction hash: ${tx.hash}`, '🚀')
-        const txReceipt = await tx.wait()
+          // Check if this is a MultiSendCallOnly transaction
+          if (this.multiSendHandler.isMultiSendTransaction(transaction)) {
+            // Delegate to the MultiSendHandler
+            return await this.multiSendHandler.handleMultiSendTransaction(transaction, fromSigner)
+          }
 
-        return {
-          receipt: this.formatTransactionReceipt(txReceipt),
-          timestamp: new Date().toISOString(),
+          // For non-MultiSendCallOnly transactions, use the original approach
+          const tx = await fromSigner.sendTransaction(transaction)
+          logger.log(`Transaction hash: ${tx.hash}`, '🚀')
+          const txReceipt = await tx.wait()
+
+          return {
+            receipt: this.formatTransactionReceipt(txReceipt),
+            timestamp: new Date().toISOString(),
+          }
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          logger.error(`Transaction failed: ${errorMessage}`)
+
+          // Return a failed result
+          return {
+            receipt: {
+              status: 'Failed',
+              from: transaction.from,
+              to: transaction.to,
+              transactionHash: 'failed',
+              blockNumber: 0,
+              gasUsed: '0',
+              effectiveGasPrice: '0',
+              logs: [],
+              explorerUrl: getTxExplorerUrlForNetwork(this.network, 'failed'),
+            },
+            timestamp: new Date().toISOString(),
+          }
         }
       }),
     )

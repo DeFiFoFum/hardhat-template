@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
-import { BytesLike, PopulatedTransaction } from 'ethers'
-import { ADDRESS_0 } from '../constants'
 import { AccessControlEnumerable } from '../../../typechain-types'
+import { ADDRESS_0 } from '../constants'
+import { BytesLike, PopulatedTransaction } from 'ethers'
 
 interface RoleInput {
   role: BytesLike
@@ -9,16 +9,13 @@ interface RoleInput {
 }
 
 export default class AccessControlEncoder {
-  accessControlContract!: AccessControlEnumerable
-
-  private constructor() {
-    // Constructor is now private to force use of the factory method
+  private constructor(private accessControlContract: AccessControlEnumerable) {
+    // Constructor is private to force use of the factory method
   }
 
   static async create(address = ADDRESS_0): Promise<AccessControlEncoder> {
-    const encoder = new AccessControlEncoder()
-    encoder.accessControlContract = await ethers.getContractAt('AccessControlEnumerable', address)
-    return encoder
+    const accessControlContract = await ethers.getContractAt('AccessControlEnumerable', address)
+    return new AccessControlEncoder(accessControlContract)
   }
 
   async encodeGrantRole({ role, account }: RoleInput): Promise<PopulatedTransaction> {

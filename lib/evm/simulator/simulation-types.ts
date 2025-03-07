@@ -1,7 +1,7 @@
-import { DeployableNetworks } from '../../../scripts/deploy/deploy.config'
 import { BigNumber } from 'ethers'
+import { DeployableNetworks } from '../../../scripts/deploy/deploy.config'
 
-export interface SimulationConfig {
+export interface OnChainSimulationConfig {
   network: DeployableNetworks
   transactions: SimulationTransaction[]
 }
@@ -16,6 +16,8 @@ export interface SimulationTransaction {
 export interface DecodedEvent {
   name: string
   args: any
+  // Add a formatted description for better readability
+  description?: string
 }
 
 export interface FormattedLog {

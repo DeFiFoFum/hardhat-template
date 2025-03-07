@@ -1,6 +1,7 @@
+import { EventHandler } from '../../lib/evm/simulator/EventHandler'
 import { OnChainSimulator } from '../../lib/evm/simulator/OnChainSimulator'
-import { getSimulationConfig } from '../../lib/evm/simulator/simulator.config'
 import { logger } from '../../lib/node/logger'
+import { getSimulationConfig } from './simulator.config'
 
 async function main() {
   try {
@@ -10,10 +11,16 @@ async function main() {
     // Create simulator instance
     const simulator = new OnChainSimulator(config.network)
 
-    // Run simulation
-    await simulator.simulate(config)
+    // Create event handler for formatting results
+    const eventHandler = new EventHandler()
 
-    logger.log('Simulation completed successfully!', '🎉')
+    // Run simulation
+    const results = await simulator.simulate(config)
+
+    // Display formatted transaction results
+    eventHandler.formatTransactionResults(results)
+
+    logger.log('\nSimulation completed successfully!', '🎉')
   } catch (error) {
     console.error('Simulation failed:', error)
     process.exitCode = 1

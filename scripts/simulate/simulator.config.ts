@@ -1,7 +1,7 @@
-import { DeployableNetworks, getDeployConfig } from '../../../scripts/deploy/deploy.config'
-import { SimulationConfig } from './simulation-types'
+import { OnChainSimulationConfig } from '../../lib/evm/simulator/simulation-types'
+import { DeployableNetworks, getDeployConfig } from '../deploy/deploy.config'
 
-export async function getSimulationConfig(): Promise<SimulationConfig> {
+export async function getSimulationConfig(): Promise<OnChainSimulationConfig> {
   const simulationNetwork: DeployableNetworks = 'bsc'
   const deployConfig = await getDeployConfig(simulationNetwork)
   const fromAddress = deployConfig.accounts.adminAddress
