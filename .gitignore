@@ -2,6 +2,7 @@
 ___*
 **/output/*
 !**/output/.gitkeep
+.DS_STORE
 
 # Deployment
 deployments/*-deployment.js
