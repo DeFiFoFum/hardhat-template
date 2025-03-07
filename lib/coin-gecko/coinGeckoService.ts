@@ -82,7 +82,7 @@ export const getUsdPriceForTokenContractOnNetwork = (
   network: CoinGeckoNetworks,
   contractAddress: string,
   dateStringOrTimestamp: string | number,
-  vsCurrency = 'usd'
+  vsCurrency = 'usd',
 ): Promise<number> => {
   return new Promise((resolve, reject) => {
     const requestFunction = async () => {

@@ -33,7 +33,7 @@ export const getDecimalsForTokenAddress = (() => {
           // Minimal ERC-20 Decimals ABI
           'function decimals() view returns (uint8)',
         ],
-        ethers.provider
+        ethers.provider,
       )
 
       // Call the decimals function of the token contract
@@ -93,7 +93,7 @@ export const getDetailsForTokenAddress = (() => {
           'function name() view returns (string)',
           'function totalSupply() view returns (uint256)',
         ],
-        ethers.provider
+        ethers.provider,
       )
 
       // Call the decimals function of the token contract

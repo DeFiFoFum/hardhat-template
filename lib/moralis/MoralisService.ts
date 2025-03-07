@@ -72,7 +72,7 @@ export class MoralisService {
       try {
         nextPage++
         console.log(
-          `${MoralisService.name}.${this.getAllContractEvents.name}:: Fetching next page ${nextPage} of events..`
+          `${MoralisService.name}.${this.getAllContractEvents.name}:: Fetching next page ${nextPage} of events..`,
         )
         response = await response.next()
         allEvents = allEvents.concat(response.toJSON().result as unknown as MoralisEventData<T>)

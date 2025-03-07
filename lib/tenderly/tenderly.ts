@@ -35,7 +35,7 @@ export interface TenderlyEVMTransaction {
 
 export async function runTenderlySimulation(
   transaction: TenderlyEVMTransaction,
-  config: SimulationConfig
+  config: SimulationConfig,
 ): Promise<void> {
   const [TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY] = [
     getEnv('TENDERLY_USER', true),
@@ -64,7 +64,7 @@ export async function runTenderlySimulation(
         headers: {
           'X-Access-Key': TENDERLY_ACCESS_KEY as string,
         },
-      }
+      },
     )
 
     const transactionResult = resp.data.transaction

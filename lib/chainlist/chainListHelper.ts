@@ -58,7 +58,7 @@ export async function measureAndSortByLatency(chains: Chain[]): Promise<Chain[]>
             },
             {
               timeout: 1000, // Set the timeout to 1000 milliseconds
-            }
+            },
           )
           const latency = Date.now() - start
           console.log(`Latency for chain ${chain.name} on RPC ${rpcUrl} has latency ${latency}ms`)
@@ -66,7 +66,7 @@ export async function measureAndSortByLatency(chains: Chain[]): Promise<Chain[]>
         } catch (error) {
           return { url: rpcUrl, latency: 'Error' }
         }
-      })
+      }),
     )
 
     // Filter out the RPCs that returned an error, then sort by latency

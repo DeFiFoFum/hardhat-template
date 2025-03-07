@@ -45,7 +45,7 @@ export async function getCREATE2SafeInitializer(options?: SafeDeploymentOptions)
   // Encode the setup function call
   const initializerData = ethers.utils.defaultAbiCoder.encode(
     ['address[]', 'uint256', 'address', 'bytes', 'address', 'address', 'uint256', 'address'],
-    initializerParams
+    initializerParams,
   )
 
   return { proxyFactory, gnosisSafeSingleton_l2, initializerParams, initializerData }

@@ -7,7 +7,7 @@ export function convertStorageValueToAddress(storageValue: string): string {
 export async function getStorageAtNetwork(
   contractAddress: string,
   slot: string,
-  networkName: Networks
+  networkName: Networks,
 ): Promise<string> {
   const rpcUrl = geRpcUrlForNetwork(networkName)
 

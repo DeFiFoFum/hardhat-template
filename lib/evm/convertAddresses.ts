@@ -15,7 +15,7 @@ export const isAddress = (address?: string) =>
 export function convertAddressesToExplorerLinksByNetwork(
   addressObject: any,
   networkName: Networks,
-  detailedInfo = false
+  detailedInfo = false,
 ) {
   const getExplorerLink = getExplorerUrlForNetwork(networkName)
   return convertAddressesToExplorerLinks(addressObject, getExplorerLink, detailedInfo)
@@ -32,13 +32,13 @@ export function convertAddressesToExplorerLinksByNetwork(
 export function convertAddressesToExplorerLinks(
   addressObject: any,
   getLink: (address: string) => string,
-  detailedInfo = false
+  detailedInfo = false,
 ) {
   // Using an internal function to allow for deep copying before
   function _convertAddressesToExplorerLinks(
     _addressObject: any,
     _getLink: (address: string) => string,
-    _detailedInfo = false
+    _detailedInfo = false,
   ) {
     // Return early if _addressObject is null or undefined
     if (_addressObject == null) {

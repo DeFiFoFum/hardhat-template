@@ -24,7 +24,7 @@ type TimeSeriesData<C extends Contract, MethodName extends keyof C> = Record<num
 
 export async function getTimeSeriesData<C extends Contract, MethodName extends keyof C>(
   { forkNetwork, fromBlock, toBlock, blockInterval = 1 }: TimeSeriesBlockOptions,
-  { contract, functionName, params }: ContractFunctionCallOptions<C, MethodName>
+  { contract, functionName, params }: ContractFunctionCallOptions<C, MethodName>,
 ): Promise<TimeSeriesData<C, MethodName>> {
   const currentNetwork = network.name as Networks
   if (currentNetwork !== 'hardhat') {
@@ -33,10 +33,10 @@ export async function getTimeSeriesData<C extends Contract, MethodName extends k
   const endBlock = toBlock === 'latest' ? await setupFork(forkNetwork, undefined) : toBlock
   logger.log(
     `Getting time series data from block ${fromBlock} to block ${toBlock} (${endBlock}) on network ${currentNetwork}`,
-    '📊'
+    '📊',
   )
   logger.warn(
-    `For this to work, you MUST be connected to an Archive node. Some RPC urls on ChainList work, and some don't.`
+    `For this to work, you MUST be connected to an Archive node. Some RPC urls on ChainList work, and some don't.`,
   )
 
   let timeSeriesOutput: TimeSeriesData<C, MethodName> = {}

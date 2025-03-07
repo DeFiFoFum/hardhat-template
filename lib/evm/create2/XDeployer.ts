@@ -26,17 +26,17 @@ export class XDeployer {
 
   async deployXTransparentUpgradeableProxy(
     params: Parameters<TransparentUpgradeableProxy__factory['deploy']>,
-    saltNumber: number
+    saltNumber: number,
   ) {
     const deployDetails = await this.deployXContract<TransparentUpgradeableProxy__factory>(
       'TransparentUpgradeableProxy',
       params,
-      saltNumber
+      saltNumber,
     )
 
     const proxyContract = await this.ethers.getContractAt(
       'ITransparentUpgradeableProxy',
-      deployDetails.newContractAddress
+      deployDetails.newContractAddress,
     )
 
     return {
@@ -48,7 +48,7 @@ export class XDeployer {
   async deployXContract<CF extends ContractFactory>(
     contractName: string,
     params: Parameters<CF['deploy']>,
-    saltNumber: number
+    saltNumber: number,
   ): Promise<{ newContractAddress: string; newContractSalt: string; saltInput: number }> {
     const createX = await this.ethers.getContractAt('ICreateX', this.xDeployerAddress)
     const initCode = (await this.ethers.getContractFactory(contractName)).getDeployTransaction(...params).data
@@ -79,7 +79,7 @@ export class XDeployer {
 
     logger.log(
       `deployXContract:: Contract deployed at address: ${newContractAddress} with salt ${newContractSalt}`,
-      '🚀'
+      '🚀',
     )
     if (!newContractAddress || !newContractSalt) {
       throw new Error('deployXContract:: Could not get newContractAddress or newContractSalt')

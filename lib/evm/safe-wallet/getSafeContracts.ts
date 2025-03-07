@@ -16,7 +16,7 @@ export async function getMultiSendCallOnlyContractAt(address: string, signer?: S
   const multiSendCallOnlyContract = (await ethers.getContractAtFromArtifact(
     MultiSendCallOnly_Artifact,
     address,
-    signer
+    signer,
   )) as MultiSendCallOnly
   return multiSendCallOnlyContract
 }

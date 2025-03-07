@@ -83,7 +83,7 @@ async function findClosestBlockNumber(targetDate: string, averageBlockTime?: num
 
 export async function findStartBlockNumbersForYear(
   year: 2022 | 2023 | 2024,
-  averageBlockTime?: number
+  averageBlockTime?: number,
 ): Promise<{ [key: number]: number }> {
   const startBlocks: { [key: number]: number } = {}
   const currentYear = new Date().getUTCFullYear()
