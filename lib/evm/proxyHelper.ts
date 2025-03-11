@@ -26,16 +26,18 @@ export const EIP1967_IMPLEMENTATION_SLOT = `0x360894a13ba1a3210667c828492db98dca
  * @throws Will throw an error if the network is not found or if the storage cannot be fetched.
  */
 
-export async function getProxyAdminOfProxyContract(networkName: Networks, contractAddress: string) {
+export async function getProxyAdminOfProxyContract(
+  networkName: Networks,
+  contractAddress: string,
+): Promise<{ proxyAdminAddress: string; proxyAdminOwner: string | null }> {
   const storageValue = await getStorageAtNetwork(contractAddress, EIP1967_ADMIN_SLOT, networkName)
   const proxyAdminAddress = convertStorageValueToAddress(storageValue)
 
-  let proxyAdminOwner
+  let proxyAdminOwner = null
   try {
     proxyAdminOwner = await ethers.getContractAt('Ownable', proxyAdminAddress).then((contract) => contract.owner())
   } catch (e) {
-    logger.warn(`getProxyAdminOfProxyContract:: No ProxyAdmin Contract owner found for ${proxyAdminAddress}`)
-    proxyAdminOwner = 'no-owner-found'
+    logger.warn(`getProxyAdminOfProxyContract:: owner() not a valid function on the address of the ProxyAdmin.`)
   }
   return { proxyAdminAddress, proxyAdminOwner }
 }

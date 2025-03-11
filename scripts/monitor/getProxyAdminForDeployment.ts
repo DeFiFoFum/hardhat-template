@@ -1,6 +1,6 @@
 import { network } from 'hardhat'
 import { Networks } from '../../hardhat'
-import { getImplementationOfProxyContract, getProxyAdminOfProxyContract } from '../../lib/evm/getProxyAdmin'
+import { getImplementationOfProxyContract, getProxyAdminOfProxyContract } from '../../lib/evm/proxyHelper'
 import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/address/convertAddresses'
 
 // NOTE: Import deployment files
