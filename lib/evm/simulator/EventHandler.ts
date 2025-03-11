@@ -15,6 +15,11 @@ export class EventHandler {
       RoleRevoked: 'event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)',
       RoleAdminChanged:
         'event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)',
+      // Ownable events
+      OwnershipTransferred: 'event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)',
+      // Proxy Admin
+      AdminChanged: 'event AdminChanged(address previousAdmin, address newAdmin)',
+      BeaconUpgraded: 'event BeaconUpgraded(address indexed beacon)',
     }
 
     this.iface = new Interface(Object.values(EVENT_ABI))
@@ -81,7 +86,7 @@ export class EventHandler {
       return
     }
 
-    results.forEach((result, txIndex) => {
+    return results.map((result, txIndex) => {
       const { receipt } = result
 
       logger.log(`\nTransaction ${txIndex + 1} Summary:`, '📊')
@@ -104,7 +109,7 @@ export class EventHandler {
         })
 
         // Display logs grouped by contract
-        Object.entries(logsByContract).forEach(([address, logs]) => {
+        const formattedLogs = Object.entries(logsByContract).map(([address, logs]) => {
           logger.log(`\n  Contract: ${address}`, '📜')
 
           // Format logs into a structured object for console.dir
@@ -126,21 +131,24 @@ export class EventHandler {
               return {
                 name,
                 description: description || 'No description available',
+                data: log.data,
                 args: formattedArgs,
+                topics: log.topics,
               }
             } else {
               return {
                 name: 'Unknown Event',
                 description: 'Could not decode event',
                 data: log.data,
+                args: undefined,
                 topics: log.topics,
               }
             }
           })
 
-          // Use console.dir for better formatting
-          console.dir(formattedEvents, { depth: null, colors: true })
+          return formattedEvents
         })
+        return formattedLogs
       } else {
         logger.log('No events emitted', '📜')
       }

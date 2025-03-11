@@ -8,6 +8,7 @@ import { OnChainSimulationConfig, SimulationResult, FormattedReceipt, FormattedL
 import fs from 'fs'
 import path from 'path'
 import { logger } from '../../node/logger'
+import { Log, TransactionReceipt } from '@ethersproject/providers'
 
 export class OnChainSimulator {
   private network: Networks
@@ -29,7 +30,7 @@ export class OnChainSimulator {
     return utils.formatUnits(bn, 'gwei')
   }
 
-  private formatTransactionReceipt(receipt: any): FormattedReceipt {
+  private formatTransactionReceipt(receipt: TransactionReceipt): FormattedReceipt {
     const formattedReceipt: FormattedReceipt = {
       status: receipt.status === 1 ? 'Success' : 'Failed',
       from: receipt.from,
@@ -38,7 +39,7 @@ export class OnChainSimulator {
       blockNumber: receipt.blockNumber,
       gasUsed: `${this.formatBigNumber(receipt.gasUsed)} gwei`,
       effectiveGasPrice: `${this.formatBigNumber(receipt.effectiveGasPrice)} gwei`,
-      logs: receipt.logs.map((log: any): FormattedLog => {
+      logs: receipt.logs.map((log: Log): FormattedLog => {
         try {
           return {
             address: log.address,
@@ -49,7 +50,11 @@ export class OnChainSimulator {
           }
         } catch (error) {
           logger.error(`Error formatting log: ${error}`)
-          return log
+          return {
+            ...log,
+            contractUrl: convertToExplorerUrlForNetwork(this.network, log.address),
+            decodedEvent: null,
+          }
         }
       }),
       explorerUrl: getTxExplorerUrlForNetwork(this.network, receipt.transactionHash),

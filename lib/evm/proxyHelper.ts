@@ -37,7 +37,9 @@ export async function getProxyAdminOfProxyContract(
   try {
     proxyAdminOwner = await ethers.getContractAt('Ownable', proxyAdminAddress).then((contract) => contract.owner())
   } catch (e) {
-    logger.warn(`getProxyAdminOfProxyContract:: owner() not a valid function on the address of the ProxyAdmin.`)
+    logger.warn(
+      `getProxyAdminOfProxyContract:: owner() not a valid function on the address of the ProxyAdmin ${proxyAdminAddress}.`,
+    )
   }
   return { proxyAdminAddress, proxyAdminOwner }
 }

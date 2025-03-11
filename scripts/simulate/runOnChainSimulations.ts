@@ -11,14 +11,13 @@ async function main() {
     // Create simulator instance
     const simulator = new OnChainSimulator(config.network)
 
-    // Create event handler for formatting results
-    const eventHandler = new EventHandler()
-
     // Run simulation
     const results = await simulator.simulate(config)
 
     // Display formatted transaction results
-    eventHandler.formatTransactionResults(results)
+    const eventHandler = new EventHandler()
+    const formattedEvents = eventHandler.formatTransactionResults(results)
+    console.dir(formattedEvents, { depth: null, colors: true })
 
     logger.log('\nSimulation completed successfully!', '🎉')
   } catch (error) {
