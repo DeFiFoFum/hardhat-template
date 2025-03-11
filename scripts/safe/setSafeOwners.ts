@@ -1,7 +1,7 @@
 import { ethers, network } from 'hardhat'
 import { getErrorMessage } from '../../lib/node/getErrorMessage'
 import { logger } from '../../hardhat/utils'
-import { CREATE2_DEPLOYER } from '../deploy/CREATE2'
+import { CREATE2_DEPLOYER } from '../deploy/CREATE2/create2.config'
 import { getCREATE2SafeInitializer } from '../../lib/evm/safe-wallet/create2Safe'
 import { getAddOwnersTransactionData } from '../../lib/evm/safe-wallet/getAddOwnersTransactionData'
 import { getSafeContractAt } from '../../lib/evm/safe-wallet/getSafeContracts'

@@ -41,6 +41,7 @@ export const NETWORKS = <const>[
   'polygon',
   'polygonTestnet',
   'sepolia',
+  'sonic',
   'zircuit',
   'zircuitTestnet',
 ]
@@ -265,6 +266,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     getExplorerUrl: (address: string) => `https://sepolia.etherscan.io/address/${address}`,
     chainId: 11155111,
     accounts: testnetAccounts,
+  },
+  sonic: {
+    url: getEnv('SONIC_RPC_URL') || 'https://sonic.drpc.org',
+    getExplorerUrl: (address: string) => `https://sonicscan.org/address/${address}`,
+    chainId: 146,
+    accounts: mainnetAccounts,
   },
   zircuit: {
     url: getEnv('ZIRCUIT_RPC_URL') || 'https://zircuit-mainnet.drpc.org',
