@@ -1,5 +1,6 @@
-import { BigNumber, BigNumberish, Contract, ContractFactory, Signer, utils } from 'ethers'
+import { BigNumber, BigNumberish, Contract, ContractFactory, utils } from 'ethers'
 import { network, run, ethers } from 'hardhat'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { FactoryOptions } from 'hardhat/types'
 import { logger } from '../../../hardhat/utils/logger'
 import { DEPLOYMENTS_BASE_DIR } from '../deploy.config'
@@ -29,7 +30,7 @@ import { delayWithLoadingBar } from '../../../lib/cli/CliDelay'
 // -----------------------------------------------------------------------------------------------
 
 interface DeployManagerConstructor {
-  signer?: Signer
+  signer?: SignerWithAddress
   baseDir?: string
   snapshotManager: ISnapshotManager
   gasPriceOverride?: BigNumberish
@@ -47,7 +48,7 @@ type CreateDeployManager = Omit<DeployManagerConstructor, 'snapshotManager'> & {
  * See docs at top of file for more details.
  */
 export class DeployManager implements IDeployManager {
-  private signer?: Signer
+  private signer?: SignerWithAddress
   private baseDir: string
   private gasPriceOverride?: BigNumber
   private maxDeployRetries: number = 20
@@ -116,7 +117,7 @@ export class DeployManager implements IDeployManager {
    * Gets the signer instance.
    * @returns - A promise that resolves to a signer instance.
    */
-  async getSigner(): Promise<Signer> {
+  async getSigner(): Promise<SignerWithAddress> {
     let signer = this.signer
     if (!signer) {
       // NOTE: Defaults to the first signer if not provided
@@ -133,7 +134,7 @@ export class DeployManager implements IDeployManager {
    * Sets the signer instance.
    * @param signer - The signer instance.
    */
-  setSigner(signer: Signer) {
+  setSigner(signer: SignerWithAddress) {
     this.signer = signer
   }
 
