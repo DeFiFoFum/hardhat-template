@@ -79,10 +79,12 @@
     "ws": "^7.5.10",
     "braces": "^3.0.3",
     "elliptic": "^6.6.0",
-    "axios": "^1.7.4",
+    "axios": "^1.8.2",
     "micromatch": "^4.0.8",
     "cookie": "^0.7.0",
-    "secp256k1": "^4.0.4"
+    "secp256k1": "^4.0.4",
+    "serialize-javascript": "^6.0.2",
+    "undici": "^5.28.5"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
