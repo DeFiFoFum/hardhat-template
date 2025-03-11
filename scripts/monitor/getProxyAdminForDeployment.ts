@@ -1,7 +1,7 @@
 import { network } from 'hardhat'
 import { Networks } from '../../hardhat'
 import { getImplementationOfProxyContract, getProxyAdminOfProxyContract } from '../../lib/evm/getProxyAdmin'
-import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/convertAddresses'
+import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/address/convertAddresses'
 
 // NOTE: Import deployment files
 // import { deployment } from '../../deployments/'
@@ -25,7 +25,6 @@ async function script() {
       implementationAddress,
     },
     currentNetwork,
-    true,
   )
 
   console.dir(output, { depth: null })

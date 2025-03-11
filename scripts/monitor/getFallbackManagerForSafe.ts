@@ -1,7 +1,7 @@
 import { network } from 'hardhat'
 import { Networks } from '../../hardhat'
 import { getFallbackManagerForSafe } from '../../lib/evm/safe-wallet/getFallbackManagerForSafe'
-import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/convertAddresses'
+import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/address/convertAddresses'
 
 // NOTE: Import deployment files
 // import { deployment } from '../../deployments/'
@@ -19,7 +19,6 @@ async function script() {
       fallbackManagerAddress,
     },
     currentNetwork,
-    true,
   )
 
   console.dir(output, { depth: null })

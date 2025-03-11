@@ -1,7 +1,8 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Networks } from '../../hardhat'
 import path from 'path'
-import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/convertAddresses'
+import { convertAddressesToExplorerLinksByNetwork } from '../../lib/evm/address/convertAddresses'
+import { getAddressToNameMap } from '../../lib/evm/address/addressBookHelper'
 import { writeObjectToTsFile } from '../../lib/node/files'
 import { getDateMinuteString } from '../../lib/node/dateHelper'
 import { logger } from '../../hardhat/utils'
@@ -40,7 +41,19 @@ export async function saveDeploymentOutput(
   // getDateMinuteString: YYYYMMDDTHH:MM
   const filePath = path.resolve(DEPLOYMENTS_BASE_DIR, `${getDateMinuteString()}-${networkName}-deployment`)
   if (convertAddressesToExplorerLinks) {
-    deploymentDetails = convertAddressesToExplorerLinksByNetwork(deploymentDetails, networkName, true)
+    let addressToNameMap: Record<string, string> | undefined = undefined
+
+    // Try to load address book, but continue even if it fails
+    const addressBookPath = path.join(__dirname, '../../lib/evm/address/safe-address-book-latest.csv')
+    try {
+      addressToNameMap = getAddressToNameMap(addressBookPath, parseInt(networkName))
+    } catch (error) {
+      logger.warn(`Failed to load address book: ${error instanceof Error ? error.message : String(error)}`)
+      logger.warn(`Address book path: ${addressBookPath}`)
+    }
+
+    // Convert addresses to explorer links, with optional name mapping
+    deploymentDetails = convertAddressesToExplorerLinksByNetwork(deploymentDetails, networkName, addressToNameMap)
   }
   if (logOutput) {
     logger.log(`Deployment output for ${networkName}:`, '📝')
