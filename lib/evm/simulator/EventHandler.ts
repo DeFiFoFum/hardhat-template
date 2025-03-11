@@ -17,6 +17,8 @@ export class EventHandler {
         'event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)',
       // Ownable events
       OwnershipTransferred: 'event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)',
+      OwnershipTransferStarted:
+        'event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner)',
       // Proxy Admin
       AdminChanged: 'event AdminChanged(address previousAdmin, address newAdmin)',
       BeaconUpgraded: 'event BeaconUpgraded(address indexed beacon)',
