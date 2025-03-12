@@ -24,7 +24,7 @@ async function main() {
 async function deployCreate2Safe(salt: number, name?: string) {
   logger.logHeader('Deploying Gnosis Safe with CREATE2', '🚀')
   const currentNetwork = network.name as DeployableNetworks
-  const deployConfigNetwork = await forkIfHardhat(currentNetwork, 'mainnet' as DeployableNetworks)
+  const deployConfigNetwork = await forkIfHardhat(currentNetwork, 'polygon' as DeployableNetworks)
   const [deployer] = await ethers.getSigners()
   const deployerAddress = await deployer.getAddress()
   if (currentNetwork != 'hardhat' && deployerAddress != CREATE2_DEPLOYER) {

@@ -3,7 +3,7 @@ import { getErrorMessage } from '../../lib/node/getErrorMessage'
 import { logger } from '../../hardhat/utils'
 import { CREATE2_DEPLOYER } from '../deploy/CREATE2/create2.config'
 import { getCREATE2SafeInitializer } from '../../lib/evm/safe-wallet/create2Safe'
-import { getAddOwnersTransactionData } from '../../lib/evm/safe-wallet/getAddOwnersTransactionData'
+import { SafeWalletTxEncoder } from '../../lib/evm/safe-wallet/SafeWalletTxEncoder'
 import { getSafeContractAt } from '../../lib/evm/safe-wallet/getSafeContracts'
 import { DeployableNetworks } from '../deploy/deploy.config'
 import { forkIfHardhat } from '../deploy/utils/forkDeployHelper'
@@ -21,7 +21,7 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   const deployerAddress = await deployer.getAddress()
 
-  await forkIfHardhat(currentNetwork, 'zircuit' as DeployableNetworks)
+  await forkIfHardhat(currentNetwork, 'polygon' as DeployableNetworks)
 
   if (deployerAddress != CREATE2_DEPLOYER) {
     throw new Error(`Deployer ${deployerAddress} address must be CREATE2_DEPLOYER: ${CREATE2_DEPLOYER}`)
@@ -47,7 +47,9 @@ async function main() {
     // Owner Setup
     logger.log(`Sending owner tx to ${safeAddress}`, '⚙️')
 
-    const ownerData = await getAddOwnersTransactionData(safeAddress, deployerAddress, safeOwnerConfig.ownersToAdd)
+    const safeWalletTxEncoder = await SafeWalletTxEncoder.create(safeAddress, deployerAddress)
+
+    const ownerData = await safeWalletTxEncoder.getAddOwnersTransactionData(safeOwnerConfig.ownersToAdd)
     if (!ownerData.data) {
       console.log({ ownerData })
       throw new Error(`setSafeOwners:: No tx data found for ${safeAddress} and ownerData: ${ownerData}`)
