@@ -42,6 +42,7 @@ export const NETWORKS = <const>[
   'polygonTestnet',
   'sepolia',
   'sonic',
+  'sonicTestnet',
   'zircuit',
   'zircuitTestnet',
 ]
@@ -273,6 +274,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     chainId: 146,
     accounts: mainnetAccounts,
   },
+  sonicTestnet: {
+    url: getEnv('SONIC_TESTNET_RPC_URL') || 'https://rpc.blaze.soniclabs.com',
+    getExplorerUrl: (address: string) => `https://testnet.sonicscan.org/address/${address}`,
+    chainId: 57054,
+    accounts: testnetAccounts,
+  },
   zircuit: {
     url: getEnv('ZIRCUIT_RPC_URL') || 'https://zircuit-mainnet.drpc.org',
     getExplorerUrl: (address: string) => `https://explorer.zircuit.com/address/${address}`,
@@ -395,6 +402,8 @@ const config: HardhatUserConfig = {
       polygonMumbai: getEnv('POLYGONSCAN_API_KEY'),
       linea: getEnv('LINEASCAN_API_KEY'),
       lineaTestnet: getEnv('LINEASCAN_API_KEY'),
+      sonic: getEnv('SONICSCAN_API_KEY'),
+      sonicTestnet: getEnv('SONICSCAN_API_KEY'),
     },
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#adding-support-for-other-networks
     customChains: [
