@@ -423,6 +423,22 @@ const config: HardhatUserConfig = {
           browserURL: 'https://sepolia.lineascan.build/',
         },
       },
+      {
+        network: 'sonic',
+        chainId: 146,
+        urls: {
+          apiURL: 'https://api.sonicscan.org/api',
+          browserURL: 'https://sonicscan.org/',
+        },
+      },
+      {
+        network: 'sonicTestnet',
+        chainId: 57054,
+        urls: {
+          apiURL: 'https://api-testnet.sonicscan.org/api/',
+          browserURL: 'https://testnet.sonicscan.org/',
+        },
+      },
     ],
   },
 }
