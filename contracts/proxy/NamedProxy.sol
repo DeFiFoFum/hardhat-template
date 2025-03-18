@@ -8,6 +8,9 @@ import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transpa
  * @notice Helps with onchain usability by providing a name for the proxy
  */
 contract NamedProxy is TransparentUpgradeableProxy {
+    /// @dev Prevent bytecode collisions
+    string public constant NAME = "NamedProxy";
+
     constructor(
         address logic_,
         address admin_,
