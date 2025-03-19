@@ -12,7 +12,13 @@ import { SafeOwnerConfig } from './safeWalletTypes'
 
 function getSafeOwnerConfigArray(): SafeOwnerConfig[] {
   // TODO: Add your config
-  return []
+  return [
+    {
+      safeAddress: '0x-set-address-here',
+      ownersToAdd: ['0x-set-address-here'],
+      threshold: 1,
+    },
+  ]
 }
 
 async function main() {
