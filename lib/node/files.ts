@@ -41,7 +41,9 @@ export const writeObjectToTsFile = async (fileName: string, constName: string, d
  */
 export const writeJSONToFile = async (fileName: string, data: {}): Promise<void> => {
   try {
-    await fs.promises.writeFile(fileName + '.json', JSON.stringify(data, null, 4))
+    // Clean .json extension if present
+    const cleanedFilename = fileName.endsWith('.json') ? fileName.slice(0, -5) : fileName
+    await fs.promises.writeFile(cleanedFilename + '.json', JSON.stringify(data, null, 4))
   } catch (e) {
     console.error(`Error writing ${fileName}: ${e}`)
   }

@@ -13,3 +13,11 @@ Paste the following into "Custom Instructions" for coding assistants.
 
 1. Always create a table of contents.
 2. Use callouts for NOTES, WARNINGS, and TIPS. (And any other relevant callouts.)
+3. Front Matter use the
+
+```md
+---
+Last Update: YYYY-MM-DD
+---
+# Title
+```
