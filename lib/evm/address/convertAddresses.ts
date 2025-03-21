@@ -1,8 +1,12 @@
 import { getExplorerUrlForNetwork } from '../../../hardhat.config'
 import { Networks } from '../../../hardhat.config'
+import { logger } from '../../node/logger'
 
 export const isAddress = (address?: string) =>
   address ? (address.length === 42 && address.slice(0, 2) === '0x' ? true : false) : false
+
+export const isTxHash = (txHash?: string) =>
+  txHash ? (txHash.length === 66 && txHash.slice(0, 2) === '0x' ? true : false) : false
 
 /**
  * Iterates through an object and converts any address strings to objects with address and explorer link
@@ -21,8 +25,12 @@ export function convertAddressesToExplorerLinksByNetwork(
   return convertAddressesToExplorerLinks(addressObject, getExplorerLink, addressToNameMap)
 }
 
+function _convertExplorerAddressLinkToTxLink(explorerLink: string) {
+  return explorerLink.replace('address', 'tx')
+}
+
 /**
- * Iterates through an object and converts any address strings to objects with address and explorer link
+ * Iterates through an object and converts any address or tx hash strings to objects with address and explorer link
  *
  * @param {Object<any>} addressObject Object to iterate through looking for possible addresses to convert
  * @param {(address: string) => string} getLink Function which takes an address and converts to an explorer link
@@ -57,6 +65,12 @@ export function convertAddressesToExplorerLinks(
           }
 
           _addressObject[key] = addressObj
+        } else if (isTxHash(value)) {
+          const txObj: any = {
+            txHash: value,
+            explorer: _convertExplorerAddressLinkToTxLink(_getLink(value)),
+          }
+          _addressObject[key] = txObj
         }
       } else {
         _convertAddressesToExplorerLinks(value, _getLink)
@@ -65,5 +79,11 @@ export function convertAddressesToExplorerLinks(
     return _addressObject
   }
   const addrObjDeepCopy = JSON.parse(JSON.stringify(addressObject))
+
+  if (!addressToNameMap) {
+    logger.warn(
+      'convertAddressesToExplorerLinks:: addressToNameMap is not provided. A Safe Wallet compatible CSV address book can be converted through getAddressToNameMap().',
+    )
+  }
   return _convertAddressesToExplorerLinks(addrObjDeepCopy, getLink)
 }
