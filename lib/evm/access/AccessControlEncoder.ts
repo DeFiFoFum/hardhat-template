@@ -3,12 +3,12 @@ import { AccessControlEnumerable } from '../../../typechain-types'
 import { ADDRESS_0 } from '../constants'
 import { BytesLike, PopulatedTransaction } from 'ethers'
 
-interface RoleInput {
+export interface RoleAssignment {
   role: BytesLike
   account: string
 }
 
-export default class AccessControlEncoder {
+export class AccessControlEncoder {
   private constructor(private accessControlContract: AccessControlEnumerable) {
     // Constructor is private to force use of the factory method
   }
@@ -18,15 +18,15 @@ export default class AccessControlEncoder {
     return new AccessControlEncoder(accessControlContract)
   }
 
-  async encodeGrantRole({ role, account }: RoleInput): Promise<PopulatedTransaction> {
+  async encodeGrantRole({ role, account }: RoleAssignment): Promise<PopulatedTransaction> {
     return await this.accessControlContract.populateTransaction.grantRole(role, account)
   }
 
-  async encodeRevokeRole({ role, account }: RoleInput): Promise<PopulatedTransaction> {
+  async encodeRevokeRole({ role, account }: RoleAssignment): Promise<PopulatedTransaction> {
     return await this.accessControlContract.populateTransaction.revokeRole(role, account)
   }
 
-  async encodeRenounceRole({ role, account }: RoleInput): Promise<PopulatedTransaction> {
+  async encodeRenounceRole({ role, account }: RoleAssignment): Promise<PopulatedTransaction> {
     return await this.accessControlContract.populateTransaction.renounceRole(role, account)
   }
 }

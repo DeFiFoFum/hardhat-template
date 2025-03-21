@@ -1,5 +1,5 @@
 import { PopulatedTransaction } from '@ethersproject/contracts'
-import AccessControlEncoder from './AccessControlEncoder'
+import { AccessControlEncoder } from './AccessControlEncoder'
 import { BigNumber, utils, BytesLike } from 'ethers'
 
 import { TimelockControllerEnumerable } from '../../../typechain-types'
@@ -48,7 +48,7 @@ export interface BatchEncodeReturn {
   operationId: string
 }
 
-export default class TimelockEncoder {
+export class TimelockEncoder {
   private constructor(
     private _timelockContract: TimelockControllerEnumerable,
     private accessControlEncoder: AccessControlEncoder,
