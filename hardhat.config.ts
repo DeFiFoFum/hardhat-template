@@ -135,7 +135,12 @@ function getAccountsForEnvironment(
   return undefined // Return undefined if neither mnemonic or private key are present
 }
 
-// Account setup for supported environments
+/**
+ * This setup allows for the use of different accounts for different environments.
+ *
+ * For example MAINNET_DUMMY is intended to deploy contracts on mainnet, but with a different account
+ *  than the one used for the MAINNET environment to prevent front running.
+ */
 const mainnetAccounts = getAccountsForEnvironment('MAINNET')
 const mainnetDummyAccounts = getAccountsForEnvironment('MAINNET_DUMMY')
 const testnetAccounts = getAccountsForEnvironment('TESTNET')
