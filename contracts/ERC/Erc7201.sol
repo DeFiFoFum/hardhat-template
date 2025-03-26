@@ -24,6 +24,7 @@ contract Erc7201_Example {
         string _symbol;
     }
 
+    /// @notice ERC-7201: Namespaced Storage Layout
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.ERC20")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant _ERC20StorageLocation = 0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
 

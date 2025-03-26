@@ -39,7 +39,7 @@ async function fixture() {
   }
 }
 
-describe('ERC-7201', function () {
+describe('ERC-7201: Namespaced Storage Layout', function () {
   let FR: FixtureReturn
   let accounts: FixtureReturn['accounts']
   let contracts: FixtureReturn['contracts']
