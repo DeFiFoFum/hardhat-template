@@ -1,12 +1,16 @@
 {
-    "require": "hardhat/register",
-    "timeout": 40000,
-    "_": [
-        "test/**/*.ts",
-        "lib/**/*.spec.ts"
-    ],
-    "DEV-COMMENTS": {
-        "warning": "Running test directly from Visual Studio Code won't compile your contracts automatically. Make sure compile them manually.",
-        "source": "https://hardhat.org/hardhat-runner/docs/advanced/vscode-tests"
-    }
+  "require": "hardhat/register",
+  "timeout": 40000,
+  "_": [
+    "test/**/*.spec.ts",
+    "test/**/*.test.ts",
+    "lib/**/*.spec.ts",
+    "lib/**/*.test.ts",
+    "scripts/deploy/**/*.spec.ts",
+    "scripts/deploy/**/*.test.ts"
+  ],
+  "DEV-COMMENTS": {
+    "warning": "Running test directly from Visual Studio Code won't compile your contracts automatically. Make sure compile them manually.",
+    "source": "https://hardhat.org/hardhat-runner/docs/advanced/vscode-tests"
+  }
 }
