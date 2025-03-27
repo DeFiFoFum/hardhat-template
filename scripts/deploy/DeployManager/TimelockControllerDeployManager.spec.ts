@@ -4,8 +4,9 @@ import { mine, time, loadFixture } from '@nomicfoundation/hardhat-network-helper
 import { expect } from 'chai'
 import '@nomicfoundation/hardhat-chai-matchers'
 import { DeployManager } from './DeployManager'
-import { TimelockDeployManager } from './TimelockControllerDeployManager'
+import { TimelockControllerDeployManager } from './TimelockControllerDeployManager'
 import { TimelockControllerEnumerable } from '../../../typechain-types'
+import { getRoleMembersForContracts } from '../../monitor/accessControlHelper'
 
 /**
  * Configurable fixture to use for each test file.
@@ -52,7 +53,7 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
   let FR: FixtureReturn
   let accounts: FixtureReturn['accounts']
   let deployManager: DeployManager
-  let timelockDeployManager: TimelockDeployManager
+  let timelockDeployManager: TimelockControllerDeployManager
 
   beforeEach(async function () {
     FR = await loadFixture(fixture)
@@ -61,17 +62,17 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
   })
 
   describe('create', () => {
-    it('should create a TimelockDeployManager instance with correct props', async () => {
+    it('should create a TimelockControllerDeployManager instance with correct props', async () => {
       const proposers = [accounts.proposer.address]
       const executors = [accounts.executor.address]
       const admin = accounts.admin.address
-      const cancellers = [accounts.canceller.address]
+      const additionalCancellers = [accounts.canceller.address]
 
-      timelockDeployManager = await TimelockDeployManager.create({
+      timelockDeployManager = await TimelockControllerDeployManager.create({
         deployManager,
         proposers,
         executors,
-        cancellers,
+        additionalCancellers,
         admin,
       })
 
@@ -79,7 +80,7 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
       expect(timelockDeployManager.props.proposers).to.deep.equal(proposers)
       expect(timelockDeployManager.props.executors).to.deep.equal(executors)
       expect(timelockDeployManager.props.admin).to.equal(admin)
-      expect(timelockDeployManager.props.cancellers).to.deep.equal(cancellers)
+      expect(timelockDeployManager.props.additionalCancellers).to.deep.equal(additionalCancellers)
     })
   })
 
@@ -90,13 +91,13 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
       const proposers = [accounts.proposer.address]
       const executors = [accounts.executor.address]
       const admin = accounts.admin.address
-      const cancellers = [accounts.canceller.address]
+      const additionalCancellers = [accounts.canceller.address]
 
-      timelockDeployManager = await TimelockDeployManager.create({
+      timelockDeployManager = await TimelockControllerDeployManager.create({
         deployManager,
         proposers,
         executors,
-        cancellers,
+        additionalCancellers,
         admin,
       })
     })
@@ -132,30 +133,31 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
     })
 
     it('should handle deployment without cancellers', async () => {
-      // Create new instance without cancellers
-      timelockDeployManager = await TimelockDeployManager.create({
+      // Create new instance without additional cancellers
+      timelockDeployManager = await TimelockControllerDeployManager.create({
         deployManager,
         proposers: [accounts.proposer.address],
         executors: [accounts.executor.address],
         admin: accounts.admin.address,
-        cancellers: [],
+        additionalCancellers: [],
       })
 
       const timelock = await timelockDeployManager.deployAndConfigureTimelock(minDelaySeconds)
       const CANCELLER_ROLE = await timelock.CANCELLER_ROLE()
 
-      // Verify no cancellers were set
+      // Verify proposer has canceller role but additional canceller does not
+      expect(await timelock.hasRole(CANCELLER_ROLE, accounts.proposer.address)).to.be.true
       expect(await timelock.hasRole(CANCELLER_ROLE, accounts.canceller.address)).to.be.false
     })
 
     it('should deploy timelock with null admin to enable timelocked admin changes', async () => {
       // Create new instance with null admin
-      timelockDeployManager = await TimelockDeployManager.create({
+      timelockDeployManager = await TimelockControllerDeployManager.create({
         deployManager,
         proposers: [accounts.proposer.address],
         executors: [accounts.executor.address],
         admin: null,
-        cancellers: [],
+        additionalCancellers: [],
       })
 
       const timelock = await timelockDeployManager.deployAndConfigureTimelock(minDelaySeconds)
@@ -239,6 +241,85 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
 
       // If we get here, the transaction was successful
       // This validates that the timelock can still execute operations even when it's the only admin
+    })
+
+    it('should create new timelock with different roles', async () => {
+      // Create initial configuration
+      const initialProposers = [accounts.proposer.address]
+      const initialExecutors = [accounts.executor.address]
+      const initialAdmin = accounts.admin.address
+      const initialAdditionalCancellers = [accounts.canceller.address]
+
+      timelockDeployManager = await TimelockControllerDeployManager.create({
+        deployManager,
+        proposers: initialProposers,
+        executors: initialExecutors,
+        admin: initialAdmin,
+        additionalCancellers: initialAdditionalCancellers,
+      })
+
+      // Deploy first timelock with initial configuration
+      const firstTimelock = await timelockDeployManager.deployAndConfigureTimelock(minDelaySeconds)
+
+      // Get all role members for first timelock
+      const firstTimelockRoles = await getRoleMembersForContracts(
+        [firstTimelock],
+        ['TIMELOCK_ADMIN_ROLE', 'PROPOSER_ROLE', 'EXECUTOR_ROLE', 'CANCELLER_ROLE'],
+      )
+
+      // Verify initial roles
+      expect(firstTimelockRoles[firstTimelock.address].TIMELOCK_ADMIN_ROLE).to.have.members([
+        initialAdmin,
+        firstTimelock.address,
+      ])
+      expect(firstTimelockRoles[firstTimelock.address].PROPOSER_ROLE).to.have.members(initialProposers)
+      expect(firstTimelockRoles[firstTimelock.address].EXECUTOR_ROLE).to.have.members(initialExecutors)
+      expect(firstTimelockRoles[firstTimelock.address].CANCELLER_ROLE).to.have.members([
+        ...initialProposers,
+        ...initialAdditionalCancellers,
+      ])
+
+      // Create new configuration for second timelock
+      const newProposers = [accounts.notAdmin.address]
+      const newExecutors = [accounts.executor.address]
+      const newAdmin = accounts.admin.address
+      const newAdditionalCancellers = [accounts.canceller.address]
+
+      // Create new timelock with new configuration
+      const secondTimelockDeployManager = await TimelockControllerDeployManager.create({
+        deployManager,
+        proposers: newProposers,
+        executors: newExecutors,
+        admin: newAdmin,
+        additionalCancellers: newAdditionalCancellers,
+      })
+
+      // Deploy second timelock with new configuration
+      const secondTimelock = await secondTimelockDeployManager.deployAndConfigureTimelock(minDelaySeconds)
+
+      // Get all role members for second timelock
+      const secondTimelockRoles = await getRoleMembersForContracts(
+        [secondTimelock],
+        ['TIMELOCK_ADMIN_ROLE', 'PROPOSER_ROLE', 'EXECUTOR_ROLE', 'CANCELLER_ROLE'],
+      )
+
+      // Verify new roles
+      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE).to.have.members([
+        newAdmin,
+        secondTimelock.address,
+      ])
+      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE).to.have.members(newProposers)
+      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE).to.have.members(newExecutors)
+      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE).to.have.members([
+        ...newProposers,
+        ...newAdditionalCancellers,
+      ])
+
+      // Verify no other accounts have roles
+      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE).to.not.include(accounts.deployer.address)
+      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE).to.not.include(accounts.deployer.address)
+      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE).to.not.include(accounts.deployer.address)
+      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE).to.not.include(accounts.deployer.address)
     })
   })
 })
