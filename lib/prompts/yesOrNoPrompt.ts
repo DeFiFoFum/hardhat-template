@@ -7,7 +7,7 @@ export function createYesOrNoPrompt(promptText: string, abortText: string, throw
   })
 
   return new Promise((resolve, reject) => {
-    readline.question(promptText, (answer: string) => {
+    readline.question(`${promptText} (y/n)`, (answer: string) => {
       readline.close()
       if (answer.trim().toUpperCase() === 'Y') {
         resolve(true)
