@@ -1,7 +1,7 @@
 import { BigNumber, utils } from 'ethers'
 import { convertToExplorerUrlForNetwork, getTxExplorerUrlForNetwork, Networks } from '../../../hardhat.config'
 import { logger } from '../../node/logger'
-import { EventHandler } from './EventHandler'
+import { EventHandler } from '../transactions/EventHandler'
 import { SimulationResult, FormattedLog } from './simulation-types'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { ethers } from 'hardhat'

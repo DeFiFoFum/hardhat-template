@@ -1,4 +1,4 @@
-import { EventHandler } from '../../lib/evm/simulator/EventHandler'
+import { EventHandler } from '../../lib/evm/transactions/EventHandler'
 import { OnChainSimulator } from '../../lib/evm/simulator/OnChainSimulator'
 import { logger } from '../../lib/node/logger'
 import { getSimulationConfig } from './simulator.config'

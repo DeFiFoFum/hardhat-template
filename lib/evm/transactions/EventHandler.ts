@@ -1,5 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { DecodedEvent, FormattedLog, SimulationResult } from './simulation-types'
+import { DecodedEvent, FormattedLog, SimulationResult } from '../simulator/simulation-types'
 import { logger } from '../../node/logger'
 
 export class EventHandler {
@@ -82,6 +82,7 @@ export class EventHandler {
   /**
    * Format and display transaction results with events
    */
+  // TODO: Remove dependency on SimulationResult
   formatTransactionResults(results: SimulationResult[]) {
     if (results.length === 0) {
       logger.log('No transactions executed', '📜')
