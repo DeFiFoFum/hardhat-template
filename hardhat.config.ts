@@ -20,6 +20,8 @@ import './plugins/abiPlugins'
 // Project Config
 import solhintConfig from './solhint.config'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
+// Import the vanity generator task
+// import './lib/evm/create2/create3VanityGenerator'
 
 // Network Config
 export const NETWORKS = <const>[

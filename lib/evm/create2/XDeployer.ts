@@ -3,6 +3,8 @@ import { ethers } from 'hardhat'
 import { logger } from '../../../hardhat/utils'
 import { TransparentUpgradeableProxy__factory } from '../../../typechain-types'
 
+export const DEFAULT_X_DEPLOYER_ADDRESS = '0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed'
+
 /**
  * XDeployer is a utility class to deploy contracts using the Create2 pattern.
  *
@@ -11,7 +13,7 @@ import { TransparentUpgradeableProxy__factory } from '../../../typechain-types'
  */
 export class XDeployer {
   ethers: typeof ethers
-  xDeployerAddress = '0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed'
+  xDeployerAddress = DEFAULT_X_DEPLOYER_ADDRESS
 
   constructor(_ethers: typeof ethers) {
     this.ethers = _ethers
