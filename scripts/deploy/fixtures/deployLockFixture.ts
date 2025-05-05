@@ -4,6 +4,7 @@ import { DeployableNetworks, FixtureOverrides, getDeployConfig } from '../deploy
 import { DeployManager } from '../DeployManager/DeployManager'
 import { logger } from '../../../hardhat/utils'
 import { formatEther } from 'ethers/lib/utils'
+import { Lock__factory } from '../../../typechain-types'
 
 export async function deployLockFixture(
   hre: HardhatRuntimeEnvironment,
@@ -19,10 +20,10 @@ export async function deployLockFixture(
   const lockedAmount = hre.ethers.utils.parseEther('.00001')
 
   const lockContractName = 'Lock'
-  const Lock = await hre.ethers.getContractFactory(lockContractName)
-  const lock = await deployManager.deployContractFromFactory(Lock, [unlockTime, deployConfig.accounts.adminAddress], {
-    name: lockContractName, // Pass in contract name to log contract
-  })
+  const lock = await deployManager.deployContract<Lock__factory>('Lock', [
+    unlockTime,
+    deployConfig.accounts.adminAddress,
+  ])
   const deployer = (await hre.ethers.getSigners())[0]
   await deployer.sendTransaction({ to: lock.address, value: lockedAmount })
   await deployer.sendTransaction({ to: lock.address, value: lockedAmount })
