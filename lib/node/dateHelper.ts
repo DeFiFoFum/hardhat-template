@@ -7,7 +7,7 @@ const toISOStringNoColons = (date: Date) => date.toISOString().replace(/[-:]/g, 
  * @param {Date} date (optional) The date to convert to a string in the format YYYYMMDD. Defaults to the current date.
  * @returns {string} The current date as a string in the format YYYYMMDD.
  */
-export const getDateDayString = (date = new Date()) => toISOStringNoColons(date).slice(0, 7)
+export const getDateDayString = (date = new Date()) => toISOStringNoColons(date).slice(0, 8)
 
 /**
  * Gets the current date and time as a string in the format YYYYMMDDTHH:MM.
