@@ -7,6 +7,11 @@ import {
 } from '../../typechain-types'
 import { BytesLike } from 'ethers'
 
+type RoleDetails = {
+  roleSignature: BytesLike
+  accounts: string[]
+}
+
 /**
  * Returns owners for array of contract addresses.
  *
@@ -50,9 +55,9 @@ export async function getRoleMembersForContracts<C extends AccessControlEnumerab
   accessControlEnumerableArray: C[],
   roles: Role[],
 ) {
-  const finalOutput = {} as Record<C['address'], Record<Role, string[]>>
+  const finalOutput = {} as Record<C['address'], Record<Role, RoleDetails>>
   for (const accessControlEnumerable of accessControlEnumerableArray) {
-    const roleOutput = {} as Record<Role, string[]>
+    const roleOutput = {} as Record<Role, RoleDetails>
     for await (const role of roles) {
       // Check if the function exists on the contract
       if (typeof (accessControlEnumerable as any)[role] === 'function') {
@@ -62,7 +67,7 @@ export async function getRoleMembersForContracts<C extends AccessControlEnumerab
         for (let roleIndex = 0; roleIndex < currentCount.toNumber(); roleIndex++) {
           rolePromises.push(accessControlEnumerable.getRoleMember(roleSignature, roleIndex))
         }
-        roleOutput[role] = await Promise.all(rolePromises)
+        roleOutput[role] = { roleSignature, accounts: await Promise.all(rolePromises) }
       } else {
         console.error(`Role ${role} does not exist on contract ${accessControlEnumerable.address}`)
       }
