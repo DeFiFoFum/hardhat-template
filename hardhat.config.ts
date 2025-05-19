@@ -45,6 +45,8 @@ export const NETWORKS = <const>[
   'sepolia',
   'sonic',
   'sonicTestnet',
+  'unichain',
+  'unichainTestnet',
   'zircuit',
   'zircuitTestnet',
 ]
@@ -287,6 +289,18 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     chainId: 57054,
     accounts: testnetAccounts,
   },
+  unichain: {
+    url: getEnv('UNICHAIN_RPC_URL') || 'https://unichain.drpc.org',
+    getExplorerUrl: (address: string) => `https://unichain.blockscout.com/address/${address}`,
+    chainId: 130,
+    accounts: mainnetAccounts,
+  },
+  unichainTestnet: {
+    url: getEnv('UNICHAIN_TESTNET_RPC_URL') || 'https://unichain-testnet.drpc.org',
+    getExplorerUrl: (address: string) => `https://unichain-sepolia.blockscout.com/address/${address}`,
+    chainId: 1301,
+    accounts: testnetAccounts,
+  },
   zircuit: {
     url: getEnv('ZIRCUIT_RPC_URL') || 'https://zircuit-mainnet.drpc.org',
     getExplorerUrl: (address: string) => `https://explorer.zircuit.com/address/${address}`,
@@ -411,9 +425,29 @@ const config: HardhatUserConfig = {
       lineaTestnet: getEnv('LINEASCAN_API_KEY'),
       sonic: getEnv('SONICSCAN_API_KEY'),
       sonicTestnet: getEnv('SONICSCAN_API_KEY'),
+      unichain: 'empty',
+      unichainTestnet: 'empty',
+      zircuit: getEnv('ZIRCUITSCAN_API_KEY'),
+      zircuitTestnet: getEnv('ZIRCUITSCAN_API_KEY'),
     },
     // https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-verify#adding-support-for-other-networks
     customChains: [
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org/api',
+          browserURL: 'https://basescan.org',
+        },
+      },
+      {
+        network: 'base-sepolia',
+        chainId: 84532,
+        urls: {
+          apiURL: 'https://api-sepolia.basescan.org/api',
+          browserURL: 'https://sepolia.basescan.org',
+        },
+      },
       {
         network: 'linea',
         chainId: 59144,
@@ -444,6 +478,38 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://api-testnet.sonicscan.org/api/',
           browserURL: 'https://testnet.sonicscan.org/',
+        },
+      },
+      {
+        network: 'unichain',
+        chainId: 130,
+        urls: {
+          apiURL: 'https://unichain.blockscout.com/api',
+          browserURL: 'https://unichain.blockscout.com',
+        },
+      },
+      {
+        network: 'unichainTestnet',
+        chainId: 1301,
+        urls: {
+          apiURL: 'https://unichain-sepolia.blockscout.com/api',
+          browserURL: 'https://unichain-sepolia.blockscout.com',
+        },
+      },
+      {
+        network: 'zircuit',
+        chainId: 48900,
+        urls: {
+          apiURL: 'https://explorer.zircuit.com/api/contractVerifyHardhat',
+          browserURL: 'https://explorer.zircuit.com',
+        },
+      },
+      {
+        network: 'zircuitTestnet',
+        chainId: 48899,
+        urls: {
+          apiURL: 'https://explorer.testnet.zircuit.com/api/contractVerifyHardhat',
+          browserURL: 'https://explorer.testnet.zircuit.com',
         },
       },
     ],
