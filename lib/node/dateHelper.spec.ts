@@ -5,7 +5,7 @@ describe('dateHelper', () => {
   describe('getDateDayString', () => {
     it('should return the current date in YYYYMMDD format', () => {
       const date = new Date('2023-03-30T12:10:00Z')
-      expect(getDateDayString(date)).to.equal('2023033')
+      expect(getDateDayString(date)).to.equal('20230330')
     })
   })
 
