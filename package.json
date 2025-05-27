@@ -27,7 +27,7 @@
     "docs:build": "yarn --cwd docs-site build",
     "docs:serve": "yarn --cwd docs-site serve",
     "deploy": "hardhat run ./scripts/deploy/deployLock.ts --network",
-    "deploy:safe": "hardhat run ./scripts/deploy/deployCreate2Safe.ts --network",
+    "deploy:safe": "hardhat run ./scripts/deploy/CREATE2/deployCreate2Safe.ts --network",
     "verify": "hardhat verify-contract",
     "semgrep": "semgrep --config modules/semgrep-smart-contracts/solidity ./contracts",
     "test": "env TESTING=true hardhat test",
@@ -110,7 +110,7 @@
     "ethers": "^5.4.7",
     "ethers-multisend": "^3.0.0",
     "fs": "^0.0.1-security",
-    "hardhat": "2.14.0",
+    "hardhat": "2.24.1",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.10",
     "husky": "^9.0.11",
@@ -131,6 +131,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "4.9.6",
     "@openzeppelin/contracts-upgradeable": "4.9.6",
-    "cli-progress": "^3.12.0"
+    "cli-progress": "^3.12.0",
+    "zod": "^3.25.30"
   }
 }
