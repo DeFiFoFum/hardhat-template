@@ -4,7 +4,7 @@ import { DeployableNetworks, FixtureOverrides, getDeployConfig } from '../deploy
 import { DeployManager } from '../DeployManager/DeployManager'
 import { logger } from '../../../hardhat/utils'
 import { formatEther } from 'ethers/lib/utils'
-import { Lock__factory } from '../../../typechain-types'
+import { Lock__factory, LockUpgradeable__factory } from '../../../typechain-types'
 
 export async function deployLockFixture(
   hre: HardhatRuntimeEnvironment,
@@ -29,13 +29,23 @@ export async function deployLockFixture(
   await deployer.sendTransaction({ to: lock.address, value: lockedAmount })
   logger.log(`Lock with ${formatEther(lockedAmount)} ETH deployed to: ${lock.address}`, '🔒')
 
-  const lockUpgradeable = await deployManager.deployUpgradeableContract(
+  const [proxyAdminContractAddress, proxyAdminOwnerAddress] = [
+    deployConfig.contractOverrides.adminContracts.proxyAdminContractAddress,
+    deployConfig.accounts.proxyAdminOwnerAddress,
+  ]
+  if (!proxyAdminContractAddress || !proxyAdminOwnerAddress) {
+    throw new Error(
+      'deployLockFixture:: proxyAdminContractAddress and proxyAdminOwnerAddress must be set in the deployment variables',
+    )
+  }
+
+  const lockUpgradeable = await deployManager.deployUpgradeableContract<LockUpgradeable__factory>(
     'LockUpgradeable',
     [unlockTime, deployConfig.accounts.adminAddress],
     {
       name: 'LockUpgradeable', // Pass in contract name to log contract
-      proxyAdminAddress: deployConfig.contractOverrides.proxyAdminContractAddress,
-      proxyAdminOwner: deployConfig.accounts.proxyAdminOwnerAddress,
+      proxyAdminAddress: proxyAdminContractAddress,
+      proxyAdminOwner: proxyAdminOwnerAddress,
     },
   )
   logger.log(`LockUpgradeable to: ${lock.address}`, '🔒')

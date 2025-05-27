@@ -21,7 +21,7 @@ async function main() {
   const { accounts: deploymentAccounts, contractOverrides } = deploymentVariables
 
   // Optional, used throughout the script and will be deployed if not passed
-  let proxyAdminContractAddress = contractOverrides?.proxyAdminContractAddress
+  const proxyAdminContractAddress = contractOverrides?.adminContracts.proxyAdminContractAddress
   // Actions to take after deployment to finalize deployment setup
   const { pushActionsAndLog, pushActions, getActions, tryActionCatchAndLog } = createActionLog()
 

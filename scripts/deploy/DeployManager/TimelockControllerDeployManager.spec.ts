@@ -268,13 +268,13 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
       )
 
       // Verify initial roles
-      expect(firstTimelockRoles[firstTimelock.address].TIMELOCK_ADMIN_ROLE).to.have.members([
+      expect(firstTimelockRoles[firstTimelock.address].TIMELOCK_ADMIN_ROLE.accounts).to.have.members([
         initialAdmin,
         firstTimelock.address,
       ])
-      expect(firstTimelockRoles[firstTimelock.address].PROPOSER_ROLE).to.have.members(initialProposers)
-      expect(firstTimelockRoles[firstTimelock.address].EXECUTOR_ROLE).to.have.members(initialExecutors)
-      expect(firstTimelockRoles[firstTimelock.address].CANCELLER_ROLE).to.have.members([
+      expect(firstTimelockRoles[firstTimelock.address].PROPOSER_ROLE.accounts).to.have.members(initialProposers)
+      expect(firstTimelockRoles[firstTimelock.address].EXECUTOR_ROLE.accounts).to.have.members(initialExecutors)
+      expect(firstTimelockRoles[firstTimelock.address].CANCELLER_ROLE.accounts).to.have.members([
         ...initialProposers,
         ...initialAdditionalCancellers,
       ])
@@ -304,22 +304,30 @@ describe('TimelockControllerDeployManager - Hardhat + EthersV5', function () {
       )
 
       // Verify new roles
-      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE).to.have.members([
+      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE.accounts).to.have.members([
         newAdmin,
         secondTimelock.address,
       ])
-      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE).to.have.members(newProposers)
-      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE).to.have.members(newExecutors)
-      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE).to.have.members([
+      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE.accounts).to.have.members(newProposers)
+      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE.accounts).to.have.members(newExecutors)
+      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE.accounts).to.have.members([
         ...newProposers,
         ...newAdditionalCancellers,
       ])
 
       // Verify no other accounts have roles
-      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE).to.not.include(accounts.deployer.address)
-      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE).to.not.include(accounts.deployer.address)
-      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE).to.not.include(accounts.deployer.address)
-      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE).to.not.include(accounts.deployer.address)
+      expect(secondTimelockRoles[secondTimelock.address].TIMELOCK_ADMIN_ROLE.accounts).to.not.include(
+        accounts.deployer.address,
+      )
+      expect(secondTimelockRoles[secondTimelock.address].PROPOSER_ROLE.accounts).to.not.include(
+        accounts.deployer.address,
+      )
+      expect(secondTimelockRoles[secondTimelock.address].EXECUTOR_ROLE.accounts).to.not.include(
+        accounts.deployer.address,
+      )
+      expect(secondTimelockRoles[secondTimelock.address].CANCELLER_ROLE.accounts).to.not.include(
+        accounts.deployer.address,
+      )
     })
   })
 })

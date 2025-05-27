@@ -7,6 +7,10 @@ import { writeObjectToTsFile } from '../../lib/node/files'
 import { getDateMinuteString } from '../../lib/node/dateHelper'
 import { logger } from '../../hardhat/utils'
 import { ethers } from 'hardhat'
+import { DeploymentAccounts, DeploymentContractOverrides, DeploymentVariables, MultisigConfig } from './deploy.schemas'
+
+// Re-export types for backward compatibility
+export type { DeploymentAccounts, DeploymentContractOverrides, DeploymentVariables }
 
 // Define a base directory for deployments
 export const DEPLOYMENTS_BASE_DIR = path.resolve(__dirname, '../../deployments')
@@ -83,40 +87,6 @@ export interface FixtureOverrides {
 }
 
 /**
- * DeploymentAccounts defines the structure for account-related configurations
- * needed during the deployment process.
- *
- * Extend or modify this interface to include additional account-related configurations as needed.
- */
-export interface DeploymentAccounts {
-  adminAddress: string
-  proxyAdminOwnerAddress: string
-}
-
-/**
- * DeploymentContractOverrides allows for specifying addresses of already deployed
- * contracts or for overriding the default addresses during deployment.
- *
- * Extend or modify this interface to include overrides for additional contracts as needed.
- */
-export interface DeploymentContractOverrides {
-  proxyAdminContractAddress?: string
-}
-
-/**
- * Deployment variables used for the deployment of contracts in this project.
- *
- * Extend or modify the DeploymentVariables interface if additional variables are required.
- */
-interface DeploymentVariables {
-  // Accounts and contract overrides should be configured above
-  accounts: DeploymentAccounts
-  contractOverrides: DeploymentContractOverrides
-  // These deployment variables can be changed and extended as needed.
-  wNative: string
-}
-
-/**
  * Apply overrides to the production values. This is useful for composing and testing fixtures,
  *  as well as for certain scripts.
  *
@@ -135,25 +105,42 @@ function applyFixtureOverrides(
   }
 }
 
+const ADDRESS_PLACEHOLDER = '0x-address-not-set-in_deploy.config'
+
+/**
+ * Multisig config for Omnichain Multisig Safes
+ */
+const omniChainMultisigConfig: MultisigConfig = {
+  // TODO: Configure
+  SecureAdminSafe: ADDRESS_PLACEHOLDER,
+  GeneralAdminSafe: ADDRESS_PLACEHOLDER,
+  InsecureAdminSafe: ADDRESS_PLACEHOLDER,
+}
+
 /**
  * Configuration for each deployable network. The structure is based on the interfaces above.
  *
  * accountOverrides and contractOverrides are optional and can be used to override configured values in this file.
  */
-const addressPlaceholder = '0x-address-not-set-in_deploy.config'
 const deployableNetworkConfig: Record<
   DeployableNetworks,
   (fixtureOverrides: FixtureOverrides) => Promise<DeploymentVariables>
 > = {
   bsc: async (fixtureOverrides: FixtureOverrides) => {
-    const productionValues = {
+    const productionValues: DeploymentVariables = {
       accounts: {
-        adminAddress: addressPlaceholder,
-        proxyAdminOwnerAddress: addressPlaceholder,
+        adminAddress: ADDRESS_PLACEHOLDER,
+        multisigConfig: null,
+        proxyAdminOwnerAddress: null,
       },
       // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        // proxyAdminContractAddress: '',
+        adminContracts: {
+          proxyAdminContractAddress: null,
+          timelock_OneDay: null,
+          timelock_ThreeDay: null,
+        },
+        protocolContracts: {},
       },
       wNative: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
     }
@@ -161,16 +148,22 @@ const deployableNetworkConfig: Record<
     return applyFixtureOverrides(productionValues, fixtureOverrides)
   },
   bscTestnet: async (fixtureOverrides: FixtureOverrides) => {
-    const productionValues = {
+    const productionValues: DeploymentVariables = {
       accounts: {
-        adminAddress: addressPlaceholder,
-        proxyAdminOwnerAddress: addressPlaceholder,
+        adminAddress: ADDRESS_PLACEHOLDER,
+        multisigConfig: null,
+        proxyAdminOwnerAddress: null,
       },
       // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        // proxyAdminContractAddress: '',
+        adminContracts: {
+          proxyAdminContractAddress: null,
+          timelock_OneDay: null,
+          timelock_ThreeDay: null,
+        },
+        protocolContracts: {},
       },
-      wNative: addressPlaceholder,
+      wNative: ADDRESS_PLACEHOLDER,
     }
     // Optionally pass override values over production for easier reusability in fixtures
     return applyFixtureOverrides(productionValues, fixtureOverrides)
@@ -183,16 +176,22 @@ const deployableNetworkConfig: Record<
       )
     }
     const accounts = await ethers.getSigners()
-    const productionValues = {
+    const productionValues: DeploymentVariables = {
       accounts: {
         adminAddress: accounts[0].address,
+        multisigConfig: null,
         proxyAdminOwnerAddress: accounts[0].address,
       },
       // Optionally pass contract overrides to skip deployments already made in fixtures
       contractOverrides: {
-        // proxyAdminContractAddress: '',
+        adminContracts: {
+          proxyAdminContractAddress: null,
+          timelock_OneDay: null,
+          timelock_ThreeDay: null,
+        },
+        protocolContracts: {},
       },
-      wNative: addressPlaceholder,
+      wNative: ADDRESS_PLACEHOLDER,
     }
     // Optionally pass override values over production for easier reusability in fixtures
     return applyFixtureOverrides(productionValues, fixtureOverrides)
