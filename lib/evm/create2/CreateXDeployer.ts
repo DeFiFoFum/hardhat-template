@@ -1,7 +1,7 @@
 import { ContractFactory, ContractReceipt } from 'ethers'
 import { ethers } from 'hardhat'
 import { logger } from '../../../hardhat/utils'
-import { CreateX, TransparentUpgradeableProxy__factory } from '../../../typechain-types'
+import { CreateX } from '../../../typechain-types'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { getErrorMessage } from '../../node/getErrorMessage'
 import { SupportedNamedProxyContractNames } from '../proxy/namedProxy.config'
