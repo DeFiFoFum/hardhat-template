@@ -17,6 +17,7 @@ import 'solidity-docgen' // Markdown doc generator
 import 'hardhat-contract-sizer'
 import 'hardhat-gas-reporter'
 import './plugins/abiPlugins'
+import 'hardhat-tracer'
 // Project Config
 import solhintConfig from './solhint.config'
 import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
@@ -124,7 +125,7 @@ task(TASK_TEST, '🫶 Test Task')
  * Environment variables: <environment>_MNEMONIC or <environment>_PRIVATE_KEY
  */
 function getAccountsForEnvironment(
-  environment: 'MAINNET' | 'TESTNET' | 'MAINNET_DUMMY',
+  environment: 'MAINNET' | 'TESTNET' | 'DUMMY_MAINNET',
 ): HttpNetworkAccountsUserConfig | undefined {
   const mnemonic = getEnv(`${environment}_MNEMONIC`)
   if (mnemonic) {
@@ -142,11 +143,11 @@ function getAccountsForEnvironment(
 /**
  * This setup allows for the use of different accounts for different environments.
  *
- * For example MAINNET_DUMMY is intended to deploy contracts on mainnet, but with a different account
+ * For example DUMMY_MAINNET is intended to deploy contracts on mainnet, but with a different account
  *  than the one used for the MAINNET environment to prevent front running.
  */
 const mainnetAccounts = getAccountsForEnvironment('MAINNET')
-const mainnetDummyAccounts = getAccountsForEnvironment('MAINNET_DUMMY')
+const mainnetDummyAccounts = getAccountsForEnvironment('DUMMY_MAINNET')
 const testnetAccounts = getAccountsForEnvironment('TESTNET')
 
 const getHardhatNetworkAccounts = (
@@ -224,7 +225,7 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     accounts: mainnetAccounts,
   },
   bsc: {
-    url: getEnv('BSC_RPC_URL') || 'https://bsc-dataseed1.binance.org',
+    url: getEnv('BSC_RPC_URL') || 'https://binance.llamarpc.com',
     getExplorerUrl: (address: string) => `https://bscscan.com/address/${address}`,
     chainId: 56,
     accounts: mainnetAccounts,
