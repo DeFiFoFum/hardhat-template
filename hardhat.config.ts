@@ -40,6 +40,7 @@ export const NETWORKS = <const>[
   'iotaEvm',
   'lightLink',
   'linea',
+  'lineaDummy',
   'lineaTestnet',
   'polygon',
   'polygonTestnet',
@@ -147,7 +148,7 @@ function getAccountsForEnvironment(
  *  than the one used for the MAINNET environment to prevent front running.
  */
 const mainnetAccounts = getAccountsForEnvironment('MAINNET')
-const mainnetDummyAccounts = getAccountsForEnvironment('DUMMY_MAINNET')
+const dummyMainnetAccounts = getAccountsForEnvironment('DUMMY_MAINNET')
 const testnetAccounts = getAccountsForEnvironment('TESTNET')
 
 const getHardhatNetworkAccounts = (
@@ -253,6 +254,12 @@ const networkConfig: ExtendedHardhatNetworkConfig = {
     getExplorerUrl: (address: string) => `https://lineascan.build/address/${address}`,
     chainId: 59144,
     accounts: mainnetAccounts,
+  },
+  lineaDummy: {
+    url: getEnv('LINEA_RPC_URL') || 'https://rpc.linea.build',
+    getExplorerUrl: (address: string) => `https://lineascan.build/address/${address}`,
+    chainId: 59144,
+    accounts: dummyMainnetAccounts,
   },
   lineaTestnet: {
     url: getEnv('LINEA_TESTNET_RPC_URL') || 'https://rpc.sepolia.linea.build',
