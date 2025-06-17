@@ -1,10 +1,10 @@
-import { ContractFactory, ContractReceipt } from 'ethers'
-import { ethers } from 'hardhat'
+import { Contract, ContractFactory, ContractReceipt } from 'ethers'
+import { ethers, network } from 'hardhat'
 import { logger } from '../../../hardhat/utils'
-import { CreateX } from '../../../typechain-types'
+import { CreateX, ITransparentUpgradeableProxy } from '../../../typechain-types'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { getErrorMessage } from '../../node/getErrorMessage'
 import { SupportedNamedProxyContractNames } from '../proxy/namedProxy.config'
+import { getErrorMessage } from '../../node/getErrorMessage'
 
 export const DEFAULT_CREATE_X_CONTRACT_ADDRESS = '0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed'
 
@@ -185,31 +185,39 @@ export class CreateXDeployer {
   }
 
   /**
-   * Deploy a proxy contract using a specific salt (vanity address deployment)
-   * @param proxyContractName The name of the proxy contract
-   * @param inputSalt The specific salt to use (from vanity address generation)
-   * @param expectedAddress The expected address of the deployed contract
-   * @returns The deployed contract details
+   * Deploy a proxy contract with an implementation using a specific salt for deterministic address deployment
+   * @param proxyContractName The name of the proxy contract to deploy
+   * @param implementationContract The implementation contract to point the proxy to
+   * @param inputSalt The specific salt to use for deterministic address generation
+   * @param expectedAddress The expected deterministic address that should be deployed to
+   * @param proxyAdminAddress The address that will have proxy admin privileges
+   * @returns Object containing the deployed proxy contract, implementation through proxy, deployment details and verification info
    */
-  async deployProxyWithSalt(
+  async deployProxyWithImplementationAndSalt<C extends Contract>(
     proxyContractName: SupportedNamedProxyContractNames,
+    implementationContract: C,
     inputSalt: string,
-    expectedAddress?: string,
+    expectedAddress: string,
+    proxyAdminAddress: string,
   ): Promise<{
-    proxyAddress: string
+    proxyContract: ITransparentUpgradeableProxy
+    implementationThroughProxy: C
     deployedSalt: string
+    inputSalt: string
     tx: any
     computedAddress: string
     constructorArgs: string[]
+    verificationCommand: string
   }> {
-    logger.log(`CreateXDeployer.deployProxyWithSalt:: Deploying ${proxyContractName} with salt ${inputSalt}`, '🚀')
+    const functionName = `CreateXDeployer.deployProxyAndImplementationWithSalt::`
+    logger.log(`${functionName}:: Deploying ${proxyContractName} with salt ${inputSalt}`, '🚀')
     // Verify the salt is valid for the current signer
     if (!this.validateSalt(inputSalt)) {
       logger.error(
-        `CreateXDeployer.deployProxyWithSalt:: Invalid salt ${inputSalt} for signer ${this.deployer.address}. 
+        `${functionName} Invalid salt ${inputSalt} for signer ${this.deployer.address}. 
           If using sender protection, first 20 bytes of salt must match deployer address.`,
       )
-      throw new Error('CreateXDeployer.deployProxyWithSalt:: Invalid salt for current signer')
+      throw new Error('${functionName}:: Invalid salt for current signer')
     }
 
     const { bytecode, bytecodeHash, constructorArgs } = await this.getProxyBytecodeWithConstructorArgs(
@@ -221,14 +229,11 @@ export class CreateXDeployer {
     const computedAddress = this.computeCreate2Address(inputSalt, bytecodeHash)
     if (expectedAddress && computedAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
       throw new Error(
-        `CreateXDeployer.deployProxyWithSalt:: Address mismatch! Expected ${expectedAddress} but got ${computedAddress}. 
+        `${functionName} Address mismatch! Expected ${expectedAddress} but got ${computedAddress}. 
           This indicates the salt was modified by CreateX's guarding mechanism or there's a calculation error.`,
       )
     }
-    logger.log(
-      `CreateXDeployer.deployProxyWithSalt:: Expected address: ${computedAddress} with salt ${inputSalt}`,
-      '📍',
-    )
+    logger.log(`${functionName} Expected address: ${computedAddress} with salt ${inputSalt}`, '📍')
 
     // Deploy using the specific salt
     const deployTx = await this.createX.connect(this.deployer)['deployCreate2(bytes32,bytes)'](inputSalt, bytecode)
@@ -237,31 +242,56 @@ export class CreateXDeployer {
     // Parse events to get deployed contract address and salt using our helper
     const { contractAddress: proxyAddress, salt: deployedSalt } = this.parseContractCreationEvents(receipt)
 
-    if (!proxyAddress) {
-      throw new Error('CreateXDeployer.deployProxyWithSalt:: Could not get contract address from events or receipt')
+    if (!proxyAddress || !deployedSalt) {
+      throw new Error(
+        `${functionName} Could not get contract address: ${proxyAddress} or deployedSalt: ${deployedSalt} from events or receipt`,
+      )
     }
 
     // Verify the deployed address matches the pre-computed address
     if (proxyAddress.toLowerCase() !== computedAddress.toLowerCase()) {
       logger.error(
-        `CreateXDeployer.deployProxyWithSalt:: Address mismatch! Expected ${computedAddress} but got ${proxyAddress}. 
+        `${functionName}:: Address mismatch! Expected ${computedAddress} but got ${proxyAddress}. 
           This indicates the salt was modified by CreateX's guarding mechanism.`,
       )
     }
 
-    logger.log(`CreateXDeployer.deployProxyWithSalt:: Proxy deployed at address: ${proxyAddress}`, '🚀')
+    logger.log(`${functionName} Proxy deployed at address: ${proxyAddress}`, '🚀')
     if (deployedSalt) {
-      logger.log(`CreateXDeployer.deployProxyWithSalt:: Salt used by CreateX: ${deployedSalt}`, '🧂')
+      logger.log(`${functionName} Salt used by CreateX: ${deployedSalt}`, '🧂')
     } else {
-      logger.log(`CreateXDeployer.deployProxyWithSalt:: Salt used by CreateX could not be extracted from events`, '⚠️')
+      logger.log(`${functionName} Salt used by CreateX could not be extracted from events`, '⚠️')
     }
 
+    const proxyContract = await ethers.getContractAt('ITransparentUpgradeableProxy', proxyAddress)
+    logger.log(`${functionName} proxy deployed at address: ${proxyAddress}, expected address: ${expectedAddress}`, '🚀')
+
+    const verificationCommand = `npx hardhat verify --network ${network.name} ${proxyAddress} '${constructorArgs[0]}' '${constructorArgs[1]}' '${constructorArgs[2]}'`
+    logger.log(`${functionName} Verification command: ${verificationCommand}`, '🔎')
+
+    logger.log(
+      `${functionName} Upgrading ${proxyContractName} to implementation at address: ${implementationContract.address}`,
+      '🚀',
+    )
+    await (await proxyContract.connect(this.deployer).upgradeTo(implementationContract.address)).wait()
+    logger.log(
+      `${functionName} Upgraded ${proxyContractName} to implementation at address: ${implementationContract.address}`,
+      '🚀',
+    )
+
+    const implementationThroughProxy = implementationContract.attach(proxyContract.address) as C
+    logger.log(`${functionName} Changing admin of ${proxyContractName} to ${proxyAdminAddress}`, '🚀')
+    await (await proxyContract.connect(this.deployer).changeAdmin(proxyAdminAddress)).wait()
+
     return {
-      proxyAddress,
-      deployedSalt: deployedSalt || inputSalt, // Fallback to input salt if we couldn't extract it
+      proxyContract,
+      implementationThroughProxy,
+      inputSalt,
+      deployedSalt,
       tx: deployTx,
       computedAddress,
       constructorArgs,
+      verificationCommand,
     }
   }
 
