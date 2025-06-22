@@ -1,15 +1,22 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.13;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IUpgradeableBeacon, IBeaconFactory, IBeaconFactoryAdmin} from "./IBeaconFactory.sol";
 import {UpgradeableBeaconForFactory} from "./UpgradeableBeaconForFactory.sol";
+import {IVersionable} from "../../interfaces/IVersionable.sol";
 
 /**
  * @title BeaconFactoryAdmin
  * @notice Contract used to manage the upgrade of beacon factory implementations.
  */
-contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable {
+contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable, IVersionable {
+    /**
+     * @notice Changelog
+     * 1.1.0 - Added isAdminForUpgradeableBeacon helper function
+     */
+    string public constant override VERSION = "1.1.0";
+
     /// @notice Maximum duration for which upgrades can be locked
     uint256 public constant MAX_LOCK_DURATION = 365 days;
 
@@ -27,6 +34,8 @@ contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable {
     /// @notice Trusted controllers that can call the transferSecureTimelockController function
     mapping(address => bool) public isTrustedTimelockController;
 
+    address[] public deployedBeaconFactories;
+
     /// -----------------------------------------------------------------------
     /// Events
     /// -----------------------------------------------------------------------
@@ -34,6 +43,7 @@ contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable {
     event TransferSecureTimelockController(address oldSecureTimelockController, address newSecureTimelockController);
     event SetLockTimestamp(uint256 lockTimestamp);
     event TrustedControllerSet(address controller, bool isTrusted);
+    event DeployedBeaconFactory(address upgradeableBeacon);
 
     /// -----------------------------------------------------------------------
     /// Errors
@@ -100,9 +110,19 @@ contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable {
     function upgradeBeaconFactoryImplementation(
         IBeaconFactory _beaconFactory,
         address _newBeaconImplementation
-    ) external canPerformBeaconUpgrade {
+    ) external override canPerformBeaconUpgrade {
         address upgradeableBeaconForFactory = _beaconFactory.getUpgradeableBeaconForFactory();
         IUpgradeableBeacon(upgradeableBeaconForFactory).upgradeTo(_newBeaconImplementation);
+    }
+
+    /// @notice Upgrades the implementation of an upgradeable beacon
+    /// @param _upgradeableBeacon The address of the upgradeable beacon
+    /// @param _newBeaconImplementation The address of the new beacon implementation
+    function upgradeBeaconImplementation(
+        IUpgradeableBeacon _upgradeableBeacon,
+        address _newBeaconImplementation
+    ) external override canPerformBeaconUpgrade {
+        _upgradeableBeacon.upgradeTo(_newBeaconImplementation);
     }
 
     /// -----------------------------------------------------------------------
@@ -142,20 +162,37 @@ contract BeaconFactoryAdmin is IBeaconFactoryAdmin, Ownable {
     /// Upgradeable Beacon Helper
     /// -----------------------------------------------------------------------
 
+    /// @notice Check if the caller is the admin of the upgradeable beacon
+    /// @param _upgradeableBeacon The address of the upgradeable beacon
+    /// @return True if the caller is the admin of the upgradeable beacon, false otherwise
+    function isAdminForUpgradeableBeacon(address _upgradeableBeacon) external view override returns (bool) {
+        return Ownable(_upgradeableBeacon).owner() == address(this);
+    }
+
+    /// @notice Returns the length of the deployed beacon factories array
+    /// @return The length of the deployed beacon factories array
+    function getDeployedBeaconFactoriesLength() external view returns (uint256) {
+        return deployedBeaconFactories.length;
+    }
+
     /// @notice Deploys an implementation of an upgradeable beacon with the beacon admin set to this contract.
     function deployUpgradeableBeaconForFactory(
         string memory _beaconFactoryName,
         IBeaconFactory _beaconFactory,
         address _startingBeaconImplementation
-    ) external override returns (IUpgradeableBeacon) {
+    ) external override returns (IUpgradeableBeacon upgradeableBeacon) {
         address beaconFactoryAdmin = address(this);
 
-        return
-            new UpgradeableBeaconForFactory(
-                _beaconFactoryName,
-                beaconFactoryAdmin,
-                address(_beaconFactory),
-                _startingBeaconImplementation
-            );
+        upgradeableBeacon = new UpgradeableBeaconForFactory(
+            _beaconFactoryName,
+            beaconFactoryAdmin,
+            address(_beaconFactory),
+            _startingBeaconImplementation
+        );
+
+        deployedBeaconFactories.push(address(upgradeableBeacon));
+        emit DeployedBeaconFactory(address(upgradeableBeacon));
+
+        return upgradeableBeacon;
     }
 }
