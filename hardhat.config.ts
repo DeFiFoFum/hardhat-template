@@ -418,6 +418,9 @@ const config: HardhatUserConfig = {
     // except: [':ERC20$'], // Array of String matchers used to exclude contracts
     // outputFile: './contract-size.md', // Optional output file to write to
   },
+  sourcify: {
+    enabled: false,
+  },
   etherscan: {
     apiKey: {
       mainnet: getEnv('ETHERSCAN_API_KEY'),
