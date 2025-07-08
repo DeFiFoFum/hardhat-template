@@ -33,6 +33,7 @@
     "test": "env TESTING=true hardhat test",
     "test:ci": "yarn compile && yarn test",
     "test:all": "yarn test && yarn forge:test",
+    "test:without-fork": "node scripts/test/runTestsWithoutFork.js",
     "test:gas": "env REPORT_GAS=true yarn test",
     "test:coverage": "hardhat coverage",
     "test:forge": "forge test -vv",
