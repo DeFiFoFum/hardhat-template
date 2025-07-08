@@ -236,8 +236,8 @@ describe('CreateXDeployer', function () {
       expect(typeof createXDeployer.deployCreate2).to.equal('function')
     })
 
-    it('Should have a deployProxyWithSalt method', async () => {
-      expect(typeof createXDeployer.deployProxyWithSalt).to.equal('function')
+    it('Should have a deployProxyWithImplementationAndSalt method', async () => {
+      expect(typeof createXDeployer.deployProxyWithImplementationAndSalt).to.equal('function')
     })
   })
 

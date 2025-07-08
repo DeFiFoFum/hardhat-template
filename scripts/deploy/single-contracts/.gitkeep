@@ -1,0 +1,3 @@
+The scripts/deploy directory may be used to deploy complex protocols and at times it may be needed to deploy individual contracts. 
+
+This directory can be used to store those deployments to keep the parent directory more focused.
