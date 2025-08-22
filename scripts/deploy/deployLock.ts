@@ -18,22 +18,22 @@ async function main() {
   // Deployment Setup
   // -------------------------------------------------------------------------------------------------------------------
   // Setup network and fork if hardhat
-  const currentNetwork = network.name as DeployableNetworks
+  const initialNetwork = network.name as DeployableNetworks
   const dryRunNetwork: DeployableNetworks = 'bsc'
-  const deployConfigNetwork = await forkIfHardhat(currentNetwork, dryRunNetwork)
+  const currentNetwork = await forkIfHardhat(initialNetwork, dryRunNetwork)
 
   // Estimate gas price
-  const estimatedGasPrice = await getCurrentGasPriceForNetwork(deployConfigNetwork)
+  const estimatedGasPrice = await getCurrentGasPriceForNetwork(currentNetwork)
   logger.log(`Deploy estimated gas price: ${ethers.utils.formatUnits(estimatedGasPrice.toString(), 'gwei')} gwei`, `⛽`)
 
   // Setup accounts
   const accounts = await ethers.getSigners()
   const [deployerAccount, hardhatAdminAccount, hardhatProxyAdminOwnerAddress] = accounts
   // Optionally pass in accounts to be able to use them in the deployConfig
-  let deploymentVariables = await getDeployConfig(deployConfigNetwork)
+  let deploymentVariables = await getDeployConfig(currentNetwork)
   if (currentNetwork === 'hardhat') {
     logger.warn(`Using hardhat network, deploying with overriding accounts`)
-    deploymentVariables = await getDeployConfig(deployConfigNetwork, {
+    deploymentVariables = await getDeployConfig(currentNetwork, {
       accountOverrides: {
         adminAddress: hardhatAdminAccount.address,
         proxyAdminOwnerAddress: hardhatProxyAdminOwnerAddress.address,
@@ -68,7 +68,7 @@ async function main() {
   }
 
   try {
-    await saveDeploymentOutput(currentNetwork, output, true, true)
+    await saveDeploymentOutput(initialNetwork, output, true, true)
   } catch (e) {
     logger.error(`Error saving deployment output to file: ${e}`)
   }

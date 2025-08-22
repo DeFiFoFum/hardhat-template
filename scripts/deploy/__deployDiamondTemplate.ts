@@ -77,7 +77,7 @@ async function main() {
     }
 
     try {
-      await saveDeploymentOutput(currentNetwork, output, true, true)
+      await saveDeploymentOutput(initialNetwork, output, true, true)
     } catch (e) {
       logger.error(`Error saving deployment output to file: ${e}`)
     }
